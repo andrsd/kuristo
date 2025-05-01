@@ -1,0 +1,7 @@
+tests:
+  testA:
+    - runner: RunSeq
+
+  testB:
+    - runner: RunMPI
+      n_procs: 4
