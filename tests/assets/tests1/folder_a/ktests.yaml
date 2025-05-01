@@ -1,0 +1,7 @@
+tests:
+  testFA_1:
+    description: "Run a test that requires 4 cores"
+    steps:
+      - uses: core/sequential
+        with:
+          n_cores: 4

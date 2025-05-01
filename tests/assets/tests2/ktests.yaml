@@ -1,7 +1,25 @@
 tests:
   testA:
-    - runner: RunSeq
+    description: "Default run"
+    steps:
+      - uses: core/sequential
 
   testB:
-    - runner: RunMPI
-      n_procs: 4
+    description: "Default test that will use 4 MPI ranks"
+    steps:
+      - uses: core/mpi
+        with:
+          n_procs: 4
+
+  test_oversized:
+    description: "Oversized test that should never be scheduled"
+    steps:
+      - uses: core/sequential
+        with:
+          n_cores: 1000000
+
+  test_skipped:
+    description: "Disabled test"
+    steps:
+      - uses: core/sequential
+        skip: "disabled"

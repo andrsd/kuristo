@@ -1,0 +1,5 @@
+tests:
+  testFB_1:
+    description: "Run shell command"
+    steps:
+      - run: sleep 1
