@@ -28,7 +28,7 @@ class Job:
         self._return_code = None
         Job.ID = Job.ID + 1
         self._id = Job.ID
-        self._name = "job"
+        self._name = "job" + str(self._id)
         self._status = Job.WAITING
 
     def start(self):
