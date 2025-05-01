@@ -14,6 +14,7 @@ class Job:
     WAITING = 0
     RUNNING = 1
     FINISHED = 2
+    SKIPPED = 3
 
     def __init__(self, runner) -> None:
         """
@@ -53,6 +54,13 @@ class Job:
             self._thread.join()
             self._status = Job.FINISHED
 
+    def skip(self, reason=""):
+        """
+        Mark this job as skipped
+        """
+        self._status = Job.SKIPPED
+        self._reason = reason
+
     @property
     def name(self):
         """
@@ -81,8 +89,22 @@ class Job:
         """
         return self._status
 
+    @property
+    def is_processed(self):
+        """
+        Check if the job is processed
+
+        Processed jobs are either finished (i.e. were executed) or skipped (i.e.
+        could not be executed because or their constraints)
+        """
+        return self._status == Job.FINISHED or self._status == Job.SKIPPED
+
+    @property
+    def required_cores(self):
+        # TODO: pull this from the test spec
+        return 1
+
     def _target(self):
-        print(f"Job {self.id} started")
         self._run_process()
         self._run_checks()
         self._status = Job.FINISHED

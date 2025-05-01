@@ -46,6 +46,7 @@ def main():
     tests = parse_spec_files(spec_files)
     rcs = Resources()
     scheduler = Scheduler(tests, rcs)
+    scheduler.check()
     scheduler.run_all_jobs()
 
 if __name__ == "__main__":

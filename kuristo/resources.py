@@ -4,12 +4,16 @@ class Resources:
     """
 
     def __init__(self) -> None:
-        self._n_cores_available = 8
-        self._max_cores = 8
+        self._max_cores = 1
+        self._n_cores_available = self._max_cores
 
     @property
     def available_cores(self):
         return self._n_cores_available
+
+    @property
+    def total_cores(self):
+        return self._max_cores
 
     def allocate_cores(self, n):
         if self._n_cores_available >= n:
