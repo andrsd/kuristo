@@ -1,3 +1,4 @@
+import sys
 import argparse
 import logging
 from .scanner import Scanner
@@ -40,7 +41,7 @@ def main():
     parser = build_arg_parser()
     args = parser.parse_args()
     if args.location is None:
-        raise SystemExit("Must specify at least one location")
+        sys.exit("Must specify at least one location")
 
     spec_files = scan_locations(args.location)
     tests = parse_spec_files(spec_files)

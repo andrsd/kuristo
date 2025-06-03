@@ -19,10 +19,10 @@ class Resources:
         if self._n_cores_available >= n:
             self._n_cores_available = self._n_cores_available - n
         else:
-            raise SystemError("Trying to allocate more core then is available")
+            raise RuntimeError("Trying to allocate more core then is available")
 
     def free_cores(self, n):
         if self._n_cores_available + n <= self._max_cores:
             self._n_cores_available = self._n_cores_available + n
         else:
-            raise SystemError("Trying to free more cores then maximum available cores")
+            raise RuntimeError("Trying to free more cores then maximum available cores")

@@ -1,6 +1,7 @@
 import logging
 import networkx as netx
 import threading
+import sys
 from .job import Job
 
 
@@ -89,7 +90,7 @@ class Scheduler:
         # - find what is depending on what and tell the user
         if not is_dag:
             logging.critical("Detected cyclic dependencies")
-            raise SystemExit("Detected cyclic dependencies")
+            sys.exit("Detected cyclic dependencies")
 
     def _check_oversized_jobs(self):
         """
