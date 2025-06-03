@@ -20,6 +20,6 @@ tests:
 
   test_skipped:
     description: "Disabled test"
+    skip: "disabled"
     steps:
       - uses: core/sequential
-        skip: "disabled"

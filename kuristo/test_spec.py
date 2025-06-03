@@ -9,6 +9,7 @@ class TestSpec:
     def __init__(self, **kwargs) -> None:
         self._description = kwargs.get("description", [])
         self._steps = kwargs.get("steps", [])
+        self._skip = kwargs.get("skip", None)
 
     @staticmethod
     def from_dict(data):
