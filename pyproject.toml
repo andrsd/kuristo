@@ -11,3 +11,6 @@ dependencies = []
 license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.9"
+
+[project.scripts]
+kuristo = "kuristo.__main__:main"
