@@ -156,6 +156,11 @@ class Job:
         for step in self._steps:
             self._logger.log(f'* {step.name}...')
             step.run()
+
+            log_data = step.stdout.decode()
+            for line in log_data.splitlines():
+                self._logger.log(line)
+
             self._logger.log(f'* Finished with return code {step.return_code}')
             self._return_code |= step.return_code
 

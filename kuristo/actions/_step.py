@@ -35,6 +35,13 @@ class Step(ABC):
     def num_cores(self):
         return 1
 
+    @property
+    def stdout(self):
+        """
+        Return stdout of the jobs
+        """
+        return self._stdout
+
     def run(self):
         self._process = self._create_process()
         self._stdout, self._stderr = self._process.communicate()
