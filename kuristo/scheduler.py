@@ -9,6 +9,24 @@ from rich.style import Style
 from .job import Job
 
 
+def human_time(elapsed_time: float) -> str:
+    hours, rem = divmod(elapsed_time, 3600)
+    minutes, seconds = divmod(rem, 60)
+
+    parts = []
+    if hours:
+        parts.append(f"{int(hours)}h")
+    if minutes:
+        parts.append(f"{int(minutes)}m")
+    parts.append(f"{seconds:.2f}s")
+
+    return " ".join(parts)
+
+
+def human_time2(elapsed_time: float) -> str:
+    return f"{elapsed_time:.2f}s"
+
+
 class Scheduler:
     """
     Job scheduler
@@ -103,10 +121,10 @@ class Scheduler:
                 self._progress.console.print(f"[yellow]-[/] Job {job.id} was skipped: [cyan]{job.skip_reason}")
                 self._n_skipped = self._n_skipped + 1
             elif job.return_code == 0:
-                self._progress.console.print(f"[green]✔[/] Job {job.id} finished with return code {job.return_code}")
+                self._progress.console.print(f"[green]✔[/] Job {job.id} finished with return code {job.return_code} [magenta not bold][{human_time2(job.elapsed_time)}][/]")
                 self._n_success = self._n_success + 1
             else:
-                self._progress.console.print(f"[red]x[/] Job {job.id} finished with return code {job.return_code}")
+                self._progress.console.print(f"[red]x[/] Job {job.id} finished with return code {job.return_code} [magenta not bold][{human_time2(job.elapsed_time)}][/]")
                 self._n_failed = self._n_failed + 1
             task_id = self._tasks[job.id]
             self._progress.remove_task(task_id)
@@ -160,6 +178,4 @@ class Scheduler:
         console.print(table)
 
     def _print_time(self, elapsed_time):
-        hours, rem = divmod(elapsed_time, 3600)
-        minutes, seconds = divmod(rem, 60)
-        print(f" Took: {int(hours)}h {int(minutes)}m {seconds:.2f}s")
+        print(f" Took: {human_time(elapsed_time)}")

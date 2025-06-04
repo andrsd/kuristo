@@ -1,5 +1,6 @@
 import threading
 import logging
+import time
 from .test_spec import TestSpec
 from .action_factory import ActionFactory
 
@@ -55,6 +56,7 @@ class Job:
         self._steps = self._build_steps(test_spec)
         if test_spec.skip:
             self.skip(test_spec.skip_reason)
+        self._elapsed_time = 0.
 
     def start(self):
         """
@@ -144,13 +146,23 @@ class Job:
             n_cores = max(n_cores, s.num_cores)
         return n_cores
 
+    @property
+    def elapsed_time(self):
+        """
+        Return time it took to run this job
+        """
+        return self._elapsed_time
+
     def _target(self):
+        start_time = time.perf_counter()
         self._return_code = 0
         if self._skipped:
             self._skip_process()
         else:
             self._run_process()
-        self._finish_process();
+        end_time = time.perf_counter()
+        self._elapsed_time = end_time - start_time
+        self._finish_process()
 
     def _run_process(self):
         for step in self._steps:
