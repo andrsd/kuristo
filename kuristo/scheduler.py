@@ -1,6 +1,7 @@
 import networkx as netx
 import threading
 import sys
+import time
 from rich.progress import (Progress, SpinnerColumn, TextColumn, BarColumn, TimeElapsedColumn)
 from rich.console import Console
 from rich.table import Table
@@ -53,11 +54,15 @@ class Scheduler:
         """
         Run all jobs in the queue
         """
+        start_time = time.perf_counter()
         with self._progress:
             self._schedule_next_job()
             while any(not job.is_processed for job in self._graph.nodes):
                 threading.Event().wait(0.5)
+        end_time = time.perf_counter()
         self._print_stats()
+        print()
+        self._print_time(end_time - start_time)
 
     def _add_job(self, ts):
         """
@@ -153,3 +158,8 @@ class Scheduler:
 
         console = Console()
         console.print(table)
+
+    def _print_time(self, elapsed_time):
+        hours, rem = divmod(elapsed_time, 3600)
+        minutes, seconds = divmod(rem, 60)
+        print(f" Took: {int(hours)}h {int(minutes)}m {seconds:.2f}s")
