@@ -168,9 +168,11 @@ class Scheduler:
         table.add_column("Status", justify="left")
         table.add_column("Count", justify="right")
 
+        total = self._n_success + self._n_failed + self._n_skipped
         table.add_row("[green]✔[/] Success:", f"{self._n_success:,}")
         table.add_row("[red]x[/] Failed:", f"{self._n_failed:,}")
         table.add_row("[yellow]-[/] Skipped:", f"{self._n_skipped:,}")
+        table.add_row("  Total:", f"{total:,}")
 
         console = Console()
         console.print(table)
