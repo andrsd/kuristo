@@ -118,13 +118,13 @@ class Scheduler:
     def _job_completed(self, job):
         with self._lock:
             if job.is_skipped:
-                self._progress.console.print(f"[yellow]-[/] Job {job.id} was skipped: [cyan]{job.skip_reason}")
+                self._progress.console.print(f"[yellow]-[/] [{job.id}] [cyan not bold]{job.name}[/] was skipped: [cyan]{job.skip_reason}")
                 self._n_skipped = self._n_skipped + 1
             elif job.return_code == 0:
-                self._progress.console.print(f"[green]✔[/] Job {job.id} finished with return code {job.return_code} [magenta not bold][{human_time2(job.elapsed_time)}][/]")
+                self._progress.console.print(f"[green]✔[/] [{job.id}] [cyan not bold]{job.name}[/] finished with return code {job.return_code} [magenta not bold][{human_time2(job.elapsed_time)}][/]")
                 self._n_success = self._n_success + 1
             else:
-                self._progress.console.print(f"[red]x[/] Job {job.id} finished with return code {job.return_code} [magenta not bold][{human_time2(job.elapsed_time)}][/]")
+                self._progress.console.print(f"[red]x[/] [{job.id}] [cyan not bold]{job.name}[/] finished with return code {job.return_code} [magenta not bold][{human_time2(job.elapsed_time)}][/]")
                 self._n_failed = self._n_failed + 1
             task_id = self._tasks[job.id]
             self._progress.remove_task(task_id)
