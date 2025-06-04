@@ -43,9 +43,14 @@ class Step(ABC):
         return self._stdout
 
     def run(self):
-        self._process = self._create_process()
-        self._stdout, self._stderr = self._process.communicate()
-        self._return_code = self._process.returncode
+        try:
+            self._process = self._create_process()
+            self._stdout, self._stderr = self._process.communicate()
+            self._return_code = self._process.returncode
+        except:
+            self._stdout = b''
+            self._stderr = b''
+            self._return_code = -1
 
     @abstractmethod
     def _create_process(self) -> subprocess.Popen:
