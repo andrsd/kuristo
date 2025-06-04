@@ -2,6 +2,7 @@ import logging
 import networkx as netx
 import threading
 import sys
+from rich.progress import (Progress, SpinnerColumn, TextColumn, BarColumn, TimeElapsedColumn)
 from .job import Job
 
 
@@ -26,6 +27,14 @@ class Scheduler:
         self._max_concurrent = 4
         self._lock = threading.Lock()
         self._resources = rcs
+        self._progress = Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TimeElapsedColumn(),
+            transient=True
+        )
+        self._tasks = {}
 
     def check(self):
         """
@@ -39,9 +48,10 @@ class Scheduler:
         """
         Run all jobs in the queue
         """
-        self._schedule_next_job()
-        while any(not job.is_processed for job in self._graph.nodes):
-            threading.Event().wait(1)
+        with self._progress:
+            self._schedule_next_job()
+            while any(not job.is_processed for job in self._graph.nodes):
+                threading.Event().wait(0.1)
 
     def _add_job(self, ts):
         """
@@ -70,14 +80,22 @@ class Scheduler:
             for job in ready_jobs:
                 if len(self._active_jobs) < self._max_concurrent:
                     self._active_jobs.add(job)
-                    logging.info(f"Starting job {job.id}...")
+                    task_id = self._progress.add_task(f"[cyan]{job.name}", total=None)
+                    self._tasks[job.id] = task_id
                     job.start()
                 else:
                     break
 
     def _job_completed(self, job):
         with self._lock:
-            logging.info(f'Job {job.id} finished with return code {job.return_code}')
+            # FIXME: condition to determine if job failed of not
+            if True:
+                self._progress.console.print(f"[green]✔[/] Job {job.id} finished with return code {job.return_code}")
+            else:
+                self._progress.console.print(f"[red]x[/] Job {job.id} finished with return code {job.return_code}")
+            task_id = self._tasks[job.id]
+            self._progress.remove_task(task_id)
+            del self._tasks[job.id]
             self._active_jobs.remove(job)
         self._schedule_next_job()
 
@@ -100,7 +118,7 @@ class Scheduler:
         for source in sources:
             for job in netx.dfs_tree(self._graph, source=source):
                 if job.required_cores > self._resources.total_cores:
-                    logging.info(f"Skipping job {job.id} (too big - requires {job.required_cores} cores)")
+                    self._progress.console.print(f"[yellow]-[/] Skipping job {job.id} (too big - requires {job.required_cores} cores)")
                     job.skip(f"Job too big (requires {job.required_cores} cores)")
 
     def _skip_if_skipped_dependencies(self):
@@ -112,5 +130,5 @@ class Scheduler:
             for job in netx.dfs_tree(self._graph, source=source):
                 predecessors = list(self._graph.predecessors(job))
                 if any(dep.status == Job.SKIPPED for dep in predecessors):
-                    logging.info(f"Skipping job {job.id} (skipped dependency)")
+                    self._progress.console.print(f"[yellow]-[/] Skipping job {job.id} (skipped dependency)")
                     job.skip("Skipped dependency")

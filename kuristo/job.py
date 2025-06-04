@@ -122,4 +122,6 @@ class Job:
     @staticmethod
     def from_spec(ts):
         runner = Runner()
-        return Job(runner)
+        job = Job(runner)
+        job._name = ts._name
+        return job

@@ -11,6 +11,13 @@ tests:
         with:
           n_procs: 4
 
+  testC:
+    description: "Another test that will use 4 MPI ranks"
+    steps:
+      - uses: core/mpi
+        with:
+          n_procs: 4
+
   test_oversized:
     description: "Oversized test that should never be scheduled"
     steps:
