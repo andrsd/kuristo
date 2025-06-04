@@ -139,8 +139,10 @@ class Job:
 
     @property
     def required_cores(self):
-        # TODO: pull this from the test spec
-        return 1
+        n_cores = 1
+        for s in self._steps:
+            n_cores = max(n_cores, s.num_cores)
+        return n_cores
 
     def _target(self):
         self._return_code = 0

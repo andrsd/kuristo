@@ -127,7 +127,6 @@ class Scheduler:
         for source in sources:
             for job in netx.dfs_tree(self._graph, source=source):
                 if job.required_cores > self._resources.total_cores:
-                    self._progress.console.print(f"[yellow]-[/] Skipping job {job.id} (too big - requires {job.required_cores} cores)")
                     job.skip(f"Job too big (requires {job.required_cores} cores)")
                     self._n_skipped = self._n_skipped + 1
 
@@ -140,7 +139,6 @@ class Scheduler:
             for job in netx.dfs_tree(self._graph, source=source):
                 predecessors = list(self._graph.predecessors(job))
                 if any(dep.is_skipped for dep in predecessors):
-                    self._progress.console.print(f"[yellow]-[/] Skipping job {job.id} (skipped dependency)")
                     job.skip("Skipped dependency")
                     self._n_skipped = self._n_skipped + 1
 

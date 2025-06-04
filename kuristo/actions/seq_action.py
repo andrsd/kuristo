@@ -9,6 +9,11 @@ class SeqAction(Step):
 
     def __init__(self, name, **kwargs) -> None:
         super().__init__(name)
+        self._n_cores = kwargs.get("n_cores", 1)
+
+    @property
+    def num_cores(self):
+        return self._n_cores
 
     def _create_process(self) -> subprocess.Popen:
         # return subprocess.Popen(["echo", "seq"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)

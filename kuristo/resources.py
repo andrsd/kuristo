@@ -4,7 +4,7 @@ class Resources:
     """
 
     def __init__(self) -> None:
-        self._max_cores = 1
+        self._max_cores = 4
         self._n_cores_available = self._max_cores
 
     @property
