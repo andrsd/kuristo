@@ -3,6 +3,8 @@ import networkx as netx
 import threading
 import sys
 from rich.progress import (Progress, SpinnerColumn, TextColumn, BarColumn, TimeElapsedColumn)
+from rich.console import Console
+from rich.table import Table
 from .job import Job
 
 
@@ -35,6 +37,9 @@ class Scheduler:
             transient=True
         )
         self._tasks = {}
+        self._n_success = 0
+        self._n_failed = 0
+        self._n_skipped = 0
 
     def check(self):
         """
@@ -52,6 +57,7 @@ class Scheduler:
             self._schedule_next_job()
             while any(not job.is_processed for job in self._graph.nodes):
                 threading.Event().wait(0.1)
+        self._print_stats()
 
     def _add_job(self, ts):
         """
@@ -91,8 +97,10 @@ class Scheduler:
             # FIXME: condition to determine if job failed of not
             if True:
                 self._progress.console.print(f"[green]✔[/] Job {job.id} finished with return code {job.return_code}")
+                self._n_success = self._n_success + 1
             else:
                 self._progress.console.print(f"[red]x[/] Job {job.id} finished with return code {job.return_code}")
+                self._n_failed = self._n_failed + 1
             task_id = self._tasks[job.id]
             self._progress.remove_task(task_id)
             del self._tasks[job.id]
@@ -120,6 +128,7 @@ class Scheduler:
                 if job.required_cores > self._resources.total_cores:
                     self._progress.console.print(f"[yellow]-[/] Skipping job {job.id} (too big - requires {job.required_cores} cores)")
                     job.skip(f"Job too big (requires {job.required_cores} cores)")
+                    self._n_skipped = self._n_skipped + 1
 
     def _skip_if_skipped_dependencies(self):
         """
@@ -132,3 +141,16 @@ class Scheduler:
                 if any(dep.status == Job.SKIPPED for dep in predecessors):
                     self._progress.console.print(f"[yellow]-[/] Skipping job {job.id} (skipped dependency)")
                     job.skip("Skipped dependency")
+                    self._n_skipped = self._n_skipped + 1
+
+    def _print_stats(self):
+        table = Table(show_header=False, box=None)
+        table.add_column("Status", justify="left")
+        table.add_column("Count", justify="right")
+
+        table.add_row("[green]✔[/] Success:", f"{self._n_success:,}")
+        table.add_row("[red]x[/] Failed:", f"{self._n_failed:,}")
+        table.add_row("[yellow]-[/] Skipped:", f"{self._n_skipped:,}")
+
+        console = Console()
+        console.print(table)
