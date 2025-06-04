@@ -8,8 +8,18 @@ tests:
           echo "Hi!"
 
       - name: Print to stderr
-        run: |
-          echo "Hi stderr!" >&2
+        run: echo "Hi stderr!" >&2
 
-      - run: |
-          echo "Anynomous step"
+      - run: echo "Anynomous step"
+
+  test-that-fails:
+    description: "Failing test"
+    steps:
+      - name: Step 1
+        run: echo "Step 1"
+
+      - name: Failed step
+        run: exit 1
+
+      - name: Last step
+        run: echo "Last"
