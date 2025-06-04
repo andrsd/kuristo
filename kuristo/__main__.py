@@ -1,10 +1,18 @@
 import sys
 import argparse
-import logging
+import yaml
 from .scanner import Scanner
 from .test_spec import TestSpec
 from .scheduler import Scheduler
 from .resources import Resources
+from .action_factory import ActionFactory
+from .actions.mpi_action import MPIAction
+from .actions.seq_action import SeqAction
+
+
+def register_actions():
+    ActionFactory.register("core/sequential", SeqAction)
+    ActionFactory.register("core/mpi", MPIAction)
 
 
 def build_arg_parser():
@@ -25,30 +33,41 @@ def scan_locations(locations):
     return spec_files
 
 
-def parse_spec_files(spec_files):
+def tests_from_file(file_path):
+    test_specs = []
+    with open(file_path, 'r') as file:
+        data = yaml.safe_load(file)
+        tests = data.get('tests', {})
+        for t, params in tests.items():
+            test_specs.append(TestSpec.from_dict(t, params))
+    return test_specs
+
+
+def parse_tests_files(spec_files):
     """
-    Parse test specification files
+    Parse test files (ktests.yaml)
     """
     tests = []
     for file in spec_files:
-        tests.extend(TestSpec.from_file(file))
+        tests.extend(tests_from_file(file))
     return tests
 
 
 def main():
-    logging.basicConfig(level=logging.INFO)
+    register_actions()
 
     parser = build_arg_parser()
     args = parser.parse_args()
     if args.location is None:
         sys.exit("Must specify at least one location")
 
-    spec_files = scan_locations(args.location)
-    tests = parse_spec_files(spec_files)
+    tests_files = scan_locations(args.location)
+    tests = parse_tests_files(tests_files)
     rcs = Resources()
     scheduler = Scheduler(tests, rcs)
     scheduler.check()
     scheduler.run_all_jobs()
+
 
 if __name__ == "__main__":
     main()

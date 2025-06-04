@@ -1,4 +1,3 @@
-import logging
 import networkx as netx
 import threading
 import sys
@@ -57,7 +56,7 @@ class Scheduler:
         with self._progress:
             self._schedule_next_job()
             while any(not job.is_processed for job in self._graph.nodes):
-                threading.Event().wait(0.1)
+                threading.Event().wait(0.5)
         self._print_stats()
 
     def _add_job(self, ts):
@@ -95,8 +94,10 @@ class Scheduler:
 
     def _job_completed(self, job):
         with self._lock:
-            # FIXME: condition to determine if job failed of not
-            if True:
+            if job.is_skipped:
+                self._progress.console.print(f"[yellow]-[/] Job {job.id} was skipped: [cyan]{job.skip_reason}")
+                self._n_skipped = self._n_skipped + 1
+            elif job.return_code == 0:
                 self._progress.console.print(f"[green]✔[/] Job {job.id} finished with return code {job.return_code}")
                 self._n_success = self._n_success + 1
             else:
@@ -116,7 +117,6 @@ class Scheduler:
         # TODO: improve this
         # - find what is depending on what and tell the user
         if not is_dag:
-            logging.critical("Detected cyclic dependencies")
             sys.exit("Detected cyclic dependencies")
 
     def _check_oversized_jobs(self):
@@ -139,7 +139,7 @@ class Scheduler:
         for source in sources:
             for job in netx.dfs_tree(self._graph, source=source):
                 predecessors = list(self._graph.predecessors(job))
-                if any(dep.status == Job.SKIPPED for dep in predecessors):
+                if any(dep.is_skipped for dep in predecessors):
                     self._progress.console.print(f"[yellow]-[/] Skipping job {job.id} (skipped dependency)")
                     job.skip("Skipped dependency")
                     self._n_skipped = self._n_skipped + 1

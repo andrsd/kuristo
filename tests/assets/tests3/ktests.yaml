@@ -1,0 +1,15 @@
+tests:
+  test-stdout-stderr:
+    description: "Print to stdout and stderr"
+    steps:
+      - name: Print to stdout
+        run: |
+          echo "Hello!"
+          echo "Hi!"
+
+      - name: Print to stderr
+        run: |
+          echo "Hi stderr!" >&2
+
+      - run: |
+          echo "Anynomous step"

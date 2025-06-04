@@ -1,28 +1,115 @@
-import yaml
 
 
 class TestSpec:
     """
-    Test specification
+    Data class with a test specification
     """
+
+    class Step:
+        """
+        Data class with description of a step
+        """
+
+        def __init__(self, **kwargs):
+            self._description = kwargs.get("description", "")
+            self._name = kwargs.get("name", None)
+            self._uses = kwargs.get("uses", None)
+            self._with = kwargs.get("with", {})
+            self._run = kwargs.get("run", None)
+            self._shell = kwargs.get("shell", "sh")
+            self._id = kwargs.get("id", None)
+
+        @property
+        def name(self):
+            """
+            Return step name
+            """
+            return self._name
+
+        @property
+        def uses(self):
+            """
+            Return the action name that is used by the step
+            """
+            return self._uses
+
+        @property
+        def run(self):
+            """
+            Return the "script" that should be executed
+            """
+            return self._run
+
+        @property
+        def id(self):
+            """
+            Return the step ID
+            """
+            return self._id
+
+        @property
+        def params(self):
+            """
+            Return the step ID
+            """
+            return self._with
+
+        @staticmethod
+        def from_dict(**kwargs):
+            step = TestSpec.Step(**kwargs)
+            return step
 
     def __init__(self, name, **kwargs) -> None:
         self._name = name
-        self._description = kwargs.get("description", [])
-        self._steps = kwargs.get("steps", [])
+        self._description = kwargs.get("description", "")
+        self._steps = self._build_steps(kwargs.get("steps"))
         self._skip = kwargs.get("skip", None)
+
+    @property
+    def name(self):
+        """
+        Return test name
+        """
+        return self._name
+
+    @property
+    def steps(self):
+        """
+        Return test steps
+        """
+        return self._steps
+
+    @property
+    def description(self):
+        """
+        Return test description
+        """
+        return self._description
+
+    @property
+    def skip(self):
+        """
+        Should the test be skipped?
+        """
+        return self._skip is not None
+
+    @property
+    def skip_reason(self):
+        """
+        Return the reason why test is marked as skipped
+        """
+        return self._skip
+
+    def _build_steps(self, data):
+        """
+        Build test steps
+        """
+        steps = []
+        for entry in data:
+            steps.append(self.Step.from_dict(**entry))
+        return steps
 
     @staticmethod
     def from_dict(name, data):
         ts = TestSpec(name, **data)
         return ts
-
-    @staticmethod
-    def from_file(file_path):
-        test_specs = []
-        with open(file_path, 'r') as file:
-            data = yaml.safe_load(file)
-            tests = data.get('tests', {})
-            for t, params in tests.items():
-                test_specs.append(TestSpec.from_dict(t, params))
-        return test_specs

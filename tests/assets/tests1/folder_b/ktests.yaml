@@ -1,5 +1,6 @@
 tests:
-  testFB_1:
+  test-fb-1:
     description: "Run shell command"
     steps:
-      - run: sleep 1
+      - name: Sleep for 1 sec
+        run: sleep 1

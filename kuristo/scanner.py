@@ -1,5 +1,4 @@
 import os
-import logging
 
 
 class Scanner:
@@ -23,7 +22,6 @@ class Scanner:
         """
         Scan the location
         """
-        logging.debug(f'Scanning {self._location}...')
         specs = []
         for root, dirs, files in os.walk(self._location):
             if Scanner.FILENAME in files:

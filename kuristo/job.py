@@ -1,6 +1,7 @@
-import subprocess
 import threading
-from .runner import Runner
+import logging
+from .test_spec import TestSpec
+from .action_factory import ActionFactory
 
 
 class Job:
@@ -14,23 +15,46 @@ class Job:
     WAITING = 0
     RUNNING = 1
     FINISHED = 2
-    SKIPPED = 3
 
-    def __init__(self, runner) -> None:
+    class Logger:
         """
-        @param runner Runner that will execute the job
+        Simple encapsulation to simplify job logging into a file
         """
+
+        def __init__(self, id, log_file):
+            self._logger = logging.getLogger(f"JobLogger-{id}")
+            self._logger.setLevel(logging.INFO)
+            formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+
+            file_handler = logging.FileHandler(log_file, mode='w')
+            file_handler.setFormatter(formatter)
+            self._logger.addHandler(file_handler)
+
+        def log(self, message):
+            self._logger.info(message)
+
+    def __init__(self, test_spec: TestSpec) -> None:
+        """
+        @param test_spec Test specification
+        """
+        Job.ID = Job.ID + 1
+        self._id = Job.ID
         self._on_finish_callback = None
-        self._runner = runner
         self._thread = None
         self._process = None
         self._stdout = None
         self._stderr = None
+        self._logger = self.Logger(self._id, f'job-{self._id}.log')
         self._return_code = None
-        Job.ID = Job.ID + 1
-        self._id = Job.ID
-        self._name = "job" + str(self._id)
+        if test_spec.name is None:
+            self._name = "job" + str(self._id)
+        else:
+            self._name = test_spec.name
         self._status = Job.WAITING
+        self._skipped = False
+        self._steps = self._build_steps(test_spec)
+        if test_spec.skip:
+            self.skip(test_spec.skip_reason)
 
     def start(self):
         """
@@ -54,12 +78,15 @@ class Job:
             self._thread.join()
             self._status = Job.FINISHED
 
-    def skip(self, reason=""):
+    def skip(self, reason=None):
         """
         Mark this job as skipped
         """
-        self._status = Job.SKIPPED
-        self._reason = reason
+        self._skipped = True
+        if reason is None:
+            self._skip_reason = "skipped"
+        else:
+            self._skip_reason = reason
 
     @property
     def name(self):
@@ -90,14 +117,25 @@ class Job:
         return self._status
 
     @property
+    def is_skipped(self):
+        """
+        Return `True` if the job should be skipped
+        """
+        return self._skipped
+
+    @property
+    def skip_reason(self):
+        """
+        Return skip reason
+        """
+        return self._skip_reason
+
+    @property
     def is_processed(self):
         """
         Check if the job is processed
-
-        Processed jobs are either finished (i.e. were executed) or skipped (i.e.
-        could not be executed because or their constraints)
         """
-        return self._status == Job.FINISHED or self._status == Job.SKIPPED
+        return self._status == Job.FINISHED
 
     @property
     def required_cores(self):
@@ -105,23 +143,37 @@ class Job:
         return 1
 
     def _target(self):
-        self._run_process()
-        self._run_checks()
+        self._return_code = 0
+        if self._skipped:
+            self._skip_process()
+        else:
+            self._run_process()
+        self._finish_process();
+
+    def _run_process(self):
+        for step in self._steps:
+            self._logger.log(f'* {step.name}...')
+            step.run()
+            self._logger.log(f'* Finished with return code {step.return_code}')
+            self._return_code |= step.return_code
+
+    def _skip_process(self):
+        self._logger.log(f'* {self.name} was skipped: {self.skip_reason}')
+
+    def _finish_process(self):
         self._status = Job.FINISHED
         if self._on_finish_callback is not None:
             self._on_finish_callback(self)
 
-    def _run_process(self):
-        self._process = subprocess.Popen(self._runner.command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        self._stdout, self._stderr = self._process.communicate()
-        self._return_code = self._process.returncode
-
-    def _run_checks(self):
-        pass
+    def _build_steps(self, test_spec):
+        steps = []
+        for step in test_spec.steps:
+            action = ActionFactory.create(step)
+            if action is not None:
+                steps.append(action)
+        return steps
 
     @staticmethod
     def from_spec(ts):
-        runner = Runner()
-        job = Job(runner)
-        job._name = ts._name
+        job = Job(ts)
         return job
