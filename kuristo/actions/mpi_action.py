@@ -16,6 +16,5 @@ class MPIAction(Step):
         return self._n_ranks
 
     def _create_process(self) -> subprocess.Popen:
-        # cmd = ["mpirun", "-np", self._n_ranks, "echo", "\"seq\""]
-        # return subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        return subprocess.Popen("echo", shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        cmd = ["mpirun", "-np", f'{self._n_ranks}', "echo", "A"]
+        return subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)

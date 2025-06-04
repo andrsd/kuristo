@@ -16,5 +16,5 @@ class SeqAction(Step):
         return self._n_cores
 
     def _create_process(self) -> subprocess.Popen:
-        # return subprocess.Popen(["echo", "seq"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        return subprocess.Popen('echo "seq"', shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        cmd = ["echo", "seq"]
+        return subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
