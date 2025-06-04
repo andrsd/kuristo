@@ -5,6 +5,7 @@ import sys
 from rich.progress import (Progress, SpinnerColumn, TextColumn, BarColumn, TimeElapsedColumn)
 from rich.console import Console
 from rich.table import Table
+from rich.style import Style
 from .job import Job
 
 
@@ -32,7 +33,7 @@ class Scheduler:
         self._progress = Progress(
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
-            BarColumn(),
+            BarColumn(style=Style(color="grey23"), pulse_style=Style(color="grey46")),
             TimeElapsedColumn(),
             transient=True
         )
