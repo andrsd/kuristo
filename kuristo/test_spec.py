@@ -18,6 +18,7 @@ class TestSpec:
             self._run = kwargs.get("run", None)
             self._shell = kwargs.get("shell", "sh")
             self._id = kwargs.get("id", None)
+            self._work_dir = kwargs.get("working-directory", None)
 
         @property
         def name(self):
@@ -46,6 +47,13 @@ class TestSpec:
             Return the step ID
             """
             return self._id
+
+        @property
+        def working_directory(self):
+            """
+            Return the step working directory
+            """
+            return self._work_dir
 
         @property
         def params(self):

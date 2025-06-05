@@ -11,9 +11,17 @@ class ActionFactory:
     @staticmethod
     def create(ts):
         if ts.uses is None:
-            return ShellAction(ts.name, ts.run)
+            return ShellAction(
+                ts.name,
+                ts.working_directory,
+                ts.run
+            )
         elif ts.uses in ActionFactory.registered_actions:
-            return ActionFactory.registered_actions[ts.uses](ts.name, **ts.params)
+            return ActionFactory.registered_actions[ts.uses](
+                ts.name,
+                ts.working_directory,
+                **ts.params
+            )
         else:
             raise RuntimeError(f"Requested unknown action: {ts.uses}")
 

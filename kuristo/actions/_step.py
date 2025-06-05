@@ -7,7 +7,8 @@ class Step(ABC):
     Base class for job step
     """
 
-    def __init__(self, name) -> None:
+    def __init__(self, name, cwd=None) -> None:
+        self._cwd = cwd
         self._process = None
         self._stdout = None
         self._stderr = None
@@ -44,7 +45,15 @@ class Step(ABC):
 
     def run(self):
         try:
-            self._process = self._create_process()
+            self._process = subprocess.Popen(
+                self._create_command(),
+                shell=True,
+                cwd=self._cwd,
+                env=None,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
+            )
+
             self._stdout, self._stderr = self._process.communicate()
             self._return_code = self._process.returncode
         except:
@@ -53,5 +62,5 @@ class Step(ABC):
             self._return_code = -1
 
     @abstractmethod
-    def _create_process(self) -> subprocess.Popen:
+    def _create_command(self) -> str:
         pass

@@ -23,3 +23,10 @@ tests:
 
       - name: Last step
         run: echo "Last"
+
+  test-cwd:
+    description: "Test in different working directory"
+    steps:
+      - name: Step 1
+        working-directory: /tmp
+        run: "echo $PWD"
