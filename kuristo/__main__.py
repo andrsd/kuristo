@@ -8,7 +8,7 @@ from .resources import Resources
 from .action_factory import ActionFactory
 from .actions.mpi_action import MPIAction
 from .actions.seq_action import SeqAction
-
+from ._plugin_loader import load_user_steps_from_kuristo_dir
 
 def register_actions():
     ActionFactory.register("core/sequential", SeqAction)
@@ -55,6 +55,7 @@ def parse_tests_files(spec_files):
 
 def main():
     register_actions()
+    load_user_steps_from_kuristo_dir()
 
     parser = build_arg_parser()
     args = parser.parse_args()

@@ -1,5 +1,6 @@
 from .actions.shell import ShellAction
-
+from .actions.function import FunctionStep
+from .registry import get_step
 
 class ActionFactory:
     """
@@ -20,6 +21,13 @@ class ActionFactory:
             return ActionFactory.registered_actions[ts.uses](
                 ts.name,
                 ts.working_directory,
+                **ts.params
+            )
+        elif get_step(ts.uses):
+            return FunctionStep(
+                ts.name,
+                ts.working_directory,
+                ts.uses,
                 **ts.params
             )
         else:
