@@ -2,8 +2,14 @@ tests:
   test-user-registered-step:
     description: Run test with a user-registered step
     steps:
-      - name: Run test
-        uses: run_simulation
+      - name: Run user-defined step
+        uses: app-name/run-me
+        with:
+          input: input_file.inp
+          output: result.out
+
+      - name: Run user-defined action
+        uses: app-name/custom-step
         with:
           input: input_file.inp
           output: result.out

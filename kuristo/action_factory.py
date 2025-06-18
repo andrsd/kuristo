@@ -1,6 +1,7 @@
 from .actions.shell import ShellAction
 from .actions.function import FunctionStep
-from .registry import get_step
+from .registry import get_step, get_action
+
 
 class ActionFactory:
     """
@@ -19,6 +20,13 @@ class ActionFactory:
             )
         elif ts.uses in ActionFactory.registered_actions:
             return ActionFactory.registered_actions[ts.uses](
+                ts.name,
+                ts.working_directory,
+                **ts.params
+            )
+        elif get_action(ts.uses):
+            cls = get_action(ts.uses)
+            return cls(
                 ts.name,
                 ts.working_directory,
                 **ts.params

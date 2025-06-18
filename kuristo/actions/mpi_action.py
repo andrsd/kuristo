@@ -1,4 +1,4 @@
-from ._step import Step
+from .._step import Step
 
 
 class MPIAction(Step):

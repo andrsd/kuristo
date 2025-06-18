@@ -1,4 +1,4 @@
-from ._step import Step
+from .._step import Step
 
 
 class SeqAction(Step):
@@ -15,5 +15,5 @@ class SeqAction(Step):
         return self._n_cores
 
     def _create_command(self) -> str:
-        command = f'echo seq'
+        command = 'echo seq'
         return command

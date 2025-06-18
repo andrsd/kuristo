@@ -1,7 +1,8 @@
 from ..registry import get_step
-from ._step import Step
+from .._step import Step
 from io import StringIO
 import contextlib
+
 
 class FunctionStep(Step):
     def __init__(self, name, cwd, func_name, **params):

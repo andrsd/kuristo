@@ -10,6 +10,7 @@ from .actions.mpi_action import MPIAction
 from .actions.seq_action import SeqAction
 from ._plugin_loader import load_user_steps_from_kuristo_dir
 
+
 def register_actions():
     ActionFactory.register("core/sequential", SeqAction)
     ActionFactory.register("core/mpi", MPIAction)
