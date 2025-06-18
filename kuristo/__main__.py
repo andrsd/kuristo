@@ -1,6 +1,8 @@
 import sys
 import argparse
 import yaml
+import re
+import shutil
 from datetime import datetime
 from pathlib import Path
 from .config import Config
@@ -13,6 +15,8 @@ from .actions.mpi_action import MPIAction
 from .actions.seq_action import SeqAction
 from ._plugin_loader import load_user_steps_from_kuristo_dir
 
+
+RUN_DIR_PATTERN = re.compile(r"\d{8}_\d{6}")
 
 def register_actions():
     ActionFactory.register("core/sequential", SeqAction)
@@ -66,22 +70,30 @@ def create_run_output_dir(base_log_dir: Path) -> Path:
     return run_dir
 
 
-def update_latest_symlink(base_log_dir: Path, latest_run_dir: Path):
+def update_latest_symlink(runs_dir: Path, latest_run_dir: Path):
     """
     Create or update a symlink named 'latest' inside base_log_dir that points to latest_run_dir.
     """
-    latest_link = base_log_dir / "runs" / "latest"
-    print(latest_link)
+    latest_link = runs_dir / "latest"
     if latest_link.exists() or latest_link.is_symlink():
         latest_link.unlink()
-    relative_target = latest_run_dir.relative_to(base_log_dir / "runs")
+    relative_target = latest_run_dir.relative_to(runs_dir)
     latest_link.symlink_to(relative_target, target_is_directory=True)
+
+
+def prune_old_runs(runs_dir: Path, keep_last_n: int):
+    run_dirs = [d for d in runs_dir.iterdir() if d.is_dir() and RUN_DIR_PATTERN.match(d.name)]
+    run_dirs.sort(key=lambda d: d.stat().st_mtime, reverse=True)
+    for old_run in run_dirs[keep_last_n:]:
+        shutil.rmtree(old_run)
 
 
 def main():
     config = Config()
     log_dir = create_run_output_dir(config.log_dir)
-    update_latest_symlink(config.log_dir, log_dir)
+    runs_dir = config.log_dir / "runs"
+    prune_old_runs(runs_dir, config.log_history)
+    update_latest_symlink(runs_dir, log_dir)
 
     register_actions()
     load_user_steps_from_kuristo_dir()
