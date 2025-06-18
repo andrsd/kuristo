@@ -2,6 +2,7 @@ import networkx as netx
 import threading
 import sys
 import time
+from pathlib import Path
 from rich.progress import (Progress, SpinnerColumn, TextColumn, BarColumn, TimeElapsedColumn)
 from rich.console import Console
 from rich.table import Table
@@ -36,12 +37,13 @@ class Scheduler:
     new one(s). We run until all jobs have FINISHED status.
     """
 
-    def __init__(self, tests, rcs) -> None:
+    def __init__(self, tests, rcs, log_dir) -> None:
         """
         @param tests; [TestSpec] List of test speecifications
         @param rcs: Resources Resource to be scheduled
         """
         self._graph = netx.DiGraph()
+        self._log_dir = Path(log_dir)
         for ts in tests:
             self._add_job(ts)
         self._active_jobs = set()
@@ -72,6 +74,7 @@ class Scheduler:
         """
         Run all jobs in the queue
         """
+        self._create_log_dir()
         start_time = time.perf_counter()
         with self._progress:
             self._schedule_next_job()
@@ -86,7 +89,7 @@ class Scheduler:
         """
         Add a job into the graph
         """
-        job = Job.from_spec(ts)
+        job = Job.from_spec(ts, self._log_dir)
         job.set_on_finish(self._job_completed)
         self._graph.add_node(job)
         # TODO: add job dependencies
@@ -179,3 +182,6 @@ class Scheduler:
 
     def _print_time(self, elapsed_time):
         print(f" Took: {human_time(elapsed_time)}")
+
+    def _create_log_dir(self):
+        self._log_dir.mkdir(parents=True, exist_ok=True)

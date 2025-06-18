@@ -1,6 +1,8 @@
 import sys
 import argparse
 import yaml
+from datetime import datetime
+from pathlib import Path
 from .config import Config
 from .scanner import Scanner
 from .test_spec import TestSpec
@@ -55,8 +57,31 @@ def parse_tests_files(spec_files):
     return tests
 
 
+def create_run_output_dir(base_log_dir: Path) -> Path:
+    runs_dir = base_log_dir / "runs"
+    runs_dir.mkdir(parents=True, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    run_dir = runs_dir / timestamp
+    run_dir.mkdir()
+    return run_dir
+
+
+def update_latest_symlink(base_log_dir: Path, latest_run_dir: Path):
+    """
+    Create or update a symlink named 'latest' inside base_log_dir that points to latest_run_dir.
+    """
+    latest_link = base_log_dir / "runs" / "latest"
+    print(latest_link)
+    if latest_link.exists() or latest_link.is_symlink():
+        latest_link.unlink()
+    relative_target = latest_run_dir.relative_to(base_log_dir / "runs")
+    latest_link.symlink_to(relative_target, target_is_directory=True)
+
+
 def main():
     config = Config()
+    log_dir = create_run_output_dir(config.log_dir)
+    update_latest_symlink(config.log_dir, log_dir)
 
     register_actions()
     load_user_steps_from_kuristo_dir()
@@ -69,7 +94,7 @@ def main():
     tests_files = scan_locations(args.location)
     tests = parse_tests_files(tests_files)
     rcs = Resources()
-    scheduler = Scheduler(tests, rcs)
+    scheduler = Scheduler(tests, rcs, log_dir)
     scheduler.check()
     scheduler.run_all_jobs()
 

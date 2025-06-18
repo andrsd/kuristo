@@ -1,6 +1,7 @@
 import threading
 import logging
 import time
+from pathlib import Path
 from .test_spec import TestSpec
 from .action_factory import ActionFactory
 
@@ -34,7 +35,7 @@ class Job:
         def log(self, message):
             self._logger.info(message)
 
-    def __init__(self, test_spec: TestSpec) -> None:
+    def __init__(self, test_spec: TestSpec, log_dir: Path) -> None:
         """
         @param test_spec Test specification
         """
@@ -45,7 +46,10 @@ class Job:
         self._process = None
         self._stdout = None
         self._stderr = None
-        self._logger = self.Logger(self._id, f'job-{self._id}.log')
+        self._logger = self.Logger(
+            self._id,
+            log_dir / f'job-{self._id}.log'
+        )
         self._return_code = None
         if test_spec.name is None:
             self._name = "job" + str(self._id)
@@ -193,6 +197,6 @@ class Job:
         return steps
 
     @staticmethod
-    def from_spec(ts):
-        job = Job(ts)
+    def from_spec(ts, log_dir):
+        job = Job(ts, log_dir=log_dir)
         return job
