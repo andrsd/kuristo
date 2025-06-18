@@ -1,0 +1,3 @@
+log:
+  history: 2
+  cleanup: always

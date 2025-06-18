@@ -1,6 +1,7 @@
 import sys
 import argparse
 import yaml
+from .config import Config
 from .scanner import Scanner
 from .test_spec import TestSpec
 from .scheduler import Scheduler
@@ -55,6 +56,8 @@ def parse_tests_files(spec_files):
 
 
 def main():
+    config = Config()
+
     register_actions()
     load_user_steps_from_kuristo_dir()
 
