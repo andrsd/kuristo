@@ -7,6 +7,7 @@ from rich.progress import (Progress, SpinnerColumn, TextColumn, BarColumn, TimeE
 from rich.console import Console
 from rich.table import Table
 from rich.style import Style
+from rich.panel import Panel
 from .job import Job
 
 
@@ -172,21 +173,18 @@ class Scheduler:
                     job.skip("Skipped dependency")
 
     def _print_stats(self):
-        table = Table(show_header=False, box=None)
-        table.add_column("Status", justify="left")
-        table.add_column("Count", justify="right")
-
         total = self._n_success + self._n_failed + self._n_skipped
-        table.add_row("[green]✔[/] Success:", f"{self._n_success:,}")
-        table.add_row("[red]x[/] Failed:", f"{self._n_failed:,}")
-        table.add_row("[yellow]-[/] Skipped:", f"{self._n_skipped:,}")
-        table.add_row("  Total:", f"{total:,}")
 
         console = Console()
-        console.print(table)
+        console.print(
+            f"[green]✔[/] Success: [green]{self._n_success:,}[/]    "
+            f"[red]x[/] Failed: [red]{self._n_failed:,}[/]    "
+            f"[yellow]-[/] Skipped: [yellow]{self._n_skipped:,}[/]    "
+            f"Total: {total}"
+        )
 
     def _print_time(self, elapsed_time):
-        print(f" Took: {human_time(elapsed_time)}")
+        print(f"  Took: {human_time(elapsed_time)}")
 
     def _create_log_dir(self):
         self._log_dir.mkdir(parents=True, exist_ok=True)
