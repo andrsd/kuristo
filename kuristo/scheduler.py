@@ -146,10 +146,13 @@ class Scheduler:
         Check that jobs don't depend on each other
         """
         is_dag = netx.is_directed_acyclic_graph(self._graph)
-        # TODO: improve this
-        # - find what is depending on what and tell the user
         if not is_dag:
-            sys.exit("Detected cyclic dependencies")
+            try:
+                cycle = netx.find_cycle(self._graph)
+                readable = " → ".join(job.name for job, _ in cycle)
+                sys.exit(f"Detected cyclic dependency: {readable}")
+            except netx.exception.NetworkXNoCycle:
+                sys.exit("Detected cyclic dependency")
 
     def _check_oversized_jobs(self):
         """
