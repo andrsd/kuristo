@@ -10,7 +10,7 @@ authors = [{ name = "David Andrs", email = "andrsd@gmail.com" }]
 dependencies = []
 license = { text = "MIT" }
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 
 [project.scripts]
 kuristo = "kuristo.__main__:main"

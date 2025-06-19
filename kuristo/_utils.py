@@ -50,3 +50,30 @@ def parse_tests_files(spec_files):
     for file in spec_files:
         tests.extend(tests_from_file(file))
     return tests
+
+
+def resolve_path(path_str, source_root, build_root):
+    """
+    Resolve path
+    """
+
+    if os.path.isabs(path_str):
+        return path_str
+
+    if path_str.startswith("source:"):
+        rel_path = path_str[len("source:") :]
+        return os.path.join(source_root, rel_path)
+
+    if path_str.startswith("build:"):
+        rel_path = path_str[len("build:") :]
+        return os.path.join(build_root, rel_path)
+
+    # Heuristic fallback
+    candidate = os.path.join(build_root, path_str)
+    if os.path.exists(candidate):
+        return candidate
+    candidate = os.path.join(source_root, path_str)
+    if os.path.exists(candidate):
+        return candidate
+
+    raise FileNotFoundError(f"Could not resolve path: {path_str}")

@@ -171,6 +171,9 @@ class Job:
     def _run_process(self):
         for step in self._steps:
             self._logger.log(f'* {step.name}...')
+            cmd = step.command
+            if cmd:
+                self._logger.log(f'> {cmd}...')
             step.run()
 
             log_data = step.stdout.decode()

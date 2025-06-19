@@ -1,6 +1,8 @@
 from .._step import Step
+from kuristo import action
 
 
+@action("core/sequential")
 class SeqAction(Step):
     """
     Run a sequential command
@@ -14,6 +16,6 @@ class SeqAction(Step):
     def num_cores(self):
         return self._n_cores
 
-    def _create_command(self) -> str:
+    def _create_command(self):
         command = 'echo seq'
         return command

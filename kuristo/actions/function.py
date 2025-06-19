@@ -30,4 +30,4 @@ class FunctionStep(Step):
             self._return_code = 1
 
     def _create_command(self):
-        raise NotImplementedError("FunctionStep does not use shell commands.")
+        return None

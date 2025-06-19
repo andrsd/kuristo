@@ -10,5 +10,5 @@ class ShellAction(Step):
         super().__init__(name, cwd)
         self._commands = commands
 
-    def _create_command(self) -> str:
+    def _create_command(self):
         return self._commands

@@ -1,6 +1,8 @@
 from .._step import Step
+from kuristo import action
 
 
+@action("core/mpi")
 class MPIAction(Step):
     """
     Run an MPI command
@@ -14,6 +16,6 @@ class MPIAction(Step):
     def num_cores(self):
         return self._n_ranks
 
-    def _create_command(self) -> str:
+    def _create_command(self):
         command = f'mpirun -np {self._n_ranks} echo A'
         return command

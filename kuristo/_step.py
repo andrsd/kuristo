@@ -26,6 +26,13 @@ class Step(ABC):
         return self._name
 
     @property
+    def command(self):
+        """
+        Return command
+        """
+        return self._create_command()
+
+    @property
     def return_code(self) -> int:
         """
         Return code of the step
@@ -46,7 +53,7 @@ class Step(ABC):
     def run(self):
         try:
             self._process = subprocess.Popen(
-                self._create_command(),
+                self.command,
                 shell=True,
                 cwd=self._cwd,
                 env=None,
@@ -62,5 +69,5 @@ class Step(ABC):
             self._return_code = -1
 
     @abstractmethod
-    def _create_command(self) -> str:
+    def _create_command(self) -> str | None:
         pass
