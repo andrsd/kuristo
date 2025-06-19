@@ -1,8 +1,10 @@
 import argparse
+from kuristo import __version__
 
 
 def build_cli():
     parser = argparse.ArgumentParser(prog="kuristo", description="Kuristo test framework")
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     # Run command

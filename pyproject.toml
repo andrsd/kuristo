@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "kuristo"
-version = "0.1.0"
+dynamic = ["version"]
 description = "A heavy-weight testing framework"
 authors = [{ name = "David Andrs", email = "andrsd@gmail.com" }]
 dependencies = []
@@ -14,3 +14,6 @@ requires-python = ">=3.9"
 
 [project.scripts]
 kuristo = "kuristo.__main__:main"
+
+[tool.setuptools_scm]
+version_file = "kuristo/_version.py"

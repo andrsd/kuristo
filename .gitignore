@@ -3,3 +3,4 @@ __pycache__
 .ropeproject
 kuristo.egg-info
 .kuristo-out
+kuristo/_version.py

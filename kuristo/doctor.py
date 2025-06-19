@@ -9,6 +9,7 @@ from .config import Config
 from ._plugin_loader import find_kuristo_root, load_user_steps_from_kuristo_dir
 from .registry import _STEP_REGISTRY, _ACTION_REGISTRY
 from .action_factory import register_actions
+from kuristo import __version__
 
 
 console = Console()
@@ -27,7 +28,7 @@ def print_diag():
 
     # General
     table = Table(show_header=False, show_edge=False)
-    table.add_row("Version", "[cyan]0.1.0[/]")  # TODO: replace with dynamic version
+    table.add_row("Version", f"[cyan]{__version__}[/]")
     table.add_row("Platform", f"{platform.system()} ({platform.processor()})")
     table.add_row("Python", f"{platform.python_version()} @ {sys.executable}")
     table.add_row("Config location", f"{config.path}")
