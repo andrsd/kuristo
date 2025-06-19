@@ -1,6 +1,13 @@
 from .actions.shell import ShellAction
 from .actions.function import FunctionStep
+from .actions.mpi_action import MPIAction
+from .actions.seq_action import SeqAction
 from .registry import get_step, get_action
+
+
+def register_actions():
+    ActionFactory.register("core/sequential", SeqAction)
+    ActionFactory.register("core/mpi", MPIAction)
 
 
 class ActionFactory:
