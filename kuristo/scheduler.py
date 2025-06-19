@@ -42,10 +42,8 @@ class Scheduler:
         @param tests; [TestSpec] List of test speecifications
         @param rcs: Resources Resource to be scheduled
         """
-        self._graph = netx.DiGraph()
         self._log_dir = Path(log_dir)
-        for ts in tests:
-            self._add_job(ts)
+        self._create_graph(tests)
         self._active_jobs = set()
         self._max_concurrent = 4
         self._lock = threading.Lock()
@@ -85,14 +83,21 @@ class Scheduler:
         print()
         self._print_time(end_time - start_time)
 
-    def _add_job(self, ts):
-        """
-        Add a job into the graph
-        """
-        job = Job.from_spec(ts, self._log_dir)
-        job.set_on_finish(self._job_completed)
-        self._graph.add_node(job)
-        # TODO: add job dependencies
+    def _create_graph(self, tests):
+        self._graph = netx.DiGraph()
+        job_map = {}
+        for ts in tests:
+            job = Job.from_spec(ts, self._log_dir)
+            job.set_on_finish(self._job_completed)
+            self._graph.add_node(job)
+            job_map[job.name] = job
+
+        for ts in tests:
+            for dep_name in ts.needs:
+                if dep_name not in job_map:
+                    # TODO: improve this error message (like tell the user which file this was found in)
+                    raise ValueError(f"Job '{ts.name}' depends on unknown job '{dep_name}'")
+                self._graph.add_edge(job_map[dep_name], job_map[ts.name])
 
     def _get_ready_jobs(self):
         """

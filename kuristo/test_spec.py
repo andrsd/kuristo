@@ -72,6 +72,8 @@ class TestSpec:
         self._description = kwargs.get("description", "")
         self._steps = self._build_steps(kwargs.get("steps"))
         self._skip = kwargs.get("skip", None)
+        val = kwargs.get("needs", [])
+        self._needs = val if isinstance(val, list) else [val]
 
     @property
     def name(self):
@@ -107,6 +109,13 @@ class TestSpec:
         Return the reason why test is marked as skipped
         """
         return self._skip
+
+    @property
+    def needs(self):
+        """
+        Return the dependencies
+        """
+        return self._needs
 
     def _build_steps(self, data):
         """

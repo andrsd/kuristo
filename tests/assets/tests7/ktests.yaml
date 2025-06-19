@@ -1,0 +1,17 @@
+tests:
+  job-a:
+    description: Job-A
+    steps:
+      - run: echo First job
+
+  job-b:
+    description: Job-B
+    needs: job-a
+    steps:
+      - run: echo Second job
+
+  job-c:
+    description: Job-C
+    needs: [job-a, job-b]
+    steps:
+      - run: echo Third job
