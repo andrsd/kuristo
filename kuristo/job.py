@@ -160,10 +160,7 @@ class Job:
     def _target(self):
         start_time = time.perf_counter()
         self._return_code = 0
-        if self._skipped:
-            self._skip_process()
-        else:
-            self._run_process()
+        self._run_process()
         end_time = time.perf_counter()
         self._elapsed_time = end_time - start_time
         self._finish_process()
@@ -183,8 +180,10 @@ class Job:
             self._logger.log(f'* Finished with return code {step.return_code}')
             self._return_code |= step.return_code
 
-    def _skip_process(self):
+    def skip_process(self):
         self._logger.log(f'* {self.name} was skipped: {self.skip_reason}')
+        self._status = Job.FINISHED
+        self._elapsed_time = 0.
 
     def _finish_process(self):
         self._status = Job.FINISHED
