@@ -1,6 +1,8 @@
 import yaml
+import os
 from pathlib import Path
 from ._plugin_loader import find_kuristo_root
+from ._utils import get_default_core_limit
 
 
 class Config:
@@ -15,6 +17,7 @@ class Config:
         self.log_history = int(self._get("log.history", 5))
         # Options: on_success, always, never
         self.log_cleanup = self._get("log.cleanup", "always")
+        self.num_cores = self._resolve_cores()
 
     def _load(self):
         try:
@@ -31,3 +34,17 @@ class Config:
                 return default
             val = val.get(part, default)
         return val
+
+    def _resolve_cores(self):
+        system_default = get_default_core_limit()
+        value = self._get("resources.num_cores", system_default)
+
+        try:
+            value = int(value)
+            if value <= 0 or value > os.cpu_count():
+                raise ValueError
+        except ValueError:
+            print(f"Invalid 'resources.num_cores' value: {value}, falling back to system default ({system_cores})")
+            return system_default
+
+        return value

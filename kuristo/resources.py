@@ -1,10 +1,12 @@
+from .config import Config
+
 class Resources:
     """
     Provides resources available to the testing
     """
 
-    def __init__(self) -> None:
-        self._max_cores = 4
+    def __init__(self, config: Config) -> None:
+        self._max_cores = config.num_cores
         self._n_cores_available = self._max_cores
 
     @property

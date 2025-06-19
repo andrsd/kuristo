@@ -105,7 +105,7 @@ def main():
 
     tests_files = scan_locations(args.location)
     tests = parse_tests_files(tests_files)
-    rcs = Resources()
+    rcs = Resources(config)
     scheduler = Scheduler(tests, rcs, log_dir)
     scheduler.check()
     scheduler.run_all_jobs()
