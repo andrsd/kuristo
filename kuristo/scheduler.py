@@ -56,6 +56,7 @@ class Scheduler:
             TimeElapsedColumn(),
             transient=True
         )
+        # tasks that are executed
         self._tasks = {}
         self._n_success = 0
         self._n_failed = 0
@@ -125,15 +126,18 @@ class Scheduler:
                     break
 
     def _job_completed(self, job):
+        max_id_width = len(str(self._graph.number_of_nodes()))
+
         with self._lock:
+            padded_id = f"{job.id:>{max_id_width}}"
             if job.is_skipped:
-                self._progress.console.print(f"[yellow]-[/] [{job.id}] [cyan not bold]{job.name}[/] was skipped: [cyan]{job.skip_reason}")
+                self._progress.console.print(f"[yellow]-[/] [{padded_id}] [cyan not bold]{job.name}[/] was skipped: [cyan]{job.skip_reason}")
                 self._n_skipped = self._n_skipped + 1
             elif job.return_code == 0:
-                self._progress.console.print(f"[green]✔[/] [{job.id}] [cyan not bold]{job.name}[/] finished with return code {job.return_code} [magenta not bold][{human_time2(job.elapsed_time)}][/]")
+                self._progress.console.print(f"[green]✔[/] [{padded_id}] [cyan not bold]{job.name}[/] finished with return code {job.return_code} [magenta not bold][{human_time2(job.elapsed_time)}][/]")
                 self._n_success = self._n_success + 1
             else:
-                self._progress.console.print(f"[red]x[/] [{job.id}] [cyan not bold]{job.name}[/] finished with return code {job.return_code} [magenta not bold][{human_time2(job.elapsed_time)}][/]")
+                self._progress.console.print(f"[red]x[/] [{padded_id}] [cyan not bold]{job.name}[/] finished with return code {job.return_code} [magenta not bold][{human_time2(job.elapsed_time)}][/]")
                 self._n_failed = self._n_failed + 1
             task_id = self._tasks[job.id]
             self._progress.remove_task(task_id)
