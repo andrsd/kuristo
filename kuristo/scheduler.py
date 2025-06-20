@@ -197,11 +197,13 @@ class Scheduler:
     def _create_log_dir(self):
         self._log_dir.mkdir(parents=True, exist_ok=True)
 
-
     def _padded_job_id(self, job):
         max_id_width = len(str(self._graph.number_of_nodes()))
         return f"{job.id:>{max_id_width}}"
 
-    @property
-    def num_failed(self):
-        return self._n_failed
+    def exit_code(self, *, strict=False):
+        if self._n_failed > 0:
+            return 1
+        if strict and self._n_skipped > 0:
+            return 2
+        return 0

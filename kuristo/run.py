@@ -60,7 +60,4 @@ def run_tests(args):
     scheduler.check()
     scheduler.run_all_jobs()
 
-    if scheduler.num_failed > 0:
-        return 1
-    else:
-        return 0
+    return scheduler.exit_code()
