@@ -17,7 +17,7 @@ RUN_DIR_PATTERN = re.compile(r"\d{8}_\d{6}")
 def create_run_output_dir(base_log_dir: Path) -> Path:
     runs_dir = base_log_dir / "runs"
     runs_dir.mkdir(parents=True, exist_ok=True)
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
     run_dir = runs_dir / timestamp
     run_dir.mkdir()
     return run_dir
