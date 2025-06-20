@@ -19,6 +19,7 @@ class TestSpec:
             self._shell = kwargs.get("shell", "sh")
             self._id = kwargs.get("id", None)
             self._work_dir = kwargs.get("working-directory", None)
+            self._timeout_minutes = kwargs.get("timeout-minutes", 60)
 
         @property
         def name(self):
@@ -56,6 +57,13 @@ class TestSpec:
             return self._work_dir
 
         @property
+        def timeout_minutes(self):
+            """
+            Return the timeout in minutes
+            """
+            return self._timeout_minutes
+
+        @property
         def params(self):
             """
             Return the step ID
@@ -72,6 +80,7 @@ class TestSpec:
         self._description = kwargs.get("description", "")
         self._steps = self._build_steps(kwargs.get("steps"))
         self._skip = kwargs.get("skip", None)
+        self._timeout_minutes = kwargs.get("timeout-minutes", 60)
         val = kwargs.get("needs", [])
         self._needs = val if isinstance(val, list) else [val]
 
@@ -116,6 +125,13 @@ class TestSpec:
         Return the dependencies
         """
         return self._needs
+
+    @property
+    def timeout_minutes(self):
+        """
+        Return the timeout in minutes
+        """
+        return self._timeout_minutes
 
     def _build_steps(self, data):
         """

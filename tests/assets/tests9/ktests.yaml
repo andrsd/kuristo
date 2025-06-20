@@ -1,0 +1,18 @@
+tests:
+  test-timeout-1:
+    timeout-minutes: 3
+    steps:
+      - name: wait
+        run: sleep 2
+
+      - name: wait
+        run: sleep 10
+
+  test-timeout-2:
+    steps:
+      - name: wait
+        run: sleep 2
+
+      - name: wait
+        timeout-minutes: 2
+        run: sleep 10

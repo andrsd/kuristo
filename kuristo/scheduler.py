@@ -136,6 +136,9 @@ class Scheduler:
             if job.return_code == 0:
                 self._progress.console.print(f"[green]✔[/] [{job_id}] [cyan not bold]{job.name}[/] finished with return code {job.return_code} [magenta not bold][{human_time2(job.elapsed_time)}][/]")
                 self._n_success = self._n_success + 1
+            elif job.return_code == 124:
+                self._progress.console.print(f"[red]x[/] [{job_id}] [cyan not bold]{job.name}[/] timed out [magenta not bold][{human_time2(job.elapsed_time)}][/]")
+                self._n_failed = self._n_failed + 1
             else:
                 self._progress.console.print(f"[red]x[/] [{job_id}] [cyan not bold]{job.name}[/] finished with return code {job.return_code} [magenta not bold][{human_time2(job.elapsed_time)}][/]")
                 self._n_failed = self._n_failed + 1

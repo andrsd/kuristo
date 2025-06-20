@@ -1,7 +1,7 @@
 import threading
 import logging
 import time
-import os
+import subprocess
 from pathlib import Path
 from .test_spec import TestSpec
 from .action_factory import ActionFactory
@@ -76,6 +76,11 @@ class Job:
         self._elapsed_time = 0.
         self._env_file = log_dir / f"job-{self._id}.env"
         self._context = Context(base_env=self._get_base_env())
+        self._cancelled = threading.Event()
+        self._timeout_timer = None
+        self._timeout_minutes = test_spec.timeout_minutes
+        self._step_lock = threading.Lock()
+        self._active_step = None
 
     def start(self):
         """
@@ -84,6 +89,8 @@ class Job:
         self._status = Job.RUNNING
         self._thread = threading.Thread(target=self._target)
         self._thread.start()
+        self._timeout_timer = threading.Timer(self._timeout_minutes * 60, self._on_timeout)
+        self._timeout_timer.start()
 
     def set_on_finish(self, callback):
         """
@@ -179,9 +186,13 @@ class Job:
         end_time = time.perf_counter()
         self._elapsed_time = end_time - start_time
         self._finish_process()
+        if self._timeout_timer is not None:
+            self._timeout_timer.cancel()
 
     def _run_process(self):
         for step in self._steps:
+            with self._step_lock:
+                self._active_step = step
             self._logger.log(f'* {step.name}...')
             cmd = step.command
             if cmd:
@@ -193,9 +204,17 @@ class Job:
             for line in log_data.splitlines():
                 self._logger.log(line)
 
-            self._logger.log(f'* Finished with return code {step.return_code}')
-            self._return_code |= step.return_code
+            if self._cancelled.is_set():
+                self._logger.log(f'* Job timed out after {self._timeout_minutes} minutes')
+                self._return_code = 124
+            elif step.return_code == 124:
+                self._logger.log(f'* Step timed out after {step.timeout_minutes} minutes')
+            else:
+                self._logger.log(f'* Finished with return code {step.return_code}')
+                self._return_code |= step.return_code
 
+        with self._step_lock:
+            self._active_step = None
         if self._context:
             self._logger.dump(self._context.env)
 
@@ -208,6 +227,15 @@ class Job:
         self._status = Job.FINISHED
         if self._on_finish_callback is not None:
             self._on_finish_callback(self)
+
+    def _on_timeout(self):
+        """
+        Called if the job runs longer than allowed.
+        """
+        with self._step_lock:
+            if self._active_step is not None:
+                self._cancelled.set()
+                self._active_step.terminate()
 
     def _build_steps(self, test_spec):
         steps = []

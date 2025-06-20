@@ -5,8 +5,12 @@ import contextlib
 
 
 class FunctionStep(Step):
-    def __init__(self, name, cwd, func_name, **params):
-        super().__init__(name, cwd)
+    def __init__(self, name, cwd, timeout, func_name, **params):
+        super().__init__(
+            name=name,
+            cwd=cwd,
+            timeout=timeout
+        )
         self._func_name = func_name
         self._params = params
 

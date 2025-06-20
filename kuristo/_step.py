@@ -8,7 +8,7 @@ class Step(ABC):
     Base class for job step
     """
 
-    def __init__(self, name, cwd=None) -> None:
+    def __init__(self, name, cwd, timeout) -> None:
         self._cwd = cwd
         self._process = None
         self._stdout = None
@@ -18,6 +18,7 @@ class Step(ABC):
             self._name = ""
         else:
             self._name = name
+        self._timeout_minutes = timeout
 
     @property
     def name(self):
@@ -51,26 +52,45 @@ class Step(ABC):
         """
         return self._stdout
 
-    def run(self, context=None):
-        try:
-            env = os.environ.copy()
-            if context is not None:
-                env.update(context.env)
-            self._process = subprocess.Popen(
-                self.command,
-                shell=True,
-                cwd=self._cwd,
-                env=env,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE
-            )
+    @property
+    def timeout_minutes(self):
+        """
+        Return timeout in minutes
+        """
+        return self._timeout_minutes
 
-            self._stdout, self._stderr = self._process.communicate()
+    def run(self, context=None):
+        timeout = self.timeout_minutes
+        env = os.environ.copy()
+        if context is not None:
+            env.update(context.env)
+        self._process = subprocess.Popen(
+            self.command,
+            shell=True,
+            cwd=self._cwd,
+            env=env,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+        try:
+            self._stdout, self._stderr = self._process.communicate(
+                timeout=timeout * 60
+            )
             self._return_code = self._process.returncode
+        except subprocess.TimeoutExpired:
+            self.terminate()
+            outs, errs = self._process.communicate()
+            self._stdout = b''
+            self._stderr = f'Step timed out'.encode()
+            self._return_code = 124
         except:
             self._stdout = b''
             self._stderr = b''
             self._return_code = -1
+
+    def terminate(self):
+        if self._process is not None:
+            self._process.kill()
 
     @abstractmethod
     def _create_command(self) -> str | None:

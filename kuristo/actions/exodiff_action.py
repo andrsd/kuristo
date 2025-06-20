@@ -23,7 +23,8 @@ class ExodiffAction(Step):
     def __init__(
         self,
         name,
-        cwd=None,
+        cwd,
+        timeout,
         reference=None,
         test=None,
         atol=None,
@@ -34,7 +35,11 @@ class ExodiffAction(Step):
         build_root=None,
         fail_on_diff=True,
     ):
-        super().__init__(name, cwd)
+        super().__init__(
+            name=name,
+            cwd=cwd,
+            timeout=timeout
+        )
         self._source_root = source_root or os.getcwd()
         self._build_root = build_root or os.getcwd()
 

@@ -24,6 +24,7 @@ class ActionFactory:
             return ShellAction(
                 ts.name,
                 ts.working_directory,
+                ts.timeout_minutes,
                 ts.run
             )
         elif get_action(ts.uses):
@@ -31,12 +32,14 @@ class ActionFactory:
             return cls(
                 ts.name,
                 ts.working_directory,
+                ts.timeout_minutes,
                 **ts.params
             )
         elif get_step(ts.uses):
             return FunctionStep(
                 ts.name,
                 ts.working_directory,
+                ts.timeout_minutes,
                 ts.uses,
                 **ts.params
             )
