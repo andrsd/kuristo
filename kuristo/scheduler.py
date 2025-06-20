@@ -201,3 +201,7 @@ class Scheduler:
     def _padded_job_id(self, job):
         max_id_width = len(str(self._graph.number_of_nodes()))
         return f"{job.id:>{max_id_width}}"
+
+    @property
+    def num_failed(self):
+        return self._n_failed

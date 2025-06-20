@@ -59,3 +59,8 @@ def run_tests(args):
     scheduler = Scheduler(tests, rcs, log_dir)
     scheduler.check()
     scheduler.run_all_jobs()
+
+    if scheduler.num_failed > 0:
+        return 1
+    else:
+        return 0

@@ -1,3 +1,4 @@
+import sys
 from .cli import build_cli
 from .run import run_tests
 from .doctor import print_diag
@@ -9,7 +10,8 @@ def main():
     args = parser.parse_args()
 
     if args.command == "run":
-        run_tests(args)
+        exit_code = run_tests(args)
+        sys.exit(exit_code)
     elif args.command == "doctor":
         print_diag()
     elif args.command == "list":
