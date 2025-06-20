@@ -4,3 +4,4 @@ __pycache__
 kuristo.egg-info
 .kuristo-out
 kuristo/_version.py
+.coverage
