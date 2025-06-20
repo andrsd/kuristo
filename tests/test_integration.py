@@ -91,3 +91,18 @@ def test_deps():
     assert "Failed: 0" in result.stdout
     assert "Skipped: 0" in result.stdout
     assert "Total: 3" in result.stdout
+
+
+def test_env():
+    test_dir = ASSETS_DIR / "tests8"
+    result = subprocess.run(
+        ["kuristo", "run", "-l", str(test_dir)],
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0
+    assert "Success: 1" in result.stdout
+    assert "Failed: 0" in result.stdout
+    assert "Skipped: 0" in result.stdout
+    assert "Total: 1" in result.stdout

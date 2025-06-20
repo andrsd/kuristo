@@ -1,9 +1,12 @@
 import threading
 import logging
 import time
+import os
 from pathlib import Path
 from .test_spec import TestSpec
 from .action_factory import ActionFactory
+from .context import Context
+from .env import Env
 
 
 class Job:
@@ -35,6 +38,16 @@ class Job:
         def log(self, message):
             self._logger.info(message)
 
+        def dump(self, what):
+            # dispatch types for dumping into a log file
+            if isinstance(what, Env):
+                self._dump_env(what)
+
+        def _dump_env(self, env: Env):
+            self._logger.info("Environment variables:")
+            for key, value in env.items():
+                self._logger.info(f"| {key}={value}")
+
     def __init__(self, test_spec: TestSpec, log_dir: Path) -> None:
         """
         @param test_spec Test specification
@@ -61,6 +74,8 @@ class Job:
         if test_spec.skip:
             self.skip(test_spec.skip_reason)
         self._elapsed_time = 0.
+        self._env_file = log_dir / f"job-{self._id}.env"
+        self._context = Context(base_env=self._get_base_env())
 
     def start(self):
         """
@@ -171,7 +186,8 @@ class Job:
             cmd = step.command
             if cmd:
                 self._logger.log(f'> {cmd}...')
-            step.run()
+            step.run(context=self._context)
+            self._load_env()
 
             log_data = step.stdout.decode()
             for line in log_data.splitlines():
@@ -179,6 +195,9 @@ class Job:
 
             self._logger.log(f'* Finished with return code {step.return_code}')
             self._return_code |= step.return_code
+
+        if self._context:
+            self._logger.dump(self._context.env)
 
     def skip_process(self):
         self._logger.log(f'* {self.name} was skipped: {self.skip_reason}')
@@ -197,6 +216,17 @@ class Job:
             if action is not None:
                 steps.append(action)
         return steps
+
+    def _load_env(self):
+        if self._env_file.exists():
+            self._context.env.update_from_file(self._env_file)
+
+    def _get_base_env(self):
+        return {
+            "KURISTO_ENV": self._env_file,
+            "KURISTO_JOB": self._name,
+            "KURISTO_JOBID": self._id
+        }
 
     @staticmethod
     def from_spec(ts, log_dir):

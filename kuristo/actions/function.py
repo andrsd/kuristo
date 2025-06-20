@@ -10,7 +10,7 @@ class FunctionStep(Step):
         self._func_name = func_name
         self._params = params
 
-    def run(self):
+    def run(self, context=None):
         stdout_capture = StringIO()
         stderr_capture = StringIO()
 

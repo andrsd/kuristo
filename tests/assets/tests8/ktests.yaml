@@ -1,0 +1,17 @@
+tests:
+  step-1:
+    steps:
+      - name: Set env vars
+        run: |
+          echo GOLD_FILE=gold/foo.exo > $KURISTO_ENV
+
+      - name: Add env vars
+        run: |
+          echo "TOL=1e-6" >> $KURISTO_ENV
+          echo "NORM=L2" >> $KURISTO_ENV
+
+      - name: Print env var
+        run: |
+          echo GOLD_FILE="$GOLD_FILE"
+          echo TOL="$TOL"
+          echo NORM="$NORM"

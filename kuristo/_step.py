@@ -1,5 +1,6 @@
 import subprocess
 from abc import ABC, abstractmethod
+import os
 
 
 class Step(ABC):
@@ -50,13 +51,16 @@ class Step(ABC):
         """
         return self._stdout
 
-    def run(self):
+    def run(self, context=None):
         try:
+            env = os.environ.copy()
+            if context is not None:
+                env.update(context.env)
             self._process = subprocess.Popen(
                 self.command,
                 shell=True,
                 cwd=self._cwd,
-                env=None,
+                env=env,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
             )

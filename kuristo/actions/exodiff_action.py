@@ -72,8 +72,8 @@ class ExodiffAction(Step):
 
         return shlex.join(cmd)
 
-    def run(self):
-        super().run()
+    def run(self, context=None):
+        super().run(context=context)
 
         # interpret exodiff return code
         if self._return_code != 0:
