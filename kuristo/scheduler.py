@@ -9,6 +9,8 @@ from rich.table import Table
 from rich.style import Style
 from rich.panel import Panel
 from .job import Job
+from itertools import product
+from ._utils import rich_job_name, interpolate_str
 
 
 def human_time(elapsed_time: float) -> str:
@@ -87,10 +89,11 @@ class Scheduler:
         self._graph = netx.DiGraph()
         job_map = {}
         for ts in tests:
-            job = Job.from_spec(ts, self._log_dir)
-            job.set_on_finish(self._job_completed)
-            self._graph.add_node(job)
-            job_map[job.name] = job
+            jobs = self._create_jobs(ts)
+            for j in jobs:
+                j.set_on_finish(self._job_completed)
+                self._graph.add_node(j)
+                job_map[j.name] = j
 
         for ts in tests:
             for dep_name in ts.needs:
@@ -118,7 +121,8 @@ class Scheduler:
                 if job.is_skipped:
                     job.skip_process()
                     job_id = self._padded_job_id(job)
-                    self._progress.console.print(f"[yellow]-[/] [{job_id}] [cyan not bold]{job.name}[/] was skipped: [cyan]{job.skip_reason}")
+                    job_name = rich_job_name(job.name)
+                    self._progress.console.print(f"[yellow]-[/] [{job_id}] [cyan not bold]{job_name}[/] was skipped: [cyan]{job.skip_reason}")
                     self._n_skipped = self._n_skipped + 1
                     continue
 
@@ -126,21 +130,23 @@ class Scheduler:
                 if self._resources.available_cores >= required:
                     self._resources.allocate_cores(required)
                     self._active_jobs.add(job)
-                    task_id = self._progress.add_task(f"[cyan]{job.name}", total=None)
+                    job_name = rich_job_name(job.name)
+                    task_id = self._progress.add_task(f"[cyan]{job_name}", total=None)
                     self._tasks[job.id] = task_id
                     job.start()
 
     def _job_completed(self, job):
         with self._lock:
             job_id = self._padded_job_id(job)
+            job_name = rich_job_name(job.name)
             if job.return_code == 0:
-                self._progress.console.print(f"[green]✔[/] [{job_id}] [cyan not bold]{job.name}[/] finished with return code {job.return_code} [magenta not bold][{human_time2(job.elapsed_time)}][/]")
+                self._progress.console.print(f"[green]✔[/] [{job_id}] [cyan not bold]{job_name}[/] finished with return code {job.return_code} [magenta not bold][{human_time2(job.elapsed_time)}][/]")
                 self._n_success = self._n_success + 1
             elif job.return_code == 124:
-                self._progress.console.print(f"[red]x[/] [{job_id}] [cyan not bold]{job.name}[/] timed out [magenta not bold][{human_time2(job.elapsed_time)}][/]")
+                self._progress.console.print(f"[red]x[/] [{job_id}] [cyan not bold]{job_name}[/] timed out [magenta not bold][{human_time2(job.elapsed_time)}][/]")
                 self._n_failed = self._n_failed + 1
             else:
-                self._progress.console.print(f"[red]x[/] [{job_id}] [cyan not bold]{job.name}[/] finished with return code {job.return_code} [magenta not bold][{human_time2(job.elapsed_time)}][/]")
+                self._progress.console.print(f"[red]x[/] [{job_id}] [cyan not bold]{job_name}[/] finished with return code {job.return_code} [magenta not bold][{human_time2(job.elapsed_time)}][/]")
                 self._n_failed = self._n_failed + 1
             task_id = self._tasks[job.id]
             self._progress.remove_task(task_id)
@@ -203,6 +209,73 @@ class Scheduler:
     def _padded_job_id(self, job):
         max_id_width = len(str(self._graph.number_of_nodes()))
         return f"{job.id:>{max_id_width}}"
+
+    def _create_jobs(self, ts):
+        """
+        Create jobs
+
+        @param ts Test spec
+        @return List of `Job`s
+        """
+        if ts.strategy:
+            matrix = ts.strategy.get("matrix", {})
+            variants = self._expand_matrix_value(matrix)
+            jobs = []
+            for v in variants:
+                name = self._build_matrix_job_name(ts.name, v)
+                job = Job(name, ts, self._log_dir, matrix=v)
+                jobs.append(job)
+            return jobs
+        else:
+            job = Job(ts.name, ts, self._log_dir)
+            return [job]
+
+    def _build_matrix_job_name(self, base_name, combo):
+        """
+        Create job name for a job from a matrix
+
+        @param base_name Base job name
+        @param combo Combination of keys and values (k, v) with values form startegy.matrix
+        @return Job name
+        """
+        ipol_name = interpolate_str(base_name, { "matrix" : combo })
+        if ipol_name == base_name:
+            param_str = ",".join(f"{k}={v}" for k, v in combo.items())
+            return f"{base_name}[{param_str}]"
+        else:
+            return ipol_name
+
+    def _expand_matrix_value(self, matrix):
+        """
+        Expand matrix specification into actual (key,value) pairs
+
+        @param matrix specification
+        @return List of combinations form the matrix
+        """
+        include = matrix.pop("include", [])
+        # TODO: implement exclude
+        keys = list(matrix.keys())
+        values = list(matrix.values())
+
+        variants = []
+        seen = set()
+
+        if keys and values:
+            # build Cartesian product if we have keys and values
+            for combo in product(*values):
+                combo_dict = dict(zip(keys, combo))
+                frozen = frozenset(combo_dict.items())
+                if frozen not in seen:
+                    variants.append(combo_dict)
+                    seen.add(frozen)
+
+        # Add explicit 'include' entries
+        for extra in include:
+            frozen = frozenset(extra.items())
+            if frozen not in seen:
+                variants.append(extra)
+
+        return variants
 
     def exit_code(self, *, strict=False):
         if self._n_failed > 0:

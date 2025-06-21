@@ -1,7 +1,6 @@
 import threading
 import logging
 import time
-import subprocess
 from pathlib import Path
 from .test_spec import TestSpec
 from .action_factory import ActionFactory
@@ -48,12 +47,13 @@ class Job:
             for key, value in env.items():
                 self._logger.info(f"| {key}={value}")
 
-    def __init__(self, test_spec: TestSpec, log_dir: Path) -> None:
+    def __init__(self, name, test_spec: TestSpec, log_dir: Path, matrix=None) -> None:
         """
         @param test_spec Test specification
         """
         Job.ID = Job.ID + 1
         self._id = Job.ID
+        self._env_file = log_dir / f"job-{self._id}.env"
         self._on_finish_callback = None
         self._thread = None
         self._process = None
@@ -64,23 +64,26 @@ class Job:
             log_dir / f'job-{self._id}.log'
         )
         self._return_code = None
-        if test_spec.name is None:
+        if name is None:
             self._name = "job" + str(self._id)
         else:
-            self._name = test_spec.name
+            self._name = name
         self._status = Job.WAITING
         self._skipped = False
+        self._context = Context(
+            base_env=self._get_base_env(),
+            matrix=matrix
+        )
         self._steps = self._build_steps(test_spec)
         if test_spec.skip:
             self.skip(test_spec.skip_reason)
         self._elapsed_time = 0.
-        self._env_file = log_dir / f"job-{self._id}.env"
-        self._context = Context(base_env=self._get_base_env())
         self._cancelled = threading.Event()
         self._timeout_timer = None
         self._timeout_minutes = test_spec.timeout_minutes
         self._step_lock = threading.Lock()
         self._active_step = None
+
 
     def start(self):
         """
@@ -240,7 +243,7 @@ class Job:
     def _build_steps(self, test_spec):
         steps = []
         for step in test_spec.steps:
-            action = ActionFactory.create(step)
+            action = ActionFactory.create(step, self._context)
             if action is not None:
                 steps.append(action)
         return steps
@@ -255,8 +258,3 @@ class Job:
             "KURISTO_JOB": self._name,
             "KURISTO_JOBID": self._id
         }
-
-    @staticmethod
-    def from_spec(ts, log_dir):
-        job = Job(ts, log_dir=log_dir)
-        return job

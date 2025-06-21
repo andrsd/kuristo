@@ -1,5 +1,6 @@
 tests:
   test-A:
+    name: "Test A"
     description: "Default run"
     steps:
       - name: Sequential run

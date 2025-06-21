@@ -1,15 +1,17 @@
 from ..registry import get_step
 from .._step import Step
+from ..context import Context
 from io import StringIO
 import contextlib
 
 
 class FunctionStep(Step):
-    def __init__(self, name, cwd, timeout, func_name, **params):
+    def __init__(self, name, cwd, timeout, context: Context, func_name, **params):
         super().__init__(
             name=name,
             cwd=cwd,
-            timeout=timeout
+            timeout=timeout,
+            context=context
         )
         self._func_name = func_name
         self._params = params

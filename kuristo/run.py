@@ -8,7 +8,6 @@ from .scheduler import Scheduler
 from .resources import Resources
 from ._plugin_loader import load_user_steps_from_kuristo_dir
 from ._utils import scan_locations, parse_tests_files
-from .action_factory import register_actions
 
 
 RUN_DIR_PATTERN = re.compile(r"\d{8}_\d{6}")
@@ -50,7 +49,6 @@ def run_tests(args):
     prune_old_runs(runs_dir, config.log_history)
     update_latest_symlink(runs_dir, log_dir)
 
-    register_actions()
     load_user_steps_from_kuristo_dir()
 
     tests_files = scan_locations(locations)

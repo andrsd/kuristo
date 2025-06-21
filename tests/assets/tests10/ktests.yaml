@@ -1,0 +1,28 @@
+tests:
+  multiple-jobs-1:
+    description: Test matrix
+    strategy:
+      matrix:
+        animal: [dog, cat]
+        color: [black, brown]
+    steps:
+      - name: Run test
+        run: |
+          echo ${{ matrix.color }} ${{matrix.animal }}
+
+  multiple-jobs-2:
+    name: "${{ matrix.color }} ${{ matrix.animal }}"
+    description: Test matrix
+    strategy:
+      matrix:
+        include:
+          - animal: dog
+            color: red
+          - animal: cat
+            color: black
+          - animal: dog
+            color: brown
+    steps:
+      - name: Run test
+        run: |
+          echo ${{ matrix.color }} ${{matrix.animal }}

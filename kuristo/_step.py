@@ -1,6 +1,7 @@
 import subprocess
 from abc import ABC, abstractmethod
 import os
+from .context import Context
 
 
 class Step(ABC):
@@ -8,7 +9,7 @@ class Step(ABC):
     Base class for job step
     """
 
-    def __init__(self, name, cwd, timeout) -> None:
+    def __init__(self, name, cwd, timeout, context: Context) -> None:
         self._cwd = cwd
         self._process = None
         self._stdout = None
@@ -18,6 +19,7 @@ class Step(ABC):
             self._name = ""
         else:
             self._name = name
+        self._context = context
         self._timeout_minutes = timeout
 
     @property
@@ -58,6 +60,13 @@ class Step(ABC):
         Return timeout in minutes
         """
         return self._timeout_minutes
+
+    @property
+    def context(self):
+        """
+        Return context
+        """
+        return self._context
 
     def run(self, context=None):
         timeout = self.timeout_minutes

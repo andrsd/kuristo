@@ -1,4 +1,5 @@
 from .._step import Step
+from ..context import Context
 from kuristo import action
 
 
@@ -8,11 +9,12 @@ class MPIAction(Step):
     Run an MPI command
     """
 
-    def __init__(self, name, cwd, timeout, **kwargs) -> None:
+    def __init__(self, name, cwd, timeout, context: Context, **kwargs) -> None:
         super().__init__(
             name=name,
             cwd=cwd,
-            timeout=timeout
+            timeout=timeout,
+            context=context
         )
         self._n_ranks = kwargs.get("n_procs", 1)
 

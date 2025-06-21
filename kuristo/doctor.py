@@ -8,7 +8,6 @@ from rich.table import Table
 from .config import Config
 from ._plugin_loader import find_kuristo_root, load_user_steps_from_kuristo_dir
 from .registry import _STEP_REGISTRY, _ACTION_REGISTRY
-from .action_factory import register_actions
 from kuristo import __version__
 
 
@@ -21,7 +20,6 @@ def print_diag():
     runs_dir = log_dir / "runs"
     latest = runs_dir / "latest"
 
-    register_actions()
     load_user_steps_from_kuristo_dir()
 
     console.rule("Kuristo Diagnostic Report")

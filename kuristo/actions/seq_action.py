@@ -1,5 +1,6 @@
 from .._step import Step
 from kuristo import action
+from ..context import Context
 
 
 @action("core/sequential")
@@ -8,11 +9,12 @@ class SeqAction(Step):
     Run a sequential command
     """
 
-    def __init__(self, name, cwd, timeout, **kwargs) -> None:
+    def __init__(self, name, cwd, timeout, context: Context, **kwargs) -> None:
         super().__init__(
             name=name,
             cwd=cwd,
-            timeout=timeout
+            timeout=timeout,
+            context=context
         )
         self._n_cores = kwargs.get("n_cores", 1)
 

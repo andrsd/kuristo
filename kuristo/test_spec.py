@@ -83,6 +83,7 @@ class TestSpec:
         self._timeout_minutes = kwargs.get("timeout-minutes", 60)
         val = kwargs.get("needs", [])
         self._needs = val if isinstance(val, list) else [val]
+        self._strategy = kwargs.get("strategy", None)
 
     @property
     def name(self):
@@ -133,6 +134,13 @@ class TestSpec:
         """
         return self._timeout_minutes
 
+    @property
+    def strategy(self):
+        """
+        Return the strategy
+        """
+        return self._strategy
+
     def _build_steps(self, data):
         """
         Build test steps
@@ -144,5 +152,9 @@ class TestSpec:
 
     @staticmethod
     def from_dict(name, data):
-        ts = TestSpec(name, **data)
-        return ts
+        if isinstance(data, dict):
+            test_name = data.pop("name", name)
+            ts = TestSpec(test_name, **data)
+            return ts
+        else:
+            raise RuntimeError("Expected dict as 'data'")

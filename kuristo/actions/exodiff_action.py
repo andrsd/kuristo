@@ -3,6 +3,7 @@ import shlex
 from .._step import Step
 from kuristo import action
 from .._utils import resolve_path
+from ..context import Context
 
 
 @action("checks/exodiff")
@@ -25,6 +26,7 @@ class ExodiffAction(Step):
         name,
         cwd,
         timeout,
+        context: Context,
         reference=None,
         test=None,
         atol=None,
@@ -38,7 +40,8 @@ class ExodiffAction(Step):
         super().__init__(
             name=name,
             cwd=cwd,
-            timeout=timeout
+            timeout=timeout,
+            context=context
         )
         self._source_root = source_root or os.getcwd()
         self._build_root = build_root or os.getcwd()

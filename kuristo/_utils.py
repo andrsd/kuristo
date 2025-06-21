@@ -4,6 +4,9 @@ import os
 import yaml
 from .scanner import Scanner
 from .test_spec import TestSpec
+from jinja2 import Template
+from jinja2.runtime import Undefined
+from collections.abc import Mapping
 
 
 def get_default_core_limit():
@@ -77,3 +80,13 @@ def resolve_path(path_str, source_root, build_root):
         return candidate
 
     raise FileNotFoundError(f"Could not resolve path: {path_str}")
+
+
+def rich_job_name(job_name):
+    return job_name.replace("[", "\\[")
+
+
+def interpolate_str(text: str, variables: dict) -> str:
+    normalized = text.replace("${{", "{{").replace("}}", "}}")
+    template = Template(normalized)
+    return template.render(**variables)
