@@ -1,0 +1,32 @@
+tests:
+  test-check:
+    description: Run test and check output
+    steps:
+      - name: Run test
+        id: result
+        run: |
+          echo Value: 1.23456789
+
+      - name: Check ok
+        uses: checks/regex-float
+        with:
+          input: ${{ steps.result.output }}
+          pattern: "Value: ([-+]?(?:\\d*\\.\\d+|\\d+)(?:[eE][-+]?\\d+)?)"
+          gold: 1.23456789
+          rel_tol: 1e-5
+
+      - name: Check wrong number
+        uses: checks/regex-float
+        with:
+          input: ${{ steps.result.output }}
+          pattern: "Value: ([0-9.]+)"
+          gold: 2.4
+          abs_tol: 1e-10
+
+      - name: Check user error
+        uses: checks/regex-float
+        with:
+          input: ${{ steps.result.output }}
+          pattern: "Final: ([-+]?(?:\\d*\\.\\d+|\\d+)(?:[eE][-+]?\\d+)?)"
+          gold: 2.4
+          abs_tol: 1e-10
