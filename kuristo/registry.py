@@ -14,7 +14,10 @@ def step(name):
 
 
 def get_step(name):
-    return _STEP_REGISTRY[name]
+    if name in _STEP_REGISTRY:
+        return _STEP_REGISTRY[name]
+    else:
+        raise RuntimeError(f"Trying to use unknown action '{name}'")
 
 
 def action(name):
