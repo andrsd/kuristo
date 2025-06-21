@@ -1,5 +1,6 @@
 import kuristo
 
+
 @kuristo.step("app-name/run-me")
 def run_simulation(params):
     print("Simulating with:", params)

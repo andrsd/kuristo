@@ -108,7 +108,7 @@ class Step(ABC):
             self._stdout = None
             self._stderr = 'Step timed out'.encode()
             self._return_code = 124
-        except:
+        except subprocess.SubprocessError:
             self._stdout = None
             self._stderr = b''
             self._return_code = -1

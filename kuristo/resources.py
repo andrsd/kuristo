@@ -1,5 +1,6 @@
 from .config import Config
 
+
 class Resources:
     """
     Provides resources available to the testing

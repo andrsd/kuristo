@@ -5,8 +5,6 @@ import yaml
 from .scanner import Scanner
 from .test_spec import TestSpec
 from jinja2 import Template
-from jinja2.runtime import Undefined
-from collections.abc import Mapping
 
 
 def get_default_core_limit():

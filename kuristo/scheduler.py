@@ -5,9 +5,7 @@ import time
 from pathlib import Path
 from rich.progress import (Progress, SpinnerColumn, TextColumn, BarColumn, TimeElapsedColumn)
 from rich.console import Console
-from rich.table import Table
 from rich.style import Style
-from rich.panel import Panel
 from .job import Job
 from itertools import product
 from ._utils import rich_job_name, interpolate_str
@@ -238,7 +236,7 @@ class Scheduler:
         @param combo Combination of keys and values (k, v) with values form startegy.matrix
         @return Job name
         """
-        ipol_name = interpolate_str(base_name, { "matrix" : combo })
+        ipol_name = interpolate_str(base_name, {"matrix" : combo})
         if ipol_name == base_name:
             param_str = ",".join(f"{k}={v}" for k, v in combo.items())
             return f"{base_name}[{param_str}]"

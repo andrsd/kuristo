@@ -44,7 +44,7 @@ class Config:
             if value <= 0 or value > os.cpu_count():
                 raise ValueError
         except ValueError:
-            print(f"Invalid 'resources.num_cores' value: {value}, falling back to system default ({system_cores})")
+            print(f"Invalid 'resources.num_cores' value: {value}, falling back to system default ({system_default})")
             return system_default
 
         return value

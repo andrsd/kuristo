@@ -1,7 +1,6 @@
 import threading
 import logging
 import time
-import re
 from pathlib import Path
 from .test_spec import TestSpec
 from .action_factory import ActionFactory
