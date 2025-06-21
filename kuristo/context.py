@@ -9,5 +9,6 @@ class Context:
         self.env = Env(base_env)
         # variables for substitution
         self.vars = {
-            "matrix": matrix
+            "matrix": matrix,
+            "steps": {}
         }

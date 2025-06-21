@@ -25,6 +25,7 @@ class ExodiffAction(Step):
         self,
         name,
         context: Context,
+        id,
         working_dir,
         timeout_minutes,
         reference=None,

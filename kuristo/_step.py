@@ -11,6 +11,7 @@ class Step(ABC):
 
     def __init__(self, name, context: Context, **kwargs) -> None:
         self._cwd = kwargs.get("working_dir", None)
+        self._id = kwargs.get("id", None)
         self._process = None
         self._stdout = None
         self._stderr = None
@@ -20,7 +21,7 @@ class Step(ABC):
         else:
             self._name = name
         self._context = context
-        self._timeout_minutes = kwargs.get("timeout_minutes", None)
+        self._timeout_minutes = kwargs.get("timeout_minutes", 60)
 
     @property
     def name(self):
@@ -28,6 +29,13 @@ class Step(ABC):
         Return step name
         """
         return self._name
+
+    @property
+    def id(self):
+        """
+        Return step ID
+        """
+        return self._id
 
     @property
     def command(self):
@@ -44,7 +52,7 @@ class Step(ABC):
         return self._return_code
 
     @property
-    def num_cores(self):
+    def num_cores(self) -> int:
         return 1
 
     @property
@@ -52,7 +60,10 @@ class Step(ABC):
         """
         Return stdout of the jobs
         """
-        return self._stdout
+        if self._stdout:
+            return self._stdout
+        else:
+            return b''
 
     @property
     def timeout_minutes(self):
@@ -86,14 +97,19 @@ class Step(ABC):
                 timeout=timeout * 60
             )
             self._return_code = self._process.returncode
+            if self.id is not None:
+                self.context.vars["steps"][self.id] = {
+                    "output": self._stdout.decode()
+                }
+
         except subprocess.TimeoutExpired:
             self.terminate()
             outs, errs = self._process.communicate()
-            self._stdout = b''
-            self._stderr = f'Step timed out'.encode()
+            self._stdout = None
+            self._stderr = 'Step timed out'.encode()
             self._return_code = 124
         except:
-            self._stdout = b''
+            self._stdout = None
             self._stderr = b''
             self._return_code = -1
 

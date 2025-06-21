@@ -16,6 +16,7 @@ class ActionFactory:
             return ShellAction(
                 ts.name,
                 context,
+                id=ts.id,
                 working_dir=ts.working_directory,
                 timeout_minutes=ts.timeout_minutes,
                 commands=ts.run,
@@ -25,6 +26,7 @@ class ActionFactory:
             return cls(
                 ts.name,
                 context,
+                id=ts.id,
                 working_dir=ts.working_directory,
                 timeout_minutes=ts.timeout_minutes,
                 **ts.params
@@ -34,6 +36,7 @@ class ActionFactory:
                 ts.name,
                 context,
                 func_name=ts.uses,
+                id=ts.id,
                 working_dir=ts.working_directory,
                 timeout_minutes=ts.timeout_minutes,
                 **ts.params

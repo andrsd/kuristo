@@ -1,6 +1,7 @@
 import threading
 import logging
 import time
+import re
 from pathlib import Path
 from .test_spec import TestSpec
 from .action_factory import ActionFactory
@@ -83,7 +84,6 @@ class Job:
         self._timeout_minutes = test_spec.timeout_minutes
         self._step_lock = threading.Lock()
         self._active_step = None
-
 
     def start(self):
         """

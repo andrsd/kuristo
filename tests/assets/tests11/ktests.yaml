@@ -1,0 +1,23 @@
+tests:
+  output-test:
+    name: "Output test"
+    description: "Produce an output"
+    steps:
+      - name: Produce output
+        id: sim
+        run: |
+          echo This is some text
+          echo Some more text
+          echo Another tex
+
+      - name: In the output
+        uses: checks/regex
+        with:
+          input: ${{ steps.sim.output }}
+          pattern: "more"
+
+      - name: Not in the output
+        uses: checks/regex
+        with:
+          input: ${{ steps.sim.output }}
+          pattern: "asdf"
