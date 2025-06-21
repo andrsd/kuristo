@@ -9,12 +9,11 @@ class MPIAction(Step):
     Run an MPI command
     """
 
-    def __init__(self, name, cwd, timeout, context: Context, **kwargs) -> None:
+    def __init__(self, name, context: Context, **kwargs) -> None:
         super().__init__(
             name=name,
-            cwd=cwd,
-            timeout=timeout,
-            context=context
+            context=context,
+            **kwargs,
         )
         self._n_ranks = kwargs.get("n_procs", 1)
 

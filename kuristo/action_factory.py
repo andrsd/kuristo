@@ -15,27 +15,27 @@ class ActionFactory:
         if ts.uses is None:
             return ShellAction(
                 ts.name,
-                ts.working_directory,
-                ts.timeout_minutes,
                 context,
-                ts.run,
+                working_dir=ts.working_directory,
+                timeout_minutes=ts.timeout_minutes,
+                commands=ts.run,
             )
         elif get_action(ts.uses):
             cls = get_action(ts.uses)
             return cls(
                 ts.name,
-                ts.working_directory,
-                ts.timeout_minutes,
                 context,
+                working_dir=ts.working_directory,
+                timeout_minutes=ts.timeout_minutes,
                 **ts.params
             )
         elif get_step(ts.uses):
             return FunctionStep(
                 ts.name,
-                ts.working_directory,
-                ts.timeout_minutes,
                 context,
-                ts.uses,
+                func_name=ts.uses,
+                working_dir=ts.working_directory,
+                timeout_minutes=ts.timeout_minutes,
                 **ts.params
             )
         else:

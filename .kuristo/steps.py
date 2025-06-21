@@ -7,8 +7,8 @@ def run_simulation(params):
 
 @kuristo.action("app-name/custom-step")
 class MyCustomStep(kuristo.Step):
-    def __init__(self, name, cwd, timeout, context: kuristo.Context, **kwargs):
-        super().__init__(name, cwd, timeout, context)
+    def __init__(self, name, context: kuristo.Context, **kwargs):
+        super().__init__(name, context, **kwargs)
         self.input = kwargs.get("input", "")
         self.output = kwargs.get("output", "")
 

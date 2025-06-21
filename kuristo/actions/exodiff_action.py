@@ -24,9 +24,9 @@ class ExodiffAction(Step):
     def __init__(
         self,
         name,
-        cwd,
-        timeout,
         context: Context,
+        working_dir,
+        timeout_minutes,
         reference=None,
         test=None,
         atol=None,
@@ -39,9 +39,9 @@ class ExodiffAction(Step):
     ):
         super().__init__(
             name=name,
-            cwd=cwd,
-            timeout=timeout,
-            context=context
+            context=context,
+            working_dir=working_dir,
+            timeout_minutes=timeout_minutes,
         )
         self._source_root = source_root or os.getcwd()
         self._build_root = build_root or os.getcwd()

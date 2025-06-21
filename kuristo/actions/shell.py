@@ -8,13 +8,8 @@ class ShellAction(Step):
     This action will run shell command(s)
     """
 
-    def __init__(self, name, cwd, timeout, context: Context, commands) -> None:
-        super().__init__(
-            name=name,
-            cwd=cwd,
-            timeout=timeout,
-            context=context
-        )
+    def __init__(self, name, context: Context, commands, **kwargs) -> None:
+        super().__init__(name, context, **kwargs)
         self._commands = commands
 
     def _create_command(self):

@@ -6,12 +6,11 @@ import contextlib
 
 
 class FunctionStep(Step):
-    def __init__(self, name, cwd, timeout, context: Context, func_name, **params):
+    def __init__(self, name, context: Context, func_name, **params):
         super().__init__(
-            name=name,
-            cwd=cwd,
-            timeout=timeout,
-            context=context
+            name,
+            context,
+            **params
         )
         self._func_name = func_name
         self._params = params

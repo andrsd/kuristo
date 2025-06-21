@@ -9,8 +9,8 @@ class Step(ABC):
     Base class for job step
     """
 
-    def __init__(self, name, cwd, timeout, context: Context) -> None:
-        self._cwd = cwd
+    def __init__(self, name, context: Context, **kwargs) -> None:
+        self._cwd = kwargs.get("working_dir", None)
         self._process = None
         self._stdout = None
         self._stderr = None
@@ -20,7 +20,7 @@ class Step(ABC):
         else:
             self._name = name
         self._context = context
-        self._timeout_minutes = timeout
+        self._timeout_minutes = kwargs.get("timeout_minutes", None)
 
     @property
     def name(self):
