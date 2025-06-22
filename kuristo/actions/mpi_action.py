@@ -1,12 +1,11 @@
 from .._step import Step
 from ..context import Context
-from kuristo import action
+from abc import abstractmethod
 
 
-@action("core/mpi")
 class MPIAction(Step):
     """
-    Run an MPI command
+    Base class for running MPI commands
     """
 
     def __init__(self, name, context: Context, **kwargs) -> None:
@@ -21,6 +20,11 @@ class MPIAction(Step):
     def num_cores(self):
         return self._n_ranks
 
+    @abstractmethod
+    def _create_sub_command(self) -> str | None:
+        pass
+
     def _create_command(self):
-        command = f'mpirun -np {self._n_ranks} echo A'
+        cmd = self._create_sub_command()
+        command = f'mpirun -np {self._n_ranks} {cmd}'
         return command

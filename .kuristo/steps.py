@@ -15,3 +15,9 @@ class MyCustomStep(kuristo.Step):
 
     def _create_command(self):
         return f"echo Custom action: input={self.input}, output={self.output}"
+
+
+@kuristo.action("app-name/mpi")
+class CustomMPIAction(kuristo.MPIAction):
+    def _create_sub_command(self) -> str | None:
+        return "echo A"

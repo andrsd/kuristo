@@ -10,7 +10,7 @@ tests:
     description: "Default test that will use 4 MPI ranks"
     steps:
       - name: MPI-4 (a)
-        uses: core/mpi
+        uses: app-name/mpi
         with:
           n_procs: 4
 
@@ -18,7 +18,7 @@ tests:
     description: "Another test that will use 4 MPI ranks"
     steps:
       - name: MPI-4 (b)
-        uses: core/mpi
+        uses: app-name/mpi
         with:
           n_procs: 4
 
