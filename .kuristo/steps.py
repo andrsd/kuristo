@@ -13,7 +13,7 @@ class MyCustomStep(kuristo.Step):
         self.input = kwargs.get("input", "")
         self.output = kwargs.get("output", "")
 
-    def _create_command(self):
+    def create_command(self):
         return f"echo Custom action: input={self.input}, output={self.output}"
 
 

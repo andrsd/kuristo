@@ -21,6 +21,6 @@ class SeqAction(Step):
     def num_cores(self):
         return self._n_cores
 
-    def _create_command(self):
+    def create_command(self):
         command = 'echo seq'
         return command

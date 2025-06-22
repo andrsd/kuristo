@@ -34,5 +34,5 @@ class FunctionStep(Step):
             self._stderr = str(e).encode()
             self._return_code = 1
 
-    def _create_command(self):
+    def create_command(self):
         return None

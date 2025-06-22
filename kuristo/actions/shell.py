@@ -12,7 +12,7 @@ class ShellAction(Step):
         super().__init__(name, context, **kwargs)
         self._commands = commands
 
-    def _create_command(self):
+    def create_command(self):
         assert self.context is not None
         cmds = interpolate_str(
             self._commands,

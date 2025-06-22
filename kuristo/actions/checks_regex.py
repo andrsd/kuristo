@@ -10,7 +10,7 @@ class RegexCheck(Step):
         self._target_step = kwargs["input"]
         self._pattern = kwargs.get("pattern", [])
 
-    def _create_command(self):
+    def create_command(self):
         return None  # Not a shell command step
 
     def run(self, context=None):

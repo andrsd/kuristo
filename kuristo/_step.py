@@ -42,7 +42,7 @@ class Step(ABC):
         """
         Return command
         """
-        return self._create_command()
+        return self.create_command()
 
     @property
     def return_code(self) -> int:
@@ -118,5 +118,11 @@ class Step(ABC):
             self._process.kill()
 
     @abstractmethod
-    def _create_command(self) -> str | None:
+    def create_command(self) -> str | None:
+        """
+        Subclasses must override this method to return the shell command that will be
+        executed by this step.
+
+        @return None if the step does not run a command.
+        """
         pass

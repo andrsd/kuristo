@@ -63,7 +63,7 @@ class ExodiffCheck(Step):
         self._extra_args = extra_args or []
         self._fail_on_diff = fail_on_diff
 
-    def _create_command(self):
+    def create_command(self):
         cmd = ["exodiff"]
 
         if self._atol is not None:
