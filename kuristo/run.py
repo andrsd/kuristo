@@ -53,7 +53,7 @@ def run_tests(args):
     tests_files = scan_locations(locations)
     tests = parse_tests_files(tests_files)
     rcs = Resources(config)
-    scheduler = Scheduler(tests, rcs, log_dir)
+    scheduler = Scheduler(tests, rcs, log_dir, config=config)
     scheduler.check()
     scheduler.run_all_jobs()
 

@@ -32,6 +32,7 @@ def print_diag():
     table.add_row("Config location", f"{config.path}")
     table.add_row("Log directory", f"{runs_dir}")
     table.add_row("Latest run", str(latest.resolve() if latest.exists() else "[dim]none[/]"))
+    table.add_row("MPI launcher", f"[green]{config.mpi_launcher}[/]")
 
     console.print(table)
     console.print()

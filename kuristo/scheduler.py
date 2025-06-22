@@ -10,6 +10,8 @@ from rich.style import Style
 from .job import Job
 from itertools import product
 from ._utils import rich_job_name, interpolate_str
+from .config import Config
+from .resources import Resources
 
 
 def human_time(elapsed_time: float) -> str:
@@ -47,12 +49,15 @@ class Scheduler:
     new one(s). We run until all jobs have FINISHED status.
     """
 
-    def __init__(self, tests, rcs, log_dir) -> None:
+    def __init__(self, tests, rcs: Resources, log_dir, config: Config) -> None:
         """
         @param tests; [TestSpec] List of test speecifications
         @param rcs: Resources Resource to be scheduled
+        @param log_dir: Directory where we write logs
+        @param config: Configuration
         """
         self._log_dir = Path(log_dir)
+        self._config = config
         self._create_graph(tests)
         self._active_jobs = set()
         self._lock = threading.Lock()
@@ -234,11 +239,11 @@ class Scheduler:
             jobs = []
             for v in variants:
                 name = self._build_matrix_job_name(ts.name, v)
-                job = Job(name, ts, self._log_dir, matrix=v)
+                job = Job(name, ts, self._log_dir, self._config, matrix=v)
                 jobs.append(job)
             return jobs
         else:
-            job = Job(ts.name, ts, self._log_dir)
+            job = Job(ts.name, ts, self._log_dir, self._config)
             return [job]
 
     def _build_matrix_job_name(self, base_name, combo):

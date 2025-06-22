@@ -25,6 +25,6 @@ class MPIAction(Step):
         pass
 
     def _create_command(self):
+        launcher = self.context.config.mpi_launcher
         cmd = self._create_sub_command()
-        command = f'mpirun -np {self._n_ranks} {cmd}'
-        return command
+        return f'{launcher} -np {self._n_ranks} {cmd}'

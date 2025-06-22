@@ -6,7 +6,7 @@ from ._utils import get_default_core_limit
 
 
 class Config:
-    def __init__(self, path=None):
+    def __init__(self, path=None, mpi_launcher="mpirun"):
         self._base_dir = find_kuristo_root()
         self._config_dir = self._base_dir or Path.cwd()
 
@@ -18,6 +18,8 @@ class Config:
         # Options: on_success, always, never
         self.log_cleanup = self._get("log.cleanup", "always")
         self.num_cores = self._resolve_cores()
+
+        self.mpi_launcher = os.getenv("KURISTO_MPI_LAUNCHER", self._get("runner.mpi_launcher", mpi_launcher))
 
     def _load(self):
         try:
