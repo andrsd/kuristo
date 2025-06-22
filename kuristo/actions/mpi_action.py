@@ -21,10 +21,14 @@ class MPIAction(Step):
         return self._n_ranks
 
     @abstractmethod
-    def _create_sub_command(self) -> str | None:
+    def create_sub_command(self) -> str:
+        """
+        Subclasses must override this method to return the shell command that will be
+        executed by the MPI launcher
+        """
         pass
 
     def create_command(self):
         launcher = self.context.config.mpi_launcher
-        cmd = self._create_sub_command()
+        cmd = self.create_sub_command()
         return f'{launcher} -np {self._n_ranks} {cmd}'
