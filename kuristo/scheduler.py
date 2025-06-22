@@ -3,7 +3,8 @@ import threading
 import sys
 import time
 from pathlib import Path
-from rich.progress import (Progress, SpinnerColumn, TextColumn, BarColumn, TimeElapsedColumn)
+from rich.progress import (Progress, SpinnerColumn, TextColumn, BarColumn, ProgressColumn, TimeElapsedColumn)
+from rich.text import Text
 from rich.console import Console
 from rich.style import Style
 from .job import Job
@@ -29,6 +30,14 @@ def human_time2(elapsed_time: float) -> str:
     return f"{elapsed_time:.2f}s"
 
 
+class StepCountColumn(ProgressColumn):
+    def render(self, task) -> Text:
+        if task.total is not None:
+            return Text(f"{int(task.completed)}/{int(task.total)}", style=Style(color="green"))
+        else:
+            return Text("")
+
+
 class Scheduler:
     """
     Job scheduler
@@ -52,6 +61,7 @@ class Scheduler:
             SpinnerColumn(),
             TextColumn("[progress.description]{task.description}"),
             BarColumn(style=Style(color="grey23"), pulse_style=Style(color="grey46")),
+            StepCountColumn(),
             TimeElapsedColumn(),
             transient=True
         )
@@ -89,7 +99,9 @@ class Scheduler:
         for ts in tests:
             jobs = self._create_jobs(ts)
             for j in jobs:
-                j.set_on_finish(self._job_completed)
+                j.on_finish = self._job_completed
+                j.on_step_start = self._on_step_start
+                j.on_step_finish = self._on_step_finish
                 self._graph.add_node(j)
                 job_map[j.name] = j
 
@@ -129,8 +141,9 @@ class Scheduler:
                     self._resources.allocate_cores(required)
                     self._active_jobs.add(job)
                     job_name = rich_job_name(job.name)
-                    task_id = self._progress.add_task(f"[cyan]{job_name}", total=None)
+                    task_id = self._progress.add_task(f"[cyan]{job_name}", total=job.num_steps)
                     self._tasks[job.id] = task_id
+                    job.create_step_tasks(self._progress)
                     job.start()
 
     def _job_completed(self, job):
@@ -281,3 +294,14 @@ class Scheduler:
         if strict and self._n_skipped > 0:
             return 2
         return 0
+
+    def _on_step_start(self, job, step):
+        step_task_id = job.step_task_id(step)
+        self._progress.update(step_task_id, visible=True)
+
+    def _on_step_finish(self, job, step):
+        step_task_id = job.step_task_id(step)
+        self._progress.remove_task(step_task_id)
+
+        job_task_id = self._tasks[job.id]
+        self._progress.update(job_task_id, advance=1)

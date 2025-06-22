@@ -54,7 +54,6 @@ class Job:
         Job.ID = Job.ID + 1
         self._id = Job.ID
         self._env_file = log_dir / f"job-{self._id}.env"
-        self._on_finish_callback = None
         self._thread = None
         self._process = None
         self._stdout = None
@@ -77,12 +76,16 @@ class Job:
         self._steps = self._build_steps(test_spec)
         if test_spec.skip:
             self.skip(test_spec.skip_reason)
+        self._step_task_ids = {}
         self._elapsed_time = 0.
         self._cancelled = threading.Event()
         self._timeout_timer = None
         self._timeout_minutes = test_spec.timeout_minutes
         self._step_lock = threading.Lock()
         self._active_step = None
+        self._on_finish = self._noop
+        self._on_step_start = self._noop
+        self._on_step_finish = self._noop
 
     def start(self):
         """
@@ -93,12 +96,6 @@ class Job:
         self._thread.start()
         self._timeout_timer = threading.Timer(self._timeout_minutes * 60, self._on_timeout)
         self._timeout_timer.start()
-
-    def set_on_finish(self, callback):
-        """
-        Set the on_finish callback
-        """
-        self._on_finish_callback = callback
 
     def wait(self):
         """
@@ -181,6 +178,34 @@ class Job:
         """
         return self._elapsed_time
 
+    @property
+    def num_steps(self):
+        return len(self._steps)
+
+    @property
+    def on_step_start(self):
+        return self._on_step_start
+
+    @on_step_start.setter
+    def on_step_start(self, callback):
+        self._on_step_start = callback
+
+    @property
+    def on_step_finish(self):
+        return self._on_step_finish
+
+    @on_step_finish.setter
+    def on_step_finish(self, callback):
+        self._on_step_finish = callback
+
+    @property
+    def on_finish(self):
+        return self._on_finish
+
+    @on_finish.setter
+    def on_finish(self, callback):
+        self._on_finish = callback
+
     def _target(self):
         start_time = time.perf_counter()
         self._return_code = 0
@@ -199,7 +224,9 @@ class Job:
             cmd = step.command
             if cmd:
                 self._logger.log(f'> {cmd}...')
+            self.on_step_start(self, step)
             step.run(context=self._context)
+            self.on_step_finish(self, step)
             self._load_env()
 
             log_data = step.stdout.decode()
@@ -227,8 +254,7 @@ class Job:
 
     def _finish_process(self):
         self._status = Job.FINISHED
-        if self._on_finish_callback is not None:
-            self._on_finish_callback(self)
+        self.on_finish(self)
 
     def _on_timeout(self):
         """
@@ -257,3 +283,17 @@ class Job:
             "KURISTO_JOB": self._name,
             "KURISTO_JOBID": self._id
         }
+
+    def _noop(self, *args, **kwargs):
+        pass
+
+    def create_step_tasks(self, progress):
+        self._step_task_ids = {
+            step.name: progress.add_task(
+                f"  ↳ [magenta]{step.name}", total=None, visible=False
+            )
+            for step in self._steps
+        }
+
+    def step_task_id(self, step):
+        return self._step_task_ids.get(step.name)
