@@ -1,9 +1,9 @@
-from .._step import Step
+from .process_step import ProcessStep
 from .._utils import interpolate_str
 from ..context import Context
 
 
-class ShellAction(Step):
+class ShellAction(ProcessStep):
     """
     This action will run shell command(s)
     """

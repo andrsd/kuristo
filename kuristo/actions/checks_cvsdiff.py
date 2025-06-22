@@ -1,6 +1,7 @@
 import csv
 import math
-from kuristo import Step, action
+from kuristo import action
+from .step import Step
 
 
 @action("checks/csv-diff")
@@ -15,10 +16,6 @@ class CSVDiffCheck(Step):
 
         self._default_rel = float(kwargs.get("rel_tol", 1e-6))
         self._default_abs = float(kwargs.get("abs_tol", 1e-12))
-
-    def create_command(self):
-        # Not a shell command step
-        return None
 
     def run(self, context=None):
         gold_data = self._read_csv(self._gold_path)
@@ -46,11 +43,11 @@ class CSVDiffCheck(Step):
                         self._stdout = self._stdout.encode()
                         return
 
-            self._stdout = b"CSV files match within tolerance."
+            self._output = b"CSV files match within tolerance."
             self._return_code = 0
 
         except Exception as ex:
-            self._stdout = f"Comparison failed: {ex}".encode()
+            self._output = f"Comparison failed: {ex}".encode()
             self._return_code = -1
 
     def _read_csv(self, path):

@@ -1,10 +1,10 @@
-from .._step import Step
+from .process_step import ProcessStep
 from kuristo import action
 from ..context import Context
 
 
 @action("core/sequential")
-class SeqAction(Step):
+class SeqAction(ProcessStep):
     """
     Run a sequential command
     """

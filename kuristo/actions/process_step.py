@@ -1,59 +1,27 @@
+from .step import Step
+from ..context import Context
+import os
 import subprocess
 from abc import ABC, abstractmethod
-import os
-from .context import Context
 
 
-class Step(ABC):
+class ProcessStep(Step):
     """
     Base class for job step
     """
 
     def __init__(self, name, context: Context, **kwargs) -> None:
-        self._cwd = kwargs.get("working_dir", None)
-        self._id = kwargs.get("id", None)
+        super().__init__(name, context, **kwargs)
         self._process = None
         self._stdout = None
         self._stderr = None
-        self._return_code = -1
-        if name is None:
-            self._name = ""
-        else:
-            self._name = name
-        self._context = context
-        self._timeout_minutes = kwargs.get("timeout_minutes", 60)
 
     @property
-    def name(self):
-        """
-        Return step name
-        """
-        return self._name
-
-    @property
-    def id(self):
-        """
-        Return step ID
-        """
-        return self._id
-
-    @property
-    def command(self):
+    def command(self) -> str:
         """
         Return command
         """
         return self.create_command()
-
-    @property
-    def return_code(self) -> int:
-        """
-        Return code of the step
-        """
-        return self._return_code
-
-    @property
-    def num_cores(self) -> int:
-        return 1
 
     @property
     def stdout(self):
@@ -66,18 +34,14 @@ class Step(ABC):
             return b''
 
     @property
-    def timeout_minutes(self):
+    def stderr(self):
         """
-        Return timeout in minutes
+        Return stderr of the jobs
         """
-        return self._timeout_minutes
-
-    @property
-    def context(self):
-        """
-        Return context
-        """
-        return self._context
+        if self._stderr:
+            return self._stderr
+        else:
+            return b''
 
     def run(self, context=None):
         timeout = self.timeout_minutes
@@ -101,15 +65,14 @@ class Step(ABC):
                 self.context.vars["steps"][self.id] = {
                     "output": self._stdout.decode()
                 }
+            self._output = self._stdout
 
         except subprocess.TimeoutExpired:
             self.terminate()
             outs, errs = self._process.communicate()
-            self._stdout = None
             self._stderr = 'Step timed out'.encode()
             self._return_code = 124
         except subprocess.SubprocessError:
-            self._stdout = None
             self._stderr = b''
             self._return_code = -1
 
@@ -118,7 +81,7 @@ class Step(ABC):
             self._process.kill()
 
     @abstractmethod
-    def create_command(self) -> str | None:
+    def create_command(self) -> str:
         """
         Subclasses must override this method to return the shell command that will be
         executed by this step.

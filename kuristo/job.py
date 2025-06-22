@@ -223,15 +223,15 @@ class Job:
             with self._step_lock:
                 self._active_step = step
             self._logger.log(f'* {step.name}...')
-            cmd = step.command
-            if cmd:
-                self._logger.log(f'> {cmd}...')
+            if hasattr(step, 'command'):
+                for line in step.command.splitlines():
+                    self._logger.log(f'> {line}')
             self.on_step_start(self, step)
             step.run(context=self._context)
             self.on_step_finish(self, step)
             self._load_env()
 
-            log_data = step.stdout.decode()
+            log_data = step.output.decode()
             for line in log_data.splitlines():
                 self._logger.log(line)
 

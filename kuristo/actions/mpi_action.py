@@ -1,9 +1,9 @@
-from .._step import Step
+from .process_step import ProcessStep
 from ..context import Context
 from abc import abstractmethod
 
 
-class MPIAction(Step):
+class MPIAction(ProcessStep):
     """
     Base class for running MPI commands
     """

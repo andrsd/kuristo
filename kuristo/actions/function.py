@@ -1,5 +1,5 @@
 from ..registry import get_step
-from .._step import Step
+from .step import Step
 from ..context import Context
 from io import StringIO
 import contextlib
@@ -33,6 +33,3 @@ class FunctionStep(Step):
             self._stdout = b""
             self._stderr = str(e).encode()
             self._return_code = 1
-
-    def create_command(self):
-        return None

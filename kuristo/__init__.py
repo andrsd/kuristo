@@ -1,7 +1,6 @@
 from .registry import step, get_step, action
-from ._step import Step
 from .context import Context
-from .actions.mpi_action import MPIAction
+from .actions import Step, ProcessStep, MPIAction
 
 try:
     from ._version import __version__
@@ -13,6 +12,7 @@ __all__ = [
     "get_step",
     "action",
     "Step",
+    "ProcessStep",
     "MPIAction",
     "Context"
 ]
