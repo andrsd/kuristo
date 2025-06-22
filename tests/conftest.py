@@ -18,7 +18,7 @@ def test_workspace(tmp_path):
 @pytest.fixture
 def minimal_workflow_yaml():
     return """
-    tests:
+    jobs:
       test:
         description: test
         steps:

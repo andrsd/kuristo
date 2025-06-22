@@ -1,4 +1,4 @@
-tests:
+jobs:
   multiple-jobs-1:
     description: Test matrix
     strategy:

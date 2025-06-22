@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "kuristo"
 dynamic = ["version"]
-description = "A heavy-weight testing framework"
+description = "A heavy-weight automation framework"
 authors = [{ name = "David Andrs", email = "andrsd@gmail.com" }]
 dependencies = []
 license = { text = "MIT" }

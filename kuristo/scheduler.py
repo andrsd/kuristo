@@ -49,16 +49,16 @@ class Scheduler:
     new one(s). We run until all jobs have FINISHED status.
     """
 
-    def __init__(self, tests, rcs: Resources, log_dir, config: Config) -> None:
+    def __init__(self, specs, rcs: Resources, log_dir, config: Config) -> None:
         """
-        @param tests; [TestSpec] List of test speecifications
+        @param specs: [JobSpec] List of job specifications
         @param rcs: Resources Resource to be scheduled
         @param log_dir: Directory where we write logs
         @param config: Configuration
         """
         self._log_dir = Path(log_dir)
         self._config = config
-        self._create_graph(tests)
+        self._create_graph(specs)
         self._active_jobs = set()
         self._lock = threading.Lock()
         self._resources = rcs
@@ -98,11 +98,11 @@ class Scheduler:
         self._print_stats()
         self._print_time(end_time - start_time)
 
-    def _create_graph(self, tests):
+    def _create_graph(self, specs):
         self._graph = netx.DiGraph()
         job_map = {}
-        for ts in tests:
-            jobs = self._create_jobs(ts)
+        for sp in specs:
+            jobs = self._create_jobs(sp)
             for j in jobs:
                 j.on_finish = self._job_completed
                 j.on_step_start = self._on_step_start
@@ -110,12 +110,12 @@ class Scheduler:
                 self._graph.add_node(j)
                 job_map[j.name] = j
 
-        for ts in tests:
-            for dep_name in ts.needs:
+        for sp in specs:
+            for dep_name in sp.needs:
                 if dep_name not in job_map:
                     # TODO: improve this error message (like tell the user which file this was found in)
-                    raise ValueError(f"Job '{ts.name}' depends on unknown job '{dep_name}'")
-                self._graph.add_edge(job_map[dep_name], job_map[ts.name])
+                    raise ValueError(f"Job '{sp.name}' depends on unknown job '{dep_name}'")
+                self._graph.add_edge(job_map[dep_name], job_map[sp.name])
 
     def _get_ready_jobs(self):
         """
@@ -226,24 +226,24 @@ class Scheduler:
         max_id_width = len(str(self._graph.number_of_nodes()))
         return f"{job.id:>{max_id_width}}"
 
-    def _create_jobs(self, ts):
+    def _create_jobs(self, spec):
         """
         Create jobs
 
-        @param ts Test spec
+        @param spec Job specification
         @return List of `Job`s
         """
-        if ts.strategy:
-            matrix = ts.strategy.get("matrix", {})
+        if spec.strategy:
+            matrix = spec.strategy.get("matrix", {})
             variants = self._expand_matrix_value(matrix)
             jobs = []
             for v in variants:
-                name = self._build_matrix_job_name(ts.name, v)
-                job = Job(name, ts, self._log_dir, self._config, matrix=v)
+                name = self._build_matrix_job_name(spec.name, v)
+                job = Job(name, spec, self._log_dir, self._config, matrix=v)
                 jobs.append(job)
             return jobs
         else:
-            job = Job(ts.name, ts, self._log_dir, self._config)
+            job = Job(spec.name, spec, self._log_dir, self._config)
             return [job]
 
     def _build_matrix_job_name(self, base_name, combo):

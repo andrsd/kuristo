@@ -2,7 +2,7 @@ import threading
 import logging
 import time
 from pathlib import Path
-from .test_spec import TestSpec
+from .job_spec import JobSpec
 from .action_factory import ActionFactory
 from .context import Context
 from .env import Env
@@ -48,9 +48,9 @@ class Job:
             for key, value in env.items():
                 self._logger.info(f"| {key}={value}")
 
-    def __init__(self, name, test_spec: TestSpec, log_dir: Path, config: Config, matrix=None) -> None:
+    def __init__(self, name, job_spec: JobSpec, log_dir: Path, config: Config, matrix=None) -> None:
         """
-        @param test_spec Test specification
+        @param job_spec Job specification
         """
         Job.ID = Job.ID + 1
         self._id = Job.ID
@@ -75,14 +75,14 @@ class Job:
             base_env=self._get_base_env(),
             matrix=matrix
         )
-        self._steps = self._build_steps(test_spec)
-        if test_spec.skip:
-            self.skip(test_spec.skip_reason)
+        self._steps = self._build_steps(job_spec)
+        if job_spec.skip:
+            self.skip(job_spec.skip_reason)
         self._step_task_ids = {}
         self._elapsed_time = 0.
         self._cancelled = threading.Event()
         self._timeout_timer = None
-        self._timeout_minutes = test_spec.timeout_minutes
+        self._timeout_minutes = job_spec.timeout_minutes
         self._step_lock = threading.Lock()
         self._active_step = None
         self._on_finish = self._noop
@@ -267,9 +267,9 @@ class Job:
                 self._cancelled.set()
                 self._active_step.terminate()
 
-    def _build_steps(self, test_spec):
+    def _build_steps(self, spec):
         steps = []
-        for step in test_spec.steps:
+        for step in spec.steps:
             action = ActionFactory.create(step, self._context)
             if action is not None:
                 steps.append(action)

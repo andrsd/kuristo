@@ -5,7 +5,7 @@ from .registry import get_step, get_action
 
 class ActionFactory:
     """
-    Build action from a test step specification
+    Build action from a job step specification
     """
 
     registered_actions = {}

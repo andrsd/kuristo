@@ -1,4 +1,4 @@
-tests:
+jobs:
   test-fa-1:
     description: "Run a test that requires 4 cores"
     steps:

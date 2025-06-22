@@ -1,4 +1,4 @@
-tests:
+jobs:
   job-a:
     description: Job-A
     steps:

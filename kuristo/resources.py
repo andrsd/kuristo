@@ -3,7 +3,7 @@ from .config import Config
 
 class Resources:
     """
-    Provides resources available to the testing
+    Provides resources available to the framework
     """
 
     def __init__(self, config: Config) -> None:

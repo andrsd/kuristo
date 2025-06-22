@@ -1,4 +1,4 @@
-tests:
+jobs:
   test-user-registered-step:
     description: Run test with a user-registered step
     steps:

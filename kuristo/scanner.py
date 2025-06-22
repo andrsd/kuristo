@@ -3,7 +3,7 @@ import os
 
 class Scanner:
     """
-    Scans a location to discover test specifications
+    Scans a location to discover workflows
     """
 
     FILENAME = "ktests.yaml"

@@ -1,24 +1,24 @@
 from rich.console import Console
 from rich.text import Text
-from ._utils import scan_locations, parse_tests_files
+from ._utils import scan_locations, parse_workflow_files
 
 
 console = Console()
 
 
-def list_tests(args):
+def list_jobs(args):
     locations = args.location or ["."]
 
-    tests_files = scan_locations(locations)
-    tests = parse_tests_files(tests_files)
+    workflow_files = scan_locations(locations)
+    specs = parse_workflow_files(workflow_files)
 
-    for ts in tests:
-        name = Text(ts.name, style="bold cyan")
-        description = Text(ts.description, style="dim")
+    for sp in specs:
+        name = Text(sp.name, style="bold cyan")
+        description = Text(sp.description, style="dim")
         txt = Text("• ")
         txt.append(name)
         txt.append(": ")
         txt.append(description)
         console.print(txt)
     console.print()
-    console.print(f"Found tests: [green]{len(tests)}[/]")
+    console.print(f"Found jobs: [green]{len(specs)}[/]")

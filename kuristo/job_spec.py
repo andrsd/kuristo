@@ -1,8 +1,8 @@
 
 
-class TestSpec:
+class JobSpec:
     """
-    Data class with a test specification
+    Data class with a job specification
     """
 
     class Step:
@@ -72,7 +72,7 @@ class TestSpec:
 
         @staticmethod
         def from_dict(**kwargs):
-            step = TestSpec.Step(**kwargs)
+            step = JobSpec.Step(**kwargs)
             return step
 
     def __init__(self, name, **kwargs) -> None:
@@ -88,35 +88,35 @@ class TestSpec:
     @property
     def name(self):
         """
-        Return test name
+        Return job name
         """
         return self._name
 
     @property
     def steps(self):
         """
-        Return test steps
+        Return job steps
         """
         return self._steps
 
     @property
     def description(self):
         """
-        Return test description
+        Return job description
         """
         return self._description
 
     @property
     def skip(self):
         """
-        Should the test be skipped?
+        Should the job be skipped?
         """
         return self._skip is not None
 
     @property
     def skip_reason(self):
         """
-        Return the reason why test is marked as skipped
+        Return the reason why job is marked as skipped
         """
         return self._skip
 
@@ -143,7 +143,7 @@ class TestSpec:
 
     def _build_steps(self, data):
         """
-        Build test steps
+        Build job steps
         """
         steps = []
         for entry in data:
@@ -153,8 +153,8 @@ class TestSpec:
     @staticmethod
     def from_dict(name, data):
         if isinstance(data, dict):
-            test_name = data.pop("name", name)
-            ts = TestSpec(test_name, **data)
+            job_name = data.pop("name", name)
+            ts = JobSpec(job_name, **data)
             return ts
         else:
             raise RuntimeError("Expected dict as 'data'")

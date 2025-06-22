@@ -1,4 +1,4 @@
-tests:
+jobs:
   output-test:
     name: "Output test"
     description: "Produce an output"

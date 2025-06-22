@@ -6,7 +6,7 @@ from .config import Config
 from .scheduler import Scheduler
 from .resources import Resources
 from ._plugin_loader import load_user_steps_from_kuristo_dir
-from ._utils import scan_locations, parse_tests_files
+from ._utils import scan_locations, parse_workflow_files
 
 
 RUN_DIR_PATTERN = re.compile(r"\d{8}_\d{6}")
@@ -39,7 +39,7 @@ def prune_old_runs(runs_dir: Path, keep_last_n: int):
         shutil.rmtree(old_run)
 
 
-def run_tests(args):
+def run_jobs(args):
     locations = args.location or ["."]
 
     config = Config()
@@ -50,10 +50,10 @@ def run_tests(args):
 
     load_user_steps_from_kuristo_dir()
 
-    tests_files = scan_locations(locations)
-    tests = parse_tests_files(tests_files)
+    workflow_files = scan_locations(locations)
+    specs = parse_workflow_files(workflow_files)
     rcs = Resources(config)
-    scheduler = Scheduler(tests, rcs, log_dir, config=config)
+    scheduler = Scheduler(specs, rcs, log_dir, config=config)
     scheduler.check()
     scheduler.run_all_jobs()
 

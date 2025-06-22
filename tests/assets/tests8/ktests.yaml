@@ -1,4 +1,4 @@
-tests:
+jobs:
   step-1:
     steps:
       - name: Set env vars

@@ -1,4 +1,4 @@
-tests:
+jobs:
   test-A:
     name: "Test A"
     description: "Default run"

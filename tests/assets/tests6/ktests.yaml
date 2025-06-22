@@ -1,4 +1,4 @@
-tests:
+jobs:
   exodiff:
     description: Run exodiff
     steps:

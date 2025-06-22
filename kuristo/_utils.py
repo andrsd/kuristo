@@ -3,7 +3,7 @@ import subprocess
 import os
 import yaml
 from .scanner import Scanner
-from .test_spec import TestSpec
+from .job_spec import JobSpec
 from jinja2 import Template
 
 
@@ -24,33 +24,33 @@ def get_default_core_limit():
 
 def scan_locations(locations):
     """
-    Scan the locations for the test specification files
+    Scan the locations for the workflow files
     """
-    spec_files = []
+    workflow_files = []
     for loc in locations:
         scanner = Scanner(loc)
-        spec_files.extend(scanner.scan())
-    return spec_files
+        workflow_files.extend(scanner.scan())
+    return workflow_files
 
 
-def tests_from_file(file_path):
-    test_specs = []
+def specs_from_file(file_path):
+    specs = []
     with open(file_path, 'r') as file:
         data = yaml.safe_load(file)
-        tests = data.get('tests', {})
-        for t, params in tests.items():
-            test_specs.append(TestSpec.from_dict(t, params))
-    return test_specs
+        jobs = data.get('jobs', {})
+        for t, params in jobs.items():
+            specs.append(JobSpec.from_dict(t, params))
+    return specs
 
 
-def parse_tests_files(spec_files):
+def parse_workflow_files(workflow_files):
     """
-    Parse test files (ktests.yaml)
+    Parse workflow files (ktests.yaml)
     """
-    tests = []
-    for file in spec_files:
-        tests.extend(tests_from_file(file))
-    return tests
+    specs = []
+    for file in workflow_files:
+        specs.extend(specs_from_file(file))
+    return specs
 
 
 def resolve_path(path_str, source_root, build_root):
