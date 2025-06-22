@@ -7,7 +7,7 @@ from ..context import Context
 
 
 @action("checks/exodiff")
-class ExodiffAction(Step):
+class ExodiffCheck(Step):
     """
     Run exodiff on two Exodus files.
 
