@@ -1,8 +1,18 @@
 import argparse
 from kuristo import __version__
+from .run import run_jobs
+from .doctor import print_diag
+from .list import list_jobs
 
 
-def build_cli():
+__all__ = [
+    "run_jobs",
+    "print_diag",
+    "list_jobs"
+]
+
+
+def build_parser():
     parser = argparse.ArgumentParser(prog="kuristo", description="Kuristo automation framework")
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     subparsers = parser.add_subparsers(dest="command", required=True)

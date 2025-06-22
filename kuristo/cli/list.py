@@ -1,6 +1,6 @@
 from rich.console import Console
 from rich.text import Text
-from ._utils import scan_locations, parse_workflow_files
+from .._utils import scan_locations, parse_workflow_files
 
 
 console = Console()
