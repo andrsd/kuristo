@@ -53,7 +53,7 @@ def run_jobs(args):
     workflow_files = scan_locations(locations)
     specs = parse_workflow_files(workflow_files)
     rcs = Resources(config)
-    scheduler = Scheduler(specs, rcs, log_dir, config=config)
+    scheduler = Scheduler(specs, rcs, log_dir, config=config, no_ansi=args.no_ansi)
     scheduler.check()
     scheduler.run_all_jobs()
 

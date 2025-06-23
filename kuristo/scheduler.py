@@ -40,6 +40,19 @@ class StepCountColumn(ProgressColumn):
             return Text("")
 
 
+class NullProgress:
+    def __init__(self, no_ansi):
+        self.console = Console(force_terminal=no_ansi, no_color=no_ansi, markup=no_ansi)
+
+    def __enter__(self): return self
+    def __exit__(self, exc_type, exc_val, exc_tb): pass
+    def add_task(self, *args, **kwargs): pass
+    def remove_task(self, *args, **kwargs): pass
+    def update(self, *args, **kwargs): pass
+    def advance(self, *args, **kwargs): pass
+    def stop(self): pass
+
+
 class Scheduler:
     """
     Job scheduler
@@ -49,27 +62,31 @@ class Scheduler:
     new one(s). We run until all jobs have FINISHED status.
     """
 
-    def __init__(self, specs, rcs: Resources, log_dir, config: Config) -> None:
+    def __init__(self, specs, rcs: Resources, log_dir, config: Config, no_ansi=False) -> None:
         """
         @param specs: [JobSpec] List of job specifications
         @param rcs: Resources Resource to be scheduled
         @param log_dir: Directory where we write logs
         @param config: Configuration
         """
+        self._no_ansi = no_ansi
         self._log_dir = Path(log_dir)
         self._config = config
         self._create_graph(specs)
         self._active_jobs = set()
         self._lock = threading.Lock()
         self._resources = rcs
-        self._progress = Progress(
-            SpinnerColumn(),
-            TextColumn("[progress.description]{task.description}"),
-            BarColumn(style=Style(color="grey23"), pulse_style=Style(color="grey46")),
-            StepCountColumn(),
-            TimeElapsedColumn(),
-            transient=True
-        )
+        if self._no_ansi:
+            self._progress = NullProgress(no_ansi=no_ansi)
+        else:
+            self._progress = Progress(
+                SpinnerColumn(),
+                TextColumn("[progress.description]{task.description}"),
+                BarColumn(style=Style(color="grey23"), pulse_style=Style(color="grey46")),
+                StepCountColumn(),
+                TimeElapsedColumn(),
+                transient=True
+            )
         # tasks that are executed
         self._tasks = {}
         self._n_success = 0
@@ -137,7 +154,9 @@ class Scheduler:
                     job.skip_process()
                     job_id = self._padded_job_id(job)
                     job_name = rich_job_name(job.name)
-                    self._progress.console.print(f"[yellow]-[/] [{job_id}] [cyan not bold]{job_name}[/] was skipped: [cyan]{job.skip_reason}")
+                    self._progress.console.print(
+                        Text.from_markup(f"[yellow]-[/] [{job_id}] [cyan not bold]{job_name}[/] was skipped: [cyan]{job.skip_reason}")
+                    )
                     self._n_skipped = self._n_skipped + 1
                     continue
 
@@ -145,24 +164,38 @@ class Scheduler:
                 if self._resources.available_cores >= required:
                     self._resources.allocate_cores(required)
                     self._active_jobs.add(job)
+                    job_id = self._padded_job_id(job)
                     job_name = rich_job_name(job.name)
-                    task_id = self._progress.add_task(f"[cyan]{job_name}", total=job.num_steps)
+                    task_id = self._progress.add_task(
+                        Text.from_markup(f"[cyan]{job_name}"),
+                        total=job.num_steps
+                    )
                     self._tasks[job.id] = task_id
                     job.create_step_tasks(self._progress)
                     job.start()
+                    if self._no_ansi:
+                        self._progress.console.print(
+                            Text.from_markup(f"- [{job_id}] {job_name} started")
+                        )
 
     def _job_completed(self, job):
         with self._lock:
             job_id = self._padded_job_id(job)
             job_name = rich_job_name(job.name)
             if job.return_code == 0:
-                self._progress.console.print(f"[green]✔[/] [{job_id}] [cyan not bold]{job_name}[/] finished with return code {job.return_code} [magenta not bold][{human_time2(job.elapsed_time)}][/]")
+                self._progress.console.print(
+                    Text.from_markup(f"[green]✔[/] [{job_id}] [cyan not bold]{job_name}[/] finished with return code {job.return_code} [magenta not bold][{human_time2(job.elapsed_time)}][/]")
+                )
                 self._n_success = self._n_success + 1
             elif job.return_code == 124:
-                self._progress.console.print(f"[red]x[/] [{job_id}] [cyan not bold]{job_name}[/] timed out [magenta not bold][{human_time2(job.elapsed_time)}][/]")
+                self._progress.console.print(
+                    Text.from_markup(f"[red]x[/] [{job_id}] [cyan not bold]{job_name}[/] timed out [magenta not bold][{human_time2(job.elapsed_time)}][/]")
+                )
                 self._n_failed = self._n_failed + 1
             else:
-                self._progress.console.print(f"[red]x[/] [{job_id}] [cyan not bold]{job_name}[/] finished with return code {job.return_code} [magenta not bold][{human_time2(job.elapsed_time)}][/]")
+                self._progress.console.print(
+                    Text.from_markup(f"[red]x[/] [{job_id}] [cyan not bold]{job_name}[/] finished with return code {job.return_code} [magenta not bold][{human_time2(job.elapsed_time)}][/]")
+                )
                 self._n_failed = self._n_failed + 1
             task_id = self._tasks[job.id]
             self._progress.remove_task(task_id)
@@ -208,16 +241,19 @@ class Scheduler:
     def _print_stats(self):
         total = self._n_success + self._n_failed + self._n_skipped
 
-        console = Console()
-        console.print(
-            f"[green]✔[/] Success: [green]{self._n_success:,}[/]    "
-            f"[red]x[/] Failed: [red]{self._n_failed:,}[/]    "
-            f"[yellow]-[/] Skipped: [yellow]{self._n_skipped:,}[/]    "
-            f"Total: {total}"
+        self._progress.console.print(
+            Text.from_markup(
+                f"[green]✔[/] Success: [green]{self._n_success:,}[/]    "
+                f"[red]x[/] Failed: [red]{self._n_failed:,}[/]    "
+                f"[yellow]-[/] Skipped: [yellow]{self._n_skipped:,}[/]    "
+                f"Total: {total}"
+            )
         )
 
     def _print_time(self, elapsed_time):
-        print(f"  Took: {human_time(elapsed_time)}")
+        self._progress.console.print(
+            Text.from_markup(f"  Took: {human_time(elapsed_time)}")
+        )
 
     def _create_log_dir(self):
         self._log_dir.mkdir(parents=True, exist_ok=True)
