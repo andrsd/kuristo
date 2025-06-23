@@ -6,6 +6,7 @@ from .checks_exodiff import ExodiffCheck
 from .checks_cvsdiff import CSVDiffCheck
 from .checks_regex import RegexCheck
 from .checks_regex_float import RegexFloatCheck
+from .composite_action import CompositeAction
 
 
 __all__ = [
@@ -17,4 +18,5 @@ __all__ = [
     "SeqAction",
     "RegexCheck",
     "RegexFloatCheck",
+    "CompositeAction"
 ]

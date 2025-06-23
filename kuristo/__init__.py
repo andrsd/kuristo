@@ -1,6 +1,6 @@
 from .registry import step, get_step, action
 from .context import Context
-from .actions import Step, ProcessStep, MPIAction
+from .actions import Step, ProcessStep, MPIAction, CompositeAction
 
 try:
     from ._version import __version__
@@ -14,5 +14,6 @@ __all__ = [
     "Step",
     "ProcessStep",
     "MPIAction",
+    "CompositeAction",
     "Context"
 ]
