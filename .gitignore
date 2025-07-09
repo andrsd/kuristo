@@ -5,3 +5,4 @@ kuristo.egg-info
 .kuristo-out
 kuristo/_version.py
 .coverage
+.pytest_cache/
