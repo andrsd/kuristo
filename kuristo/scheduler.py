@@ -62,12 +62,13 @@ class Scheduler:
     new one(s). We run until all jobs have FINISHED status.
     """
 
-    def __init__(self, specs, rcs: Resources, log_dir, config: Config, no_ansi=False) -> None:
+    def __init__(self, specs, rcs: Resources, log_dir, config: Config, no_ansi=False, report_path=None) -> None:
         """
         @param specs: [JobSpec] List of job specifications
         @param rcs: Resources Resource to be scheduled
         @param log_dir: Directory where we write logs
         @param config: Configuration
+        @param job_times_path: File name to store timing report into
         """
         self._no_ansi = no_ansi
         self._log_dir = Path(log_dir)
@@ -92,6 +93,8 @@ class Scheduler:
         self._n_success = 0
         self._n_failed = 0
         self._n_skipped = 0
+        #
+        self._report_path = report_path
 
     def check(self):
         """
@@ -114,6 +117,7 @@ class Scheduler:
         end_time = time.perf_counter()
         self._print_stats()
         self._print_time(end_time - start_time)
+        self._write_report()
 
     def _create_graph(self, specs):
         self._graph = netx.DiGraph()
@@ -346,3 +350,22 @@ class Scheduler:
 
         job_task_id = self._tasks[job.id]
         self._progress.update(job_task_id, advance=1)
+
+    def _write_report(self):
+        if self._report_path:
+            self._write_report_csv(self._report_path)
+
+    def _write_report_csv(self, csv_path: Path):
+        import csv
+        with open(csv_path, "w", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow(["id", "job name", "status", "duration [s]", "return code"])
+            for job in self._graph.nodes:
+                duration = "" if job.is_skipped else round(job.elapsed_time, 3)
+                if job.is_skipped:
+                    status = "skipped"
+                elif job.return_code == 0:
+                    status = "success"
+                else:
+                    status = "failed"
+                writer.writerow([job.id, job.name, status, duration, job.return_code])

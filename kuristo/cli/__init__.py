@@ -1,4 +1,5 @@
 import argparse
+from pathlib import Path
 from kuristo import __version__
 from .run import run_jobs
 from .doctor import print_diag
@@ -22,6 +23,7 @@ def build_parser():
     run_parser = subparsers.add_parser("run", help="Run jobs")
     run_parser.add_argument("--location", "-l", action="append", help="Location to scan for workflow files")
     run_parser.add_argument("--verbose", "-v", type=int, default=0, help="Verbose level")
+    run_parser.add_argument("--report", type=Path, help="Save report with the runtime information to a CSV file")
 
     # Doctor command
     subparsers.add_parser("doctor", help="Show diagnostic info")
