@@ -19,7 +19,7 @@ jobs:
         uses: checks/regex-float
         with:
           input: ${{ steps.result.output }}
-          pattern: "Value: ([0-9.]+)"
+          pattern: "Value: ([0-9\\.]+)"
           gold: 2.4
           abs_tol: 1e-10
 
