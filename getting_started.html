@@ -1,0 +1,199 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Getting Started &mdash; kuristo 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=2709fde1"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Writing Workflows" href="writing_workflows.html" />
+    <link rel="prev" title="Kuristo" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            kuristo
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#basic-workflow">Basic Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-the-workflow">Running the Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#list-available-jobs">List available jobs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#environment-diagnostics">Environment diagnostics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="writing_workflows.html">Writing Workflows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="actions/index.html">Built-in Actions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom_actions.html">Custom Actions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">kuristo</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Getting Started</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/getting_started.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h1>
+<p>This guide walks you through installing Kuristo, writing your first workflow, and running it locally.</p>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<p>Clone the repository and install it from source:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/andrsd/kuristo.git
+<span class="nb">cd</span><span class="w"> </span>kuristo
+pip<span class="w"> </span>install<span class="w"> </span>.
+</pre></div>
+</div>
+</section>
+<section id="basic-workflow">
+<h2>Basic Workflow<a class="headerlink" href="#basic-workflow" title="Link to this heading"></a></h2>
+<p>Kuristo workflows are written in YAML. Here’s a minimal example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">single-case</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">simple test</span>
+<span class="w">      </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./generate_mesh.sh</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./simulate --input mesh.exo</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./check_results output.csv</span>
+</pre></div>
+</div>
+<p>Save this as <code class="docutils literal notranslate"><span class="pre">ktests.yml</span></code>.</p>
+</section>
+<section id="running-the-workflow">
+<h2>Running the Workflow<a class="headerlink" href="#running-the-workflow" title="Link to this heading"></a></h2>
+<p>To run the workflow:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>kuristo<span class="w"> </span>run<span class="w"> </span>-l<span class="w"> </span>/path/
+</pre></div>
+</div>
+<p>Kuristo will traverse the directory structure and try to find <code class="docutils literal notranslate"><span class="pre">ktests.yaml</span></code> files with workflows.
+Then, it will execute each job in order, tracking progress and logging output into the <code class="docutils literal notranslate"><span class="pre">.kuristo-out/</span></code> directory.</p>
+<p>The command-line output will look like this:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>✔ [1] simple test finished with return code 0 [1.01s]
+
+✔ Success: 1    x Failed: 0    - Skipped: 0    Total: 1
+  Took: 1.5s
+</pre></div>
+</div>
+<p>By default, output is printed to the terminal and stored in per-run and per-job subdirectories under <code class="docutils literal notranslate"><span class="pre">.kuristo-out/</span></code>.</p>
+<p><strong>Options and Verbosity</strong></p>
+<p>You can control verbosity with the <code class="docutils literal notranslate"><span class="pre">--verbosity</span></code> option:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>kuristo<span class="w"> </span>run<span class="w"> </span>workflow.yml<span class="w"> </span>--verbosity<span class="o">=</span><span class="m">2</span>
+</pre></div>
+</div>
+<p>Verbosity levels:</p>
+<ul class="simple">
+<li><p><cite>0</cite>: silent</p></li>
+<li><p><cite>1</cite>: errors only</p></li>
+<li><p><cite>2</cite>: default</p></li>
+<li><p><cite>3</cite>: detailed output for each step</p></li>
+</ul>
+</section>
+<section id="list-available-jobs">
+<h2>List available jobs<a class="headerlink" href="#list-available-jobs" title="Link to this heading"></a></h2>
+<p>Use this to see what jobs are would be executed:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>kuristo<span class="w"> </span>list
+</pre></div>
+</div>
+<p>This will traverse the directory structure from the current working directory and look for <code class="docutils literal notranslate"><span class="pre">ktests.yaml</span></code> files.
+You can specify different location via <code class="docutils literal notranslate"><span class="pre">-l</span> <span class="pre">/path/to/start/search/from</span></code>.</p>
+</section>
+<section id="environment-diagnostics">
+<h2>Environment diagnostics<a class="headerlink" href="#environment-diagnostics" title="Link to this heading"></a></h2>
+<p>Use the <code class="docutils literal notranslate"><span class="pre">doctor</span></code> command to generate a diagnostic report about your Kuristo environment:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>kuristo<span class="w"> </span>doctor
+</pre></div>
+</div>
+<p>This outputs detailed information including:</p>
+<ul class="simple">
+<li><p>Kuristo version and Python interpreter</p></li>
+<li><p>Platform and CPU configuration</p></li>
+<li><p>Log and config file locations</p></li>
+<li><p>MPI launcher</p></li>
+<li><p>Active plugins, registered steps and actions</p></li>
+<li><p>Logging and cleanup policies</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Kuristo" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="writing_workflows.html" class="btn btn-neutral float-right" title="Writing Workflows" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, David Andrs.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
