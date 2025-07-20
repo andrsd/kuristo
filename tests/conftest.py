@@ -1,7 +1,4 @@
-import shutil
-import tempfile
 import pytest
-from pathlib import Path
 
 
 @pytest.fixture
@@ -14,6 +11,7 @@ def test_workspace(tmp_path):
     workdir.mkdir()
     (workdir / ".kuristo").mkdir()
     return workdir
+
 
 @pytest.fixture
 def minimal_workflow_yaml():
