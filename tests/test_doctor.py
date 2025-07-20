@@ -4,7 +4,7 @@ from kuristo.__main__ import main
 
 
 def test_kuristo_doctor(capsys):
-    test_argv = ["kuristo", "doctor"]
+    test_argv = ["kuristo", "--no-ansi", "doctor"]
     with patch.object(sys, "argv", test_argv):
         main()
 

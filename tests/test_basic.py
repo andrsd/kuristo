@@ -7,7 +7,7 @@ def test_cli_runs(tmp_path, minimal_workflow_yaml):
 
     # Call the CLI
     result = subprocess.run(
-        ["kuristo", "run", "-l", str(tmp_path)],
+        ["kuristo", "--no-ansi", "run", "-l", str(tmp_path)],
         capture_output=True,
         text=True,
     )
