@@ -66,25 +66,25 @@ kuristo run -l tests --no-ansi
 
 ```yaml
 jobs:
-    test-matrix:
-        strategy:
-            matrix:
-                include:
-                    - os: ubuntu
-                      version: 20.04
-                    - os: ubuntu
-                      version: 22.04
+  test-matrix:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu
+            version: 20.04
+          - os: ubuntu
+            version: 22.04
 
-        steps:
-            - name: Run simulation
-              id: simulation
-              run: ./simulate --config=${{ matrix.version }}
+    steps:
+      - name: Run simulation
+        id: simulation
+        run: ./simulate --config=${{ matrix.version }}
 
-            - name: Check output
-              uses: checks/regex
-              with:
-                  input: ${{ steps.simulation.output }}
-                  pattern: "SUCCESS"
+      - name: Check output
+        uses: checks/regex
+        with:
+          input: ${{ steps.simulation.output }}
+          pattern: "SUCCESS"
 ```
 
 ### Writing Custom Actions
@@ -108,12 +108,12 @@ Then, use in the workflow as:
 
 ```yaml
 jobs:
-    test:
-        steps:
-            - name: My special test
-              uses: my/special-step
-              with:
-                  input: "world"
+  test:
+    steps:
+      - name: My special test
+        uses: my/special-step
+        with:
+          input: "world"
 ```
 
 Kuristo will auto-discover `.py` files in `.kuristo/`.
@@ -133,9 +133,9 @@ Set logging retention and cleanup in `config.yaml`:
 
 ```yaml
 log:
-    dir_name: .kuristo-out
-    history: 5
-    cleanup: on_success
+  dir_name: .kuristo-out
+  history: 5
+  cleanup: on_success
 ```
 
 ## Job Timing Report
@@ -152,10 +152,10 @@ You can define a global config at `.kuristo/config.yaml`:
 
 ```yaml
 resources:
-    num_cores: 8
+  num_cores: 8
 
 runner:
-    mpi_launcher: mpiexec
+  mpi_launcher: mpiexec
 ```
 
 Or override via environment variable:
