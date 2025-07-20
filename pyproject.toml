@@ -7,7 +7,7 @@ name = "kuristo"
 dynamic = ["version"]
 description = "A simple automation framework"
 authors = [{ name = "David Andrs", email = "andrsd@gmail.com" }]
-dependencies = ["networks"]
+dependencies = ["pyyaml", "rich", "networkx", "jinja2"]
 license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.10"
@@ -17,3 +17,6 @@ kuristo = "kuristo.__main__:main"
 
 [tool.setuptools_scm]
 version_file = "kuristo/_version.py"
+
+[tool.coverage.xml]
+output = "coverage.xml"

@@ -20,4 +20,4 @@ class MyCustomStep(kuristo.ProcessStep):
 @kuristo.action("app-name/mpi")
 class CustomMPIAction(kuristo.MPIAction):
     def create_sub_command(self) -> str:
-        return "echo A"
+        return "bash -c 'echo A'"
