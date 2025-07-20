@@ -83,6 +83,8 @@ class Scheduler:
         @param config: Configuration
         @param job_times_path: File name to store timing report into
         """
+        self._max_label_len = 80
+        self._max_id_width = 1
         self._no_ansi = no_ansi
         self._log_dir = Path(log_dir)
         self._config = config
@@ -128,6 +130,13 @@ class Scheduler:
             while any(not job.is_processed for job in self._graph.nodes):
                 threading.Event().wait(0.5)
         end_time = time.perf_counter()
+        if self._no_ansi:
+            self._progress.console.print("")
+
+        line = "-" * (self._max_label_len + 12 + self._max_id_width)
+        self._progress.console.print(
+            Text.from_markup(f"[grey23]{line}[/]")
+        )
         self._print_stats()
         self._print_time(end_time - start_time)
         self._write_report()
@@ -143,6 +152,8 @@ class Scheduler:
                 j.on_step_finish = self._on_step_finish
                 self._graph.add_node(j)
                 job_map[j.name] = j
+                self._max_label_len = max(self._max_label_len, len(j.name) + 1)
+        self._max_id_width = len(str(self._graph.number_of_nodes()))
 
         for sp in specs:
             for dep_name in sp.needs:
@@ -169,11 +180,8 @@ class Scheduler:
             for job in ready_jobs:
                 if job.is_skipped:
                     job.skip_process()
-                    job_id = self._padded_job_id(job)
                     job_name = rich_job_name(job.name)
-                    self._progress.console.print(
-                        Text.from_markup(f"[yellow]-[/] [{job_id}] [cyan not bold]{job_name}[/] was skipped: [cyan]{job.skip_reason}")
-                    )
+                    self._print_staus_line(job, state="SKIP")
                     self._n_skipped = self._n_skipped + 1
                     continue
 
@@ -181,7 +189,6 @@ class Scheduler:
                 if self._resources.available_cores >= required:
                     self._resources.allocate_cores(required)
                     self._active_jobs.add(job)
-                    job_id = self._padded_job_id(job)
                     job_name = rich_job_name(job.name)
                     task_id = self._progress.add_task(
                         Text.from_markup(f"[cyan]{job_name}"),
@@ -190,29 +197,18 @@ class Scheduler:
                     self._tasks[job.id] = task_id
                     job.create_step_tasks(self._progress)
                     job.start()
-                    if self._no_ansi:
-                        self._progress.console.print(
-                            Text.from_markup(f"- [{job_id}] {job_name} started")
-                        )
+                    self._print_staus_line(job, state="STARTING")
 
     def _job_completed(self, job):
         with self._lock:
-            job_id = self._padded_job_id(job)
-            job_name = rich_job_name(job.name)
             if job.return_code == 0:
-                self._progress.console.print(
-                    Text.from_markup(f"[green]✔[/] [{job_id}] [cyan not bold]{job_name}[/] finished with return code {job.return_code} [magenta not bold][{human_time2(job.elapsed_time)}][/]")
-                )
+                self._print_staus_line(job, state="PASS")
                 self._n_success = self._n_success + 1
             elif job.return_code == 124:
-                self._progress.console.print(
-                    Text.from_markup(f"[red]x[/] [{job_id}] [cyan not bold]{job_name}[/] timed out [magenta not bold][{human_time2(job.elapsed_time)}][/]")
-                )
+                self._print_staus_line(job, state="TIMEOUT")
                 self._n_failed = self._n_failed + 1
             else:
-                self._progress.console.print(
-                    Text.from_markup(f"[red]x[/] [{job_id}] [cyan not bold]{job_name}[/] finished with return code {job.return_code} [magenta not bold][{human_time2(job.elapsed_time)}][/]")
-                )
+                self._print_staus_line(job, state="FAIL")
                 self._n_failed = self._n_failed + 1
             task_id = self._tasks[job.id]
             self._progress.remove_task(task_id)
@@ -260,24 +256,25 @@ class Scheduler:
 
         self._progress.console.print(
             Text.from_markup(
-                f"[green]✔[/] Success: [green]{self._n_success:,}[/]    "
-                f"[red]x[/] Failed: [red]{self._n_failed:,}[/]    "
-                f"[yellow]-[/] Skipped: [yellow]{self._n_skipped:,}[/]    "
-                f"Total: {total}"
+                f"[grey46]Success:[/] [green]{self._n_success:,}[/]     "
+                f"[grey46]Failed:[/] [red]{self._n_failed:,}[/]     "
+                f"[grey46]Skipped:[/] [yellow]{self._n_skipped:,}[/]     "
+                f"[grey46]Total:[/] {total}"
             )
         )
 
     def _print_time(self, elapsed_time):
-        self._progress.console.print(
-            Text.from_markup(f"  Took: {human_time(elapsed_time)}")
-        )
+        markup = f"[grey46]Took:[/] {human_time(elapsed_time)}"
+        self._progress.console.print(Text.from_markup(markup))
 
     def _create_log_dir(self):
         self._log_dir.mkdir(parents=True, exist_ok=True)
 
     def _padded_job_id(self, job):
-        max_id_width = len(str(self._graph.number_of_nodes()))
-        return f"{job.id:>{max_id_width}}"
+        return f"{job.id:>{self._max_id_width}}"
+
+    def _padded_job_name(self, job_name):
+        return f"{job_name:<{100}}"
 
     def _create_jobs(self, spec):
         """
@@ -382,3 +379,33 @@ class Scheduler:
                 else:
                     status = "failed"
                 writer.writerow([job.id, job.name, status, duration, job.return_code])
+
+    def _print_staus_line(self, job, state):
+        job_id = self._padded_job_id(job)
+        job_name = rich_job_name(job.name)
+        dots = "." * (self._max_label_len - len(job.name))
+
+        if state == "STARTING":
+            if self._no_ansi:
+                markup = f"         #{job_id} {job_name} "
+                self._progress.console.print(Text.from_markup(markup))
+        else:
+            markup = ""
+            if state == "SKIP":
+                markup += "\\[ [yellow]SKIP[/] ]"
+            elif state == "PASS":
+                markup += "\\[ [green]PASS[/] ]"
+            elif state == "FAIL" or state == "TIMEOUT":
+                markup += "\\[ [red]FAIL[/] ]"
+
+            markup += f" [grey46]#{job_id}[/]"
+            markup += f" [cyan bold]{job_name}[/]"
+            if state == "SKIP":
+                markup += f": [cyan]{job.skip_reason}"
+            elif state == "TIMEOUT":
+                markup += f" [grey23]{dots}[/]"
+                markup += " timeout"
+            else:
+                markup += f" [grey23]{dots}[/]"
+                markup += f" {human_time2(job.elapsed_time)}"
+            self._progress.console.print(Text.from_markup(markup))
