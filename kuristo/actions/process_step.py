@@ -2,7 +2,7 @@ from .step import Step
 from ..context import Context
 import os
 import subprocess
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 
 
 class ProcessStep(Step):

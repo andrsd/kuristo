@@ -1,4 +1,3 @@
-import pytest
 import sys
 import re
 from pathlib import Path
@@ -7,6 +6,7 @@ from kuristo.__main__ import main
 
 
 ASSETS_DIR = Path(__file__).parent / "assets"
+
 
 def test_kuristo_list(capsys):
     test_argv = ["kuristo", "--no-ansi", "list", "-l", str(ASSETS_DIR)]

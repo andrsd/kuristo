@@ -44,13 +44,26 @@ class NullProgress:
     def __init__(self, no_ansi):
         self.console = Console(force_terminal=no_ansi, no_color=no_ansi, markup=no_ansi)
 
-    def __enter__(self): return self
-    def __exit__(self, exc_type, exc_val, exc_tb): pass
-    def add_task(self, *args, **kwargs): pass
-    def remove_task(self, *args, **kwargs): pass
-    def update(self, *args, **kwargs): pass
-    def advance(self, *args, **kwargs): pass
-    def stop(self): pass
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+    def add_task(self, *args, **kwargs):
+        pass
+
+    def remove_task(self, *args, **kwargs):
+        pass
+
+    def update(self, *args, **kwargs):
+        pass
+
+    def advance(self, *args, **kwargs):
+        pass
+
+    def stop(self):
+        pass
 
 
 class Scheduler:
