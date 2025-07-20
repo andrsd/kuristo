@@ -2,7 +2,7 @@ name: Docs
 
 on:
   push:
-    branches: [main]  # or whatever your default branch is
+    branches: [main]
   workflow_dispatch:
 
 jobs:
