@@ -1,5 +1,11 @@
 # Kuristo
 
+[![qa](https://github.com/andrsd/kuristo/actions/workflows/qa.yml/badge.svg)](https://github.com/andrsd/kuristo/actions/workflows/qa.yml)
+[![build](https://github.com/andrsd/kuristo/actions/workflows/build.yml/badge.svg)](https://github.com/andrsd/kuristo/actions/workflows/build.yml)
+[![codecov](https://codecov.io/gh/andrsd/kuristo/graph/badge.svg?token=2I0297154I)](https://codecov.io/gh/andrsd/kuristo)
+[![License](http://img.shields.io/:license-mit-blue.svg)](https://andrsd.mit-license.org/)
+[![Scc Count Badge](https://sloc.xyz/github/andrsd/kuristo/)](https://github.com/andrsd/kuristo/)
+
 Kuristo is a flexible, plugin-enabled automation framework designed for scientific and HPC workflows. 
 It supports sequential and parallel job execution, workflow definition via YAML, resource-aware scheduling, custom step and action definitions, and rich output with optional headless mode.
 
