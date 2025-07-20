@@ -9,18 +9,18 @@ jobs:
   test-B:
     description: "Default test that will use 4 MPI ranks"
     steps:
-      - name: MPI-4 (a)
+      - name: MPI-2 (a)
         uses: app-name/mpi
         with:
-          n_procs: 4
+          n_procs: 2
 
   test-C:
     description: "Another test that will use 4 MPI ranks"
     steps:
-      - name: MPI-4 (b)
+      - name: MPI-2 (b)
         uses: app-name/mpi
         with:
-          n_procs: 4
+          n_procs: 2
 
   test-oversized:
     description: "Oversized test that should never be scheduled"
