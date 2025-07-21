@@ -8,8 +8,7 @@ from rich.text import Text
 from rich.console import Console
 from rich.style import Style
 from .job import Job
-from itertools import product
-from ._utils import rich_job_name, interpolate_str
+from ._utils import rich_job_name
 from .config import Config
 from .resources import Resources
 
@@ -284,64 +283,16 @@ class Scheduler:
         @return List of `Job`s
         """
         if spec.strategy:
-            matrix = spec.strategy.get("matrix", {})
-            variants = self._expand_matrix_value(matrix)
+            variants = spec.expand_matrix_value()
             jobs = []
             for v in variants:
-                name = self._build_matrix_job_name(spec.name, v)
+                name = spec.build_matrix_job_name(v)
                 job = Job(name, spec, self._log_dir, self._config, matrix=v)
                 jobs.append(job)
             return jobs
         else:
             job = Job(spec.name, spec, self._log_dir, self._config)
             return [job]
-
-    def _build_matrix_job_name(self, base_name, combo):
-        """
-        Create job name for a job from a matrix
-
-        @param base_name Base job name
-        @param combo Combination of keys and values (k, v) with values form startegy.matrix
-        @return Job name
-        """
-        ipol_name = interpolate_str(base_name, {"matrix" : combo})
-        if ipol_name == base_name:
-            param_str = ",".join(f"{k}={v}" for k, v in combo.items())
-            return f"{base_name}[{param_str}]"
-        else:
-            return ipol_name
-
-    def _expand_matrix_value(self, matrix):
-        """
-        Expand matrix specification into actual (key,value) pairs
-
-        @param matrix specification
-        @return List of combinations form the matrix
-        """
-        include = matrix.pop("include", [])
-        # TODO: implement exclude
-        keys = list(matrix.keys())
-        values = list(matrix.values())
-
-        variants = []
-        seen = set()
-
-        if keys and values:
-            # build Cartesian product if we have keys and values
-            for combo in product(*values):
-                combo_dict = dict(zip(keys, combo))
-                frozen = frozenset(combo_dict.items())
-                if frozen not in seen:
-                    variants.append(combo_dict)
-                    seen.add(frozen)
-
-        # Add explicit 'include' entries
-        for extra in include:
-            frozen = frozenset(extra.items())
-            if frozen not in seen:
-                variants.append(extra)
-
-        return variants
 
     def exit_code(self, *, strict=False):
         if self._n_failed > 0:

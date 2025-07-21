@@ -6,7 +6,8 @@ from ..config import Config
 from ..scheduler import Scheduler
 from ..resources import Resources
 from .._plugin_loader import load_user_steps_from_kuristo_dir
-from .._utils import scan_locations, parse_workflow_files
+from ..job_spec import parse_workflow_files
+from ..scanner import scan_locations
 
 
 RUN_DIR_PATTERN = re.compile(r"\d{8}_\d{6}")

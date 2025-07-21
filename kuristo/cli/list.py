@@ -1,6 +1,7 @@
 from rich.console import Console
 from rich.text import Text
-from .._utils import scan_locations, parse_workflow_files
+from ..job_spec import parse_workflow_files
+from ..scanner import scan_locations
 
 
 def list_jobs(args):
