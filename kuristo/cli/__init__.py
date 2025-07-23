@@ -42,6 +42,6 @@ def build_parser():
     submit_parser.add_argument("--location", "-l", action="append", help="Location to scan for workflow files")
     submit_parser.add_argument("--backend", help="Batch backend to use: ['slurm']")
 
-    status_parser = batch_subparsers.add_parser("status", help="Check HPC job status")
+    batch_subparsers.add_parser("status", help="Check HPC job status")
 
     return parser

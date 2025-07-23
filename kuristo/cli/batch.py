@@ -75,7 +75,7 @@ def write_metadata(job_id, backend_name, workdir):
 
     metadata_path = Path(workdir) / "metadata.yaml"
     with open(metadata_path, "w") as f:
-        yaml.safe_dump({'job': metadata }, f, sort_keys=False)
+        yaml.safe_dump({'job': metadata}, f, sort_keys=False)
 
 
 def read_metadata(path: Path):
