@@ -62,17 +62,19 @@ def create_run_output_dir(base_log_dir: Path) -> Path:
     return run_dir
 
 
-def prune_old_runs(runs_dir: Path, keep_last_n: int):
+def prune_old_runs(log_dir: Path, keep_last_n: int):
+    runs_dir = log_dir / "runs"
     run_dirs = [d for d in runs_dir.iterdir() if d.is_dir() and RUN_DIR_PATTERN.match(d.name)]
     run_dirs.sort(key=lambda d: d.stat().st_mtime, reverse=True)
     for old_run in run_dirs[keep_last_n:]:
         shutil.rmtree(old_run)
 
 
-def update_latest_symlink(runs_dir: Path, latest_run_dir: Path):
+def update_latest_symlink(log_dir: Path, latest_run_dir: Path):
     """
     Create or update a symlink named 'latest' inside base_log_dir that points to latest_run_dir.
     """
+    runs_dir = log_dir / "runs"
     latest_link = runs_dir / "latest"
     if latest_link.exists() or latest_link.is_symlink():
         latest_link.unlink()

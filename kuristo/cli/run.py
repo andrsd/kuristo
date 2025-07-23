@@ -11,17 +11,16 @@ def run_jobs(args):
     locations = args.location or ["."]
 
     config = Config()
-    log_dir = create_run_output_dir(config.log_dir)
-    runs_dir = config.log_dir / "runs"
-    prune_old_runs(runs_dir, config.log_history)
-    update_latest_symlink(runs_dir, log_dir)
+    out_dir = create_run_output_dir(config.log_dir)
+    prune_old_runs(config.log_dir, config.log_history)
+    update_latest_symlink(config.log_dir, out_dir)
 
     load_user_steps_from_kuristo_dir()
 
     workflow_files = scan_locations(locations)
     specs = parse_workflow_files(workflow_files)
     rcs = Resources(config)
-    scheduler = Scheduler(specs, rcs, log_dir, config=config, no_ansi=args.no_ansi, report_path=args.report)
+    scheduler = Scheduler(specs, rcs, out_dir, config=config, no_ansi=args.no_ansi, report_path=args.report)
     scheduler.check()
     scheduler.run_all_jobs()
 

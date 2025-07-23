@@ -106,17 +106,16 @@ def batch_submit(args):
     backend = get_backend(args.backend)
     locations = args.location or ["."]
     config = Config()
-    log_dir = create_run_output_dir(config.log_dir)
-    runs_dir = config.log_dir / "runs"
-    prune_old_runs(runs_dir, config.log_history)
-    update_latest_symlink(runs_dir, log_dir)
+    out_dir = create_run_output_dir(config.log_dir)
+    prune_old_runs(config.log_dir, config.log_history)
+    update_latest_symlink(config.log_dir, out_dir)
     load_user_steps_from_kuristo_dir()
     try:
         job_num = 0
         workflow_files = scan_locations(locations)
         for f in workflow_files:
             job_num += 1
-            workdir = log_dir / f"job-{job_num}"
+            workdir = out_dir / f"job-{job_num}"
             workdir.mkdir()
 
             specs = specs_from_file(f)
