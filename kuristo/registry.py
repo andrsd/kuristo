@@ -1,23 +1,4 @@
-_STEP_REGISTRY = {}
 _ACTION_REGISTRY = {}
-
-
-def step(name):
-    """
-    Function decorator, so we can do @kuristo.step(name) and have users to use
-    such function from their yaml workflow files
-    """
-    def decorator(fn):
-        _STEP_REGISTRY[name] = fn
-        return fn
-    return decorator
-
-
-def get_step(name):
-    if name in _STEP_REGISTRY:
-        return _STEP_REGISTRY[name]
-    else:
-        raise RuntimeError(f"Trying to use unknown action '{name}'")
 
 
 def action(name):

@@ -1,18 +1,21 @@
-from ..registry import get_step
 from .step import Step
 from ..context import Context
 from io import StringIO
 import contextlib
+from abc import abstractmethod
 
 
-class FunctionStep(Step):
-    def __init__(self, name, context: Context, func_name, **params):
+class FunctionAction(Step):
+    """
+    Abstract class for defining user action that executes code
+    """
+
+    def __init__(self, name, context: Context, **params):
         super().__init__(
             name,
             context,
             **params
         )
-        self._func_name = func_name
         self._params = params
 
     def run(self, context=None):
@@ -20,10 +23,8 @@ class FunctionStep(Step):
         stderr_capture = StringIO()
 
         try:
-            func = get_step(self._func_name)
-
             with contextlib.redirect_stdout(stdout_capture), contextlib.redirect_stderr(stderr_capture):
-                func(self._params)
+                self.execute()
 
             self._stdout = stdout_capture.getvalue().encode()
             self._stderr = stderr_capture.getvalue().encode()
@@ -33,3 +34,10 @@ class FunctionStep(Step):
             self._stdout = b""
             self._stderr = str(e).encode()
             self._return_code = 1
+
+    @abstractmethod
+    def execute(self) -> None:
+        """
+        Subclasses must override this method to execute their commands
+        """
+        pass
