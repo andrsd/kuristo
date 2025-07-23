@@ -1,0 +1,11 @@
+#!/bin/bash
+#SBATCH --job-name={{ job.name }}
+#SBATCH --output={{ job.workdir }}/slurm.out
+#SBATCH --error={{ job.workdir }}/slurm.err
+#SBATCH --ntasks={{ job.num_tasks }}
+#SBATCH --time={{ job.walltime | default("00:30:00") }}
+#SBATCH --partition={{ job.partition | default("default") }}
+
+cd {{ job.workdir }}
+
+kuristo run

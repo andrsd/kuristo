@@ -20,3 +20,9 @@ version_file = "kuristo/_version.py"
 
 [tool.coverage.xml]
 output = "coverage.xml"
+
+[tool.setuptools.packages.find]
+include = ["kuristo*"]
+
+[tool.setuptools.package-data]
+"kuristo" = ["templates/*.j2"]

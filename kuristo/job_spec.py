@@ -88,6 +88,7 @@ class JobSpec:
         val = kwargs.get("needs", [])
         self._needs = val if isinstance(val, list) else [val]
         self._strategy = kwargs.get("strategy", None)
+        self._location = None
 
     @property
     def name(self):
@@ -144,6 +145,10 @@ class JobSpec:
         Return the strategy
         """
         return self._strategy
+
+    @property
+    def location(self):
+        return self._location
 
     def _build_steps(self, data):
         """
@@ -202,6 +207,9 @@ class JobSpec:
             return f"{self.name}[{param_str}]"
         else:
             return ipol_name
+
+    def set_location(self, location):
+        self._location = location
 
     @staticmethod
     def from_dict(name, data):
