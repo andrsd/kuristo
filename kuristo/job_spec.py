@@ -1,3 +1,7 @@
+import os
+import yaml
+from itertools import product
+from ._utils import interpolate_str
 
 
 class JobSpec:
@@ -84,6 +88,7 @@ class JobSpec:
         val = kwargs.get("needs", [])
         self._needs = val if isinstance(val, list) else [val]
         self._strategy = kwargs.get("strategy", None)
+        self._location = None
 
     @property
     def name(self):
@@ -141,6 +146,10 @@ class JobSpec:
         """
         return self._strategy
 
+    @property
+    def location(self):
+        return self._location
+
     def _build_steps(self, data):
         """
         Build job steps
@@ -150,6 +159,58 @@ class JobSpec:
             steps.append(self.Step.from_dict(**entry))
         return steps
 
+    def expand_matrix_value(self):
+        """
+        Expand matrix specification into actual (key,value) pairs
+
+        @return List of combinations from the matrix
+        """
+        if self._strategy:
+            matrix = self._strategy.get("matrix", {})
+            include = matrix.pop("include", [])
+            # TODO: implement exclude
+            keys = list(matrix.keys())
+            values = list(matrix.values())
+
+            variants = []
+            seen = set()
+
+            if keys and values:
+                # build Cartesian product if we have keys and values
+                for combo in product(*values):
+                    combo_dict = dict(zip(keys, combo))
+                    frozen = frozenset(combo_dict.items())
+                    if frozen not in seen:
+                        variants.append(combo_dict)
+                        seen.add(frozen)
+
+            # Add explicit 'include' entries
+            for extra in include:
+                frozen = frozenset(extra.items())
+                if frozen not in seen:
+                    variants.append(extra)
+
+            return variants
+        else:
+            return []
+
+    def build_matrix_job_name(self, variant):
+        """
+        Create job name for a job from a matrix
+
+        @param variant Combination of keys and values (k, v) with values form startegy.matrix
+        @return Job name
+        """
+        ipol_name = interpolate_str(self.name, {"matrix" : variant})
+        if ipol_name == self.name:
+            param_str = ",".join(f"{k}={v}" for k, v in variant.items())
+            return f"{self.name}[{param_str}]"
+        else:
+            return ipol_name
+
+    def set_location(self, location):
+        self._location = location
+
     @staticmethod
     def from_dict(name, data):
         if isinstance(data, dict):
@@ -158,3 +219,26 @@ class JobSpec:
             return ts
         else:
             raise RuntimeError("Expected dict as 'data'")
+
+
+def parse_workflow_files(workflow_files):
+    """
+    Parse workflow files (ktests.yaml)
+    """
+    specs = []
+    for file in workflow_files:
+        specs.extend(specs_from_file(file))
+    return specs
+
+
+def specs_from_file(file_path):
+    location = os.path.dirname(file_path)
+    specs = []
+    with open(file_path, 'r') as file:
+        data = yaml.safe_load(file)
+        jobs = data.get('jobs', {})
+        for t, params in jobs.items():
+            jspec = JobSpec.from_dict(t, params)
+            jspec.set_location(location)
+            specs.append(jspec)
+    return specs

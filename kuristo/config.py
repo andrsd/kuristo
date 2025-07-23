@@ -6,6 +6,7 @@ from ._utils import get_default_core_limit
 
 
 class Config:
+
     def __init__(self, path=None, mpi_launcher="mpirun"):
         self._base_dir = find_kuristo_root()
         self._config_dir = self._base_dir or Path.cwd()
@@ -20,6 +21,10 @@ class Config:
         self.num_cores = self._resolve_cores()
 
         self.mpi_launcher = os.getenv("KURISTO_MPI_LAUNCHER", self._get("runner.mpi_launcher", mpi_launcher))
+
+        self.batch_backend = self._validate_backend(self._get("batch.backend"))
+        self.batch_default_account = self._get("batch.default_account", None)
+        self.batch_partition = self._get("batch.partition", None)
 
     def _load(self):
         try:
@@ -50,3 +55,10 @@ class Config:
             return system_default
 
         return value
+
+    def _validate_backend(self, backend):
+        allowed = {"slurm"}
+        if backend in allowed:
+            return backend
+        else:
+            return None

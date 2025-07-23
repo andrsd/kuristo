@@ -4,12 +4,14 @@ from kuristo import __version__
 from .run import run_jobs
 from .doctor import print_diag
 from .list import list_jobs
+from .batch import batch
 
 
 __all__ = [
     "run_jobs",
     "print_diag",
-    "list_jobs"
+    "list_jobs",
+    "batch"
 ]
 
 
@@ -31,5 +33,15 @@ def build_parser():
     # List command
     list_parser = subparsers.add_parser("list", help="List available jobs")
     list_parser.add_argument("--location", "-l", action="append", help="Location to scan for workflow files")
+
+    # Batch command
+    batch_parser = subparsers.add_parser("batch", help="HPC queueing system commands")
+    batch_subparsers = batch_parser.add_subparsers(dest="batch_command")
+
+    submit_parser = batch_subparsers.add_parser("submit", help="Submit jobs to HPC queue")
+    submit_parser.add_argument("--location", "-l", action="append", help="Location to scan for workflow files")
+    submit_parser.add_argument("--backend", help="Batch backend to use: ['slurm']")
+
+    batch_subparsers.add_parser("status", help="Check HPC job status")
 
     return parser

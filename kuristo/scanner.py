@@ -27,3 +27,14 @@ class Scanner:
             if Scanner.FILENAME in files:
                 specs.append(os.path.join(root, Scanner.FILENAME))
         return specs
+
+
+def scan_locations(locations):
+    """
+    Scan the locations for the workflow files
+    """
+    workflow_files = []
+    for loc in locations:
+        scanner = Scanner(loc)
+        workflow_files.extend(scanner.scan())
+    return workflow_files

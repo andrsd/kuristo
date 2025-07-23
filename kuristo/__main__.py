@@ -13,6 +13,8 @@ def main():
         cli.print_diag(args)
     elif args.command == "list":
         cli.list_jobs(args)
+    elif args.command == "batch":
+        cli.batch(args)
 
 
 if __name__ == "__main__":
