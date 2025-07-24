@@ -96,7 +96,7 @@ Create a plugin in `.kuristo/actions.py`:
 import kuristo
 
 @kuristo.action("my/special-step")
-class MyStep(kuristo.ProcessStep):
+class MyAction(kuristo.ProcessAction):
     def __init__(self, name, context: kuristo.Context, **kwargs):
         super().__init__(name, context, **kwargs)
         self.input = kwargs["input"]
