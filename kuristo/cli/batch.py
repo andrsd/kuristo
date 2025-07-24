@@ -106,12 +106,10 @@ def batch_submit(args):
     config = Config()
     if args.partition is not None:
         config.batch_partition = args.partition
+    if args.backend is not None:
+        config.batch_backend = args.backend
 
-    if args.backend is None:
-        backend = get_backend(config.batch_backend)
-    else:
-        backend = get_backend(args.backend)
-
+    backend = get_backend(config.batch_backend)
     locations = args.location or ["."]
     out_dir = create_run_output_dir(config.log_dir)
     prune_old_runs(config.log_dir, config.log_history)
