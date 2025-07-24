@@ -1,4 +1,4 @@
-from .step import Step
+from .action import Action
 from .process_step import ProcessStep
 from .function import FunctionAction
 from .mpi_action import MPIAction
@@ -11,7 +11,7 @@ from .composite_action import CompositeAction
 
 
 __all__ = [
-    "Step",
+    "Action",
     "ProcessStep",
     "ExodiffCheck",
     "FunctionAction",

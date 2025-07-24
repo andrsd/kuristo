@@ -1,14 +1,14 @@
 from abc import abstractmethod
-from .step import Step
+from .action import Action
 
 
-class CompositeAction(Step):
+class CompositeAction(Action):
     def __init__(self, name, context, **kwargs):
         super().__init__(name, context, **kwargs)
         self._steps = self.create_steps()
 
     @abstractmethod
-    def create_steps(self) -> list[Step]:
+    def create_steps(self) -> list[Action]:
         """
         Subclasses implement this to return the list of sub-steps.
         """
