@@ -1,6 +1,6 @@
 from .action import Action
 from .process_action import ProcessAction
-from .function import FunctionAction
+from .function_action import FunctionAction
 from .mpi_action import MPIAction
 from .seq_action import SeqAction
 from .checks_exodiff import ExodiffCheck

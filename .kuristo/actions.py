@@ -13,7 +13,7 @@ class RunSimulationStep(kuristo.FunctionAction):
 
 
 @kuristo.action("app-name/custom-step")
-class MyCustomStep(kuristo.ProcessStep):
+class MyCustomStep(kuristo.ProcessAction):
     def __init__(self, name, context: kuristo.Context, **kwargs):
         super().__init__(name, context, **kwargs)
         self._in = kwargs.get("input", "")
