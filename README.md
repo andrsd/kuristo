@@ -90,7 +90,7 @@ jobs:
 
 ### Writing Custom Actions
 
-Create a plugin in `.kuristo/steps.py`:
+Create a plugin in `.kuristo/actions.py`:
 
 ```python
 import kuristo

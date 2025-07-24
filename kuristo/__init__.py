@@ -1,6 +1,6 @@
-from .registry import step, get_step, action
+from .registry import action
 from .context import Context
-from .actions import Step, ProcessStep, MPIAction, CompositeAction
+from .actions import Step, ProcessStep, MPIAction, CompositeAction, FunctionAction
 
 try:
     from ._version import __version__
@@ -8,12 +8,11 @@ except ImportError:
     __version__ = "0.0.0+unknown"
 
 __all__ = [
-    "step",
-    "get_step",
     "action",
     "Step",
     "ProcessStep",
     "MPIAction",
+    "FunctionAction",
     "CompositeAction",
     "Context"
 ]

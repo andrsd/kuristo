@@ -1,9 +1,15 @@
 import kuristo
 
 
-@kuristo.step("app-name/run-me")
-def run_simulation(params):
-    print("Simulating with:", params)
+@kuristo.action("app-name/run-me")
+class RunSimulationStep(kuristo.FunctionAction):
+    def __init__(self, name, context: kuristo.Context, **kwargs):
+        super().__init__(name, context, **kwargs)
+        self._in = kwargs.get("input", "")
+        self._out = kwargs.get("output", "")
+
+    def execute(self):
+        print("Simulating with:", self._in, self._out)
 
 
 @kuristo.action("app-name/custom-step")

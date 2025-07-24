@@ -8,7 +8,7 @@ from rich.table import Table
 from rich.text import Text
 from ..config import Config
 from .._plugin_loader import find_kuristo_root, load_user_steps_from_kuristo_dir
-from ..registry import _STEP_REGISTRY, _ACTION_REGISTRY
+from ..registry import _ACTION_REGISTRY
 from kuristo import __version__
 
 
@@ -76,15 +76,6 @@ def print_diag(args):
             console.print(Text.from_markup("[dim]No .py plugins found in .kuristo/[/]"))
     else:
         console.print(Text.from_markup("[dim]No .kuristo/ directory found[/]"))
-    console.print()
-
-    # Registered steps
-    console.print(Text.from_markup("[bold]Steps registered[/]"))
-    if _STEP_REGISTRY:
-        for name in sorted(_STEP_REGISTRY):
-            console.print(Text.from_markup(f"• [bold cyan]{name}[/]"))
-    else:
-        console.print(Text.from_markup("[dim]No steps registered[/]"))
     console.print()
 
     # Registered actions
