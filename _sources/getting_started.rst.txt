@@ -102,5 +102,5 @@ This outputs detailed information including:
 - Platform and CPU configuration
 - Log and config file locations
 - MPI launcher
-- Active plugins, registered steps and actions
+- Active plugins, registered actions
 - Logging and cleanup policies
