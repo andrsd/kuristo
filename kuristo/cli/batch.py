@@ -62,7 +62,8 @@ def create_script_params(job_num: int, specs, workdir: Path, config: Config):
         name=job_name,
         n_cores=n_cores,
         max_time=max_time,
-        work_dir=workdir
+        work_dir=workdir,
+        partition=config.batch_partition
     )
 
 
@@ -103,6 +104,9 @@ def batch_submit(args):
     """
     console = Console(force_terminal=not args.no_ansi, no_color=args.no_ansi, markup=not args.no_ansi)
     config = Config()
+    if args.partition is not None:
+        config.batch_partition = args.partition
+
     if args.backend is None:
         backend = get_backend(config.batch_backend)
     else:

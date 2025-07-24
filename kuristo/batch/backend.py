@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
 from dataclasses import dataclass
+from typing import Optional
 
 
 @dataclass
@@ -13,6 +14,8 @@ class ScriptParameters:
     n_cores: int
     # Maximum time [mins]
     max_time: int
+    # Partition name
+    partition: Optional[str] = None
 
 
 class BatchBackend(ABC):

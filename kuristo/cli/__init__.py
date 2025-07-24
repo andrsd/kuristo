@@ -41,6 +41,7 @@ def build_parser():
     submit_parser = batch_subparsers.add_parser("submit", help="Submit jobs to HPC queue")
     submit_parser.add_argument("--location", "-l", action="append", help="Location to scan for workflow files")
     submit_parser.add_argument("--backend", type=str, help="Batch backend to use: ['slurm']")
+    submit_parser.add_argument("--partition", type=str, help="Partition name to use")
 
     batch_subparsers.add_parser("status", help="Check HPC job status")
 
