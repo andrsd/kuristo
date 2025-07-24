@@ -1,13 +1,13 @@
 import os
 import shlex
 from kuristo import action
-from .process_step import ProcessStep
+from .process_action import ProcessAction
 from .._utils import resolve_path
 from ..context import Context
 
 
 @action("checks/exodiff")
-class ExodiffCheck(ProcessStep):
+class ExodiffCheck(ProcessAction):
     """
     Run exodiff on two Exodus files.
 

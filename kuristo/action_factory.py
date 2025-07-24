@@ -1,4 +1,4 @@
-from .actions.shell import ShellAction
+from .actions.shell_action import ShellAction
 from .registry import get_action
 
 

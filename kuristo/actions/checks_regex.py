@@ -1,11 +1,11 @@
 import re
 from kuristo import action
-from .step import Step
+from .action import Action
 from .._utils import interpolate_str
 
 
 @action("checks/regex")
-class RegexCheck(Step):
+class RegexCheck(Action):
     def __init__(self, name, context, **kwargs):
         super().__init__(name, context, **kwargs)
         self._target_step = kwargs["input"]

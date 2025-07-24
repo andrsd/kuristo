@@ -1,11 +1,11 @@
-from .step import Step
+from .action import Action
 from ..context import Context
 from io import StringIO
 import contextlib
 from abc import abstractmethod
 
 
-class FunctionAction(Step):
+class FunctionAction(Action):
     """
     Abstract class for defining user action that executes code
     """

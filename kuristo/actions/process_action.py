@@ -1,11 +1,11 @@
-from .step import Step
+from .action import Action
 from ..context import Context
 import os
 import subprocess
 from abc import abstractmethod
 
 
-class ProcessStep(Step):
+class ProcessAction(Action):
     """
     Base class for job step
     """

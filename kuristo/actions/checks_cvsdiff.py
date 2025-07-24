@@ -1,11 +1,11 @@
 import csv
 import math
 from kuristo import action
-from .step import Step
+from .action import Action
 
 
 @action("checks/csv-diff")
-class CSVDiffCheck(Step):
+class CSVDiffCheck(Action):
     def __init__(self, name, context, **kwargs):
         super().__init__(name, context, **kwargs)
         self._gold_path = kwargs["gold"]

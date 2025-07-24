@@ -2,9 +2,9 @@ from abc import ABC, abstractmethod
 from ..context import Context
 
 
-class Step(ABC):
+class Action(ABC):
     """
-    Base class for job step
+    Base class for job action
     """
 
     def __init__(self, name, context: Context, **kwargs) -> None:
@@ -22,21 +22,21 @@ class Step(ABC):
     @property
     def name(self):
         """
-        Return step name
+        Return action name
         """
         return self._name
 
     @property
     def id(self):
         """
-        Return step ID
+        Return action ID
         """
         return self._id
 
     @property
     def return_code(self) -> int:
         """
-        Return code of the step
+        Return code of the action
         """
         return self._return_code
 
@@ -47,7 +47,7 @@ class Step(ABC):
     @property
     def output(self):
         """
-        Return output of the jobs
+        Return output of the action
         """
         if self._output:
             return self._output
