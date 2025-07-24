@@ -102,10 +102,13 @@ def batch_submit(args):
     Submit jobs into HPC queue
     """
     console = Console(force_terminal=not args.no_ansi, no_color=args.no_ansi, markup=not args.no_ansi)
-
-    backend = get_backend(args.backend)
-    locations = args.location or ["."]
     config = Config()
+    if args.backend is None:
+        backend = get_backend(config.batch_backend)
+    else:
+        backend = get_backend(args.backend)
+
+    locations = args.location or ["."]
     out_dir = create_run_output_dir(config.log_dir)
     prune_old_runs(config.log_dir, config.log_history)
     update_latest_symlink(config.log_dir, out_dir)
