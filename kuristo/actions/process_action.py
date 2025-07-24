@@ -5,7 +5,7 @@ import subprocess
 from abc import abstractmethod
 
 
-class ProcessStep(Action):
+class ProcessAction(Action):
     """
     Base class for job step
     """

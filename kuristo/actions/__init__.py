@@ -1,5 +1,5 @@
 from .action import Action
-from .process_step import ProcessStep
+from .process_action import ProcessAction
 from .function import FunctionAction
 from .mpi_action import MPIAction
 from .seq_action import SeqAction
@@ -12,7 +12,7 @@ from .composite_action import CompositeAction
 
 __all__ = [
     "Action",
-    "ProcessStep",
+    "ProcessAction",
     "ExodiffCheck",
     "FunctionAction",
     "CSVDiffCheck",
