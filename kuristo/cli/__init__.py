@@ -1,9 +1,9 @@
 import argparse
 from pathlib import Path
 from kuristo import __version__
-from .run import run_jobs
-from .doctor import print_diag
-from .list import list_jobs
+from ._run import run_jobs
+from ._doctor import print_diag
+from ._list import list_jobs
 from ._batch import batch
 
 
