@@ -4,7 +4,7 @@ from kuristo import __version__
 from .run import run_jobs
 from .doctor import print_diag
 from .list import list_jobs
-from .batch import batch
+from ._batch import batch
 
 
 __all__ = [
