@@ -2,6 +2,7 @@ import networkx as netx
 import threading
 import sys
 import time
+import yaml
 from pathlib import Path
 from rich.progress import (Progress, SpinnerColumn, TextColumn, BarColumn, ProgressColumn, TimeElapsedColumn)
 from rich.text import Text
@@ -74,18 +75,18 @@ class Scheduler:
     new one(s). We run until all jobs have FINISHED status.
     """
 
-    def __init__(self, specs, rcs: Resources, log_dir, config: Config, no_ansi=False, report_path=None) -> None:
+    def __init__(self, specs, rcs: Resources, out_dir, config: Config, no_ansi=False, report_path=None) -> None:
         """
         @param specs: [JobSpec] List of job specifications
         @param rcs: Resources Resource to be scheduled
-        @param log_dir: Directory where we write logs
+        @param out_dir: Directory where we write logs
         @param config: Configuration
         @param job_times_path: File name to store timing report into
         """
         self._max_label_len = 80
         self._max_id_width = 1
         self._no_ansi = no_ansi
-        self._log_dir = Path(log_dir)
+        self._out_dir = Path(out_dir)
         self._config = config
         self._create_graph(specs)
         self._active_jobs = set()
@@ -122,7 +123,7 @@ class Scheduler:
         """
         Run all jobs in the queue
         """
-        self._create_log_dir()
+        self._create_out_dir()
         start_time = time.perf_counter()
         with self._progress:
             self._schedule_next_job()
@@ -266,8 +267,8 @@ class Scheduler:
         markup = f"[grey46]Took:[/] {human_time(elapsed_time)}"
         self._progress.console.print(Text.from_markup(markup))
 
-    def _create_log_dir(self):
-        self._log_dir.mkdir(parents=True, exist_ok=True)
+    def _create_out_dir(self):
+        self._out_dir.mkdir(parents=True, exist_ok=True)
 
     def _padded_job_id(self, job):
         return f"{job.id:>{self._max_id_width}}"
@@ -287,11 +288,11 @@ class Scheduler:
             jobs = []
             for v in variants:
                 name = spec.build_matrix_job_name(v)
-                job = Job(name, spec, self._log_dir, self._config, matrix=v)
+                job = Job(name, spec, self._out_dir, self._config, matrix=v)
                 jobs.append(job)
             return jobs
         else:
-            job = Job(spec.name, spec, self._log_dir, self._config)
+            job = Job(spec.name, spec, self._out_dir, self._config)
             return [job]
 
     def exit_code(self, *, strict=False):
@@ -313,6 +314,7 @@ class Scheduler:
         self._progress.update(job_task_id, advance=1)
 
     def _write_report(self):
+        self._write_report_yaml(self._out_dir / "report.yaml")
         if self._report_path:
             self._write_report_csv(self._report_path)
 
@@ -330,6 +332,30 @@ class Scheduler:
                 else:
                     status = "failed"
                 writer.writerow([job.id, job.name, status, duration, job.return_code])
+
+    def _write_report_yaml(self, yaml_path: Path):
+        report = []
+        for job in self._graph.nodes:
+            if job.is_skipped:
+                status = "skipped"
+                duration = ""
+            elif job.return_code == 0:
+                status = "success"
+                duration = round(job.elapsed_time, 3)
+            else:
+                status = "failed"
+                duration = round(job.elapsed_time, 3)
+
+            report.append({
+                "id": job.id,
+                "job name": job.name,
+                "status": status,
+                "duration": duration,
+                "return code": job.return_code,
+            })
+
+        with open(yaml_path, "w") as f:
+            yaml.safe_dump({"results": report}, f, sort_keys=False)
 
     def _print_staus_line(self, job, state):
         job_id = self._padded_job_id(job)
