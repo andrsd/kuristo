@@ -44,8 +44,14 @@ class Job:
         def log(self, message, tag="INFO"):
             self._logger.info(message, extra={"tag": tag})
 
+        def job_start(self, name):
+            self.log(f"{name}", tag="JOB_START")
+
+        def job_end(self):
+            self.log("Done", tag="JOB_END")
+
         def task_start(self, name):
-            self.log(f"* {name}...", tag="TASK_START")
+            self.log(f"* {name}", tag="TASK_START")
 
         def task_end(self, return_code):
             self.log(f"* Finished with return code {return_code}", tag="TASK_END")
@@ -57,7 +63,7 @@ class Job:
             self.log(line, tag="OUTPUT")
 
         def env(self, key, value):
-            self.log(f"| {key}={value}", tag="ENV")
+            self.log(f"| {key}={value}")
 
         def dump(self, what):
             # dispatch types for dumping into a log file
@@ -65,7 +71,7 @@ class Job:
                 self._dump_env(what)
 
         def _dump_env(self, env: Env):
-            self.log("Environment variables:")
+            self.log("Environment variables:", tag="ENV")
             for key, value in env.items():
                 self.env(key, value)
 
@@ -240,6 +246,7 @@ class Job:
             self._timeout_timer.cancel()
 
     def _run_process(self):
+        self._logger.job_start(self.name)
         for step in self._steps:
             with self._step_lock:
                 self._active_step = step
@@ -278,6 +285,7 @@ class Job:
     def _finish_process(self):
         self._status = Job.FINISHED
         self.on_finish(self)
+        self._logger.job_end()
 
     def _on_timeout(self):
         """

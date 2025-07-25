@@ -19,6 +19,8 @@ def main():
         cli.status(args)
     elif args.command == "log":
         cli.log(args)
+    elif args.command == "show":
+        cli.show(args)
 
 
 if __name__ == "__main__":
