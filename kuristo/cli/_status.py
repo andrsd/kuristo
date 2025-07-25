@@ -1,5 +1,5 @@
-import yaml
 import kuristo._print as prn
+import kuristo._utils as utils
 from kuristo.config import Config
 from rich.console import Console
 
@@ -9,11 +9,6 @@ STATUS_LABELS = {
     "failed": "FAIL",
     "skipped": "SKIP",
 }
-
-
-def read_report(path):
-    with open(path, "r") as f:
-        return yaml.safe_load(f)
 
 
 def summarize(results):
@@ -54,7 +49,7 @@ def status(args):
         if not report_path.exists():
             raise RuntimeError("No report found. Did you run any jobs yet?")
 
-        report = read_report(report_path)
+        report = utils.read_report(report_path)
         print_report(console, report, args.no_ansi)
     except Exception as e:
         print(e)

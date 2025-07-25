@@ -6,6 +6,7 @@ from ._doctor import print_diag
 from ._list import list_jobs
 from ._batch import batch
 from ._status import status
+from ._log import log
 
 
 __all__ = [
@@ -13,7 +14,8 @@ __all__ = [
     "print_diag",
     "list_jobs",
     "batch",
-    "status"
+    "status",
+    "log"
 ]
 
 
@@ -49,5 +51,7 @@ def build_parser():
 
     status_parser = subparsers.add_parser("status", help="Display status of runs")
     status_parser.add_argument("--run", type=str, help="Run ID to display results for")
+
+    subparsers.add_parser("log", help="List runs")
 
     return parser
