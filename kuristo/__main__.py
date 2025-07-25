@@ -17,6 +17,8 @@ def main():
         cli.batch(args)
     elif args.command == "status":
         cli.status(args)
+    elif args.command == "log":
+        cli.log(args)
 
 
 if __name__ == "__main__":

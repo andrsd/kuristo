@@ -3,6 +3,7 @@ import subprocess
 import os
 import shutil
 import re
+import yaml
 from jinja2 import Template
 from datetime import datetime
 from pathlib import Path
@@ -115,3 +116,8 @@ def human_time(elapsed_time: float) -> str:
 
 def human_time2(elapsed_time: float) -> str:
     return f"{elapsed_time:.2f}s"
+
+
+def read_report(path):
+    with open(path, "r") as f:
+        return yaml.safe_load(f)
