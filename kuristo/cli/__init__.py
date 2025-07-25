@@ -7,6 +7,7 @@ from ._list import list_jobs
 from ._batch import batch
 from ._status import status
 from ._log import log
+from ._show import show
 
 
 __all__ = [
@@ -15,7 +16,8 @@ __all__ = [
     "list_jobs",
     "batch",
     "status",
-    "log"
+    "log",
+    "show"
 ]
 
 
@@ -53,5 +55,9 @@ def build_parser():
     status_parser.add_argument("--run", type=str, help="Run ID to display results for")
 
     subparsers.add_parser("log", help="List runs")
+
+    show_parser = subparsers.add_parser("show", help="Show job log")
+    show_parser.add_argument("--run", type=str, help="Run ID to display results for")
+    show_parser.add_argument("--job", required=True, type=int, help="Job ID")
 
     return parser

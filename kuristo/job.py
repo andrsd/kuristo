@@ -21,6 +21,12 @@ class Job:
     RUNNING = 1
     FINISHED = 2
 
+    class TaggedFormatter(logging.Formatter):
+        def format(self, record):
+            if not hasattr(record, "tag"):
+                record.tag = "INFO"  # fallback if not tagged
+            return f"{self.formatTime(record)} - {record.tag:<12} - {record.getMessage()}"
+
     class Logger:
         """
         Simple encapsulation to simplify job logging into a file
@@ -29,14 +35,35 @@ class Job:
         def __init__(self, id, log_file):
             self._logger = logging.getLogger(f"JobLogger-{id}")
             self._logger.setLevel(logging.INFO)
-            formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+            formatter = Job.TaggedFormatter()
 
             file_handler = logging.FileHandler(log_file, mode='w')
             file_handler.setFormatter(formatter)
             self._logger.addHandler(file_handler)
 
-        def log(self, message):
-            self._logger.info(message)
+        def log(self, message, tag="INFO"):
+            self._logger.info(message, extra={"tag": tag})
+
+        def job_start(self, name):
+            self.log(f"{name}", tag="JOB_START")
+
+        def job_end(self):
+            self.log("Done", tag="JOB_END")
+
+        def task_start(self, name):
+            self.log(f"* {name}", tag="TASK_START")
+
+        def task_end(self, return_code):
+            self.log(f"* Finished with return code {return_code}", tag="TASK_END")
+
+        def script_line(self, cmd):
+            self.log(f"> {cmd}", tag="SCRIPT")
+
+        def output_line(self, line):
+            self.log(line, tag="OUTPUT")
+
+        def env(self, key, value):
+            self.log(f"| {key}={value}")
 
         def dump(self, what):
             # dispatch types for dumping into a log file
@@ -44,9 +71,9 @@ class Job:
                 self._dump_env(what)
 
         def _dump_env(self, env: Env):
-            self._logger.info("Environment variables:")
+            self.log("Environment variables:", tag="ENV")
             for key, value in env.items():
-                self._logger.info(f"| {key}={value}")
+                self.env(key, value)
 
     def __init__(self, name, job_spec: JobSpec, log_dir: Path, config: Config, matrix=None) -> None:
         """
@@ -219,13 +246,14 @@ class Job:
             self._timeout_timer.cancel()
 
     def _run_process(self):
+        self._logger.job_start(self.name)
         for step in self._steps:
             with self._step_lock:
                 self._active_step = step
-            self._logger.log(f'* {step.name}...')
+            self._logger.task_start(step.name)
             if hasattr(step, 'command'):
                 for line in step.command.splitlines():
-                    self._logger.log(f'> {line}')
+                    self._logger.script_line(line)
             self.on_step_start(self, step)
             step.run(context=self._context)
             self.on_step_finish(self, step)
@@ -236,12 +264,12 @@ class Job:
                 self._logger.log(line)
 
             if self._cancelled.is_set():
-                self._logger.log(f'* Job timed out after {self._timeout_minutes} minutes')
+                self._logger.log(f'* Job timed out after {self._timeout_minutes} minutes', tag="TASK_END")
                 self._return_code = 124
             elif step.return_code == 124:
-                self._logger.log(f'* Step timed out after {step.timeout_minutes} minutes')
+                self._logger.log(f'* Step timed out after {step.timeout_minutes} minutes', tag="TASK_END")
             else:
-                self._logger.log(f'* Finished with return code {step.return_code}')
+                self._logger.task_end(step.return_code)
                 self._return_code |= step.return_code
 
         with self._step_lock:
@@ -250,13 +278,14 @@ class Job:
             self._logger.dump(self._context.env)
 
     def skip_process(self):
-        self._logger.log(f'* {self.name} was skipped: {self.skip_reason}')
+        self._logger.log(f'* {self.name} was skipped: {self.skip_reason}', tag="TASK_END")
         self._status = Job.FINISHED
         self._elapsed_time = 0.
 
     def _finish_process(self):
         self._status = Job.FINISHED
         self.on_finish(self)
+        self._logger.job_end()
 
     def _on_timeout(self):
         """
