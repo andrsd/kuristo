@@ -97,3 +97,21 @@ def minutes_to_hhmmss(minutes: int) -> str:
     mins = minutes % 60
     seconds = 0
     return f"{hours:0d}:{mins:02d}:{seconds:02d}"
+
+
+def human_time(elapsed_time: float) -> str:
+    hours, rem = divmod(elapsed_time, 3600)
+    minutes, seconds = divmod(rem, 60)
+
+    parts = []
+    if hours:
+        parts.append(f"{int(hours)}h")
+    if minutes:
+        parts.append(f"{int(minutes)}m")
+    parts.append(f"{seconds:.2f}s")
+
+    return " ".join(parts)
+
+
+def human_time2(elapsed_time: float) -> str:
+    return f"{elapsed_time:.2f}s"

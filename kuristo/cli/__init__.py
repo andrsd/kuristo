@@ -5,13 +5,15 @@ from ._run import run_jobs
 from ._doctor import print_diag
 from ._list import list_jobs
 from ._batch import batch
+from ._status import status
 
 
 __all__ = [
     "run_jobs",
     "print_diag",
     "list_jobs",
-    "batch"
+    "batch",
+    "status"
 ]
 
 
@@ -44,5 +46,8 @@ def build_parser():
     submit_parser.add_argument("--partition", type=str, help="Partition name to use")
 
     batch_subparsers.add_parser("status", help="Check HPC job status")
+
+    status_parser = subparsers.add_parser("status", help="Display status of runs")
+    status_parser.add_argument("--run", type=Path, help="Run ID to display results for")
 
     return parser

@@ -15,6 +15,8 @@ def main():
         cli.list_jobs(args)
     elif args.command == "batch":
         cli.batch(args)
+    elif args.command == "status":
+        cli.status(args)
 
 
 if __name__ == "__main__":

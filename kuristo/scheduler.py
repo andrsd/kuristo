@@ -2,33 +2,16 @@ import networkx as netx
 import threading
 import sys
 import time
+import yaml
+import kuristo._print as prn
 from pathlib import Path
 from rich.progress import (Progress, SpinnerColumn, TextColumn, BarColumn, ProgressColumn, TimeElapsedColumn)
 from rich.text import Text
 from rich.console import Console
 from rich.style import Style
 from .job import Job
-from ._utils import rich_job_name
 from .config import Config
 from .resources import Resources
-
-
-def human_time(elapsed_time: float) -> str:
-    hours, rem = divmod(elapsed_time, 3600)
-    minutes, seconds = divmod(rem, 60)
-
-    parts = []
-    if hours:
-        parts.append(f"{int(hours)}h")
-    if minutes:
-        parts.append(f"{int(minutes)}m")
-    parts.append(f"{seconds:.2f}s")
-
-    return " ".join(parts)
-
-
-def human_time2(elapsed_time: float) -> str:
-    return f"{elapsed_time:.2f}s"
 
 
 class StepCountColumn(ProgressColumn):
@@ -74,18 +57,18 @@ class Scheduler:
     new one(s). We run until all jobs have FINISHED status.
     """
 
-    def __init__(self, specs, rcs: Resources, log_dir, config: Config, no_ansi=False, report_path=None) -> None:
+    def __init__(self, specs, rcs: Resources, out_dir, config: Config, no_ansi=False, report_path=None) -> None:
         """
         @param specs: [JobSpec] List of job specifications
         @param rcs: Resources Resource to be scheduled
-        @param log_dir: Directory where we write logs
+        @param out_dir: Directory where we write logs
         @param config: Configuration
         @param job_times_path: File name to store timing report into
         """
         self._max_label_len = 80
         self._max_id_width = 1
         self._no_ansi = no_ansi
-        self._log_dir = Path(log_dir)
+        self._out_dir = Path(out_dir)
         self._config = config
         self._create_graph(specs)
         self._active_jobs = set()
@@ -107,6 +90,7 @@ class Scheduler:
         self._n_success = 0
         self._n_failed = 0
         self._n_skipped = 0
+        self._total_runtime = 0.
         #
         self._report_path = report_path
 
@@ -122,22 +106,24 @@ class Scheduler:
         """
         Run all jobs in the queue
         """
-        self._create_log_dir()
+        self._create_out_dir()
         start_time = time.perf_counter()
         with self._progress:
             self._schedule_next_job()
             while any(not job.is_processed for job in self._graph.nodes):
                 threading.Event().wait(0.5)
         end_time = time.perf_counter()
+        self._total_runtime = end_time - start_time
         if self._no_ansi:
             self._progress.console.print("")
 
-        line = "-" * (self._max_label_len + 12 + self._max_id_width)
-        self._progress.console.print(
-            Text.from_markup(f"[grey23]{line}[/]")
-        )
-        self._print_stats()
-        self._print_time(end_time - start_time)
+        prn.line(self._progress.console, self._max_label_len + 12 + self._max_id_width)
+        prn.stats(self._progress.console, prn.RunStats(
+            n_success=self._n_success,
+            n_failed=self._n_failed,
+            n_skipped=self._n_skipped
+        ))
+        prn.time(self._progress.console, self._total_runtime)
         self._write_report()
 
     def _create_graph(self, specs):
@@ -179,8 +165,7 @@ class Scheduler:
             for job in ready_jobs:
                 if job.is_skipped:
                     job.skip_process()
-                    job_name = rich_job_name(job.name)
-                    self._print_staus_line(job, state="SKIP")
+                    prn.status_line(self._progress.console, job, "SKIP", self._max_id_width, self._max_label_len, self._no_ansi)
                     self._n_skipped = self._n_skipped + 1
                     continue
 
@@ -188,7 +173,7 @@ class Scheduler:
                 if self._resources.available_cores >= required:
                     self._resources.allocate_cores(required)
                     self._active_jobs.add(job)
-                    job_name = rich_job_name(job.name)
+                    job_name = prn.rich_job_name(job.name)
                     task_id = self._progress.add_task(
                         Text.from_markup(f"[cyan]{job_name}"),
                         total=job.num_steps
@@ -196,18 +181,18 @@ class Scheduler:
                     self._tasks[job.id] = task_id
                     job.create_step_tasks(self._progress)
                     job.start()
-                    self._print_staus_line(job, state="STARTING")
+                    prn.status_line(self._progress.console, job, "STARTING", self._max_id_width, self._max_label_len, self._no_ansi)
 
     def _job_completed(self, job):
         with self._lock:
             if job.return_code == 0:
-                self._print_staus_line(job, state="PASS")
+                prn.status_line(self._progress.console, job, "PASS", self._max_id_width, self._max_label_len, self._no_ansi)
                 self._n_success = self._n_success + 1
             elif job.return_code == 124:
-                self._print_staus_line(job, state="TIMEOUT")
+                prn.status_line(self._progress.console, job, "TIMEOUT", self._max_id_width, self._max_label_len, self._no_ansi)
                 self._n_failed = self._n_failed + 1
             else:
-                self._print_staus_line(job, state="FAIL")
+                prn.status_line(self._progress.console, job, "FAIL", self._max_id_width, self._max_label_len, self._no_ansi)
                 self._n_failed = self._n_failed + 1
             task_id = self._tasks[job.id]
             self._progress.remove_task(task_id)
@@ -250,30 +235,8 @@ class Scheduler:
                 if any(dep.is_skipped for dep in predecessors):
                     job.skip("Skipped dependency")
 
-    def _print_stats(self):
-        total = self._n_success + self._n_failed + self._n_skipped
-
-        self._progress.console.print(
-            Text.from_markup(
-                f"[grey46]Success:[/] [green]{self._n_success:,}[/]     "
-                f"[grey46]Failed:[/] [red]{self._n_failed:,}[/]     "
-                f"[grey46]Skipped:[/] [yellow]{self._n_skipped:,}[/]     "
-                f"[grey46]Total:[/] {total}"
-            )
-        )
-
-    def _print_time(self, elapsed_time):
-        markup = f"[grey46]Took:[/] {human_time(elapsed_time)}"
-        self._progress.console.print(Text.from_markup(markup))
-
-    def _create_log_dir(self):
-        self._log_dir.mkdir(parents=True, exist_ok=True)
-
-    def _padded_job_id(self, job):
-        return f"{job.id:>{self._max_id_width}}"
-
-    def _padded_job_name(self, job_name):
-        return f"{job_name:<{100}}"
+    def _create_out_dir(self):
+        self._out_dir.mkdir(parents=True, exist_ok=True)
 
     def _create_jobs(self, spec):
         """
@@ -287,11 +250,11 @@ class Scheduler:
             jobs = []
             for v in variants:
                 name = spec.build_matrix_job_name(v)
-                job = Job(name, spec, self._log_dir, self._config, matrix=v)
+                job = Job(name, spec, self._out_dir, self._config, matrix=v)
                 jobs.append(job)
             return jobs
         else:
-            job = Job(spec.name, spec, self._log_dir, self._config)
+            job = Job(spec.name, spec, self._out_dir, self._config)
             return [job]
 
     def exit_code(self, *, strict=False):
@@ -313,6 +276,7 @@ class Scheduler:
         self._progress.update(job_task_id, advance=1)
 
     def _write_report(self):
+        self._write_report_yaml(self._out_dir / "report.yaml")
         if self._report_path:
             self._write_report_csv(self._report_path)
 
@@ -331,32 +295,29 @@ class Scheduler:
                     status = "failed"
                 writer.writerow([job.id, job.name, status, duration, job.return_code])
 
-    def _print_staus_line(self, job, state):
-        job_id = self._padded_job_id(job)
-        job_name = rich_job_name(job.name)
-        dots = "." * (self._max_label_len - len(job.name))
-
-        if state == "STARTING":
-            if self._no_ansi:
-                markup = f"         #{job_id} {job_name} "
-                self._progress.console.print(Text.from_markup(markup))
-        else:
-            markup = ""
-            if state == "SKIP":
-                markup += "\\[ [yellow]SKIP[/] ]"
-            elif state == "PASS":
-                markup += "\\[ [green]PASS[/] ]"
-            elif state == "FAIL" or state == "TIMEOUT":
-                markup += "\\[ [red]FAIL[/] ]"
-
-            markup += f" [grey46]#{job_id}[/]"
-            markup += f" [cyan bold]{job_name}[/]"
-            if state == "SKIP":
-                markup += f": [cyan]{job.skip_reason}"
-            elif state == "TIMEOUT":
-                markup += f" [grey23]{dots}[/]"
-                markup += " timeout"
+    def _write_report_yaml(self, yaml_path: Path):
+        report = []
+        for job in self._graph.nodes:
+            if job.is_skipped:
+                status = "skipped"
+                duration = None
+            elif job.return_code == 0:
+                status = "success"
+                duration = round(job.elapsed_time, 3)
             else:
-                markup += f" [grey23]{dots}[/]"
-                markup += f" {human_time2(job.elapsed_time)}"
-            self._progress.console.print(Text.from_markup(markup))
+                status = "failed"
+                duration = round(job.elapsed_time, 3)
+
+            report.append({
+                "id": job.id,
+                "job name": job.name,
+                "status": status,
+                "duration": duration,
+                "return code": job.return_code,
+            })
+
+        with open(yaml_path, "w") as f:
+            yaml.safe_dump({
+                "results": report,
+                "total_runtime": self._total_runtime
+            }, f, sort_keys=False)
