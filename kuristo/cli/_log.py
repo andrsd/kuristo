@@ -1,6 +1,6 @@
 from rich.table import Table
 import kuristo.utils as utils
-from kuristo.config import Config
+import kuristo.config as config
 from rich.console import Console
 
 
@@ -8,8 +8,8 @@ def log(args):
     try:
         console = Console(force_terminal=not args.no_ansi, no_color=args.no_ansi, markup=not args.no_ansi)
 
-        config = Config()
-        runs_dir = config.log_dir / "runs"
+        cfg = config.get()
+        runs_dir = cfg.log_dir / "runs"
         if not runs_dir.exists():
             raise RuntimeError("No runs found.")
 

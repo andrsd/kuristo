@@ -1,4 +1,4 @@
-from kuristo.config import Config
+import kuristo.config as config
 import kuristo.utils as utils
 from datetime import datetime
 from pathlib import Path
@@ -124,8 +124,9 @@ def render_section(console: Console, sec, max_label_len):
     console.print()
 
 
-def render_sections(console: Console, sections, config: Config):
-    max_label_len = config.console_width
+def render_sections(console: Console, sections):
+    cfg = config.get()
+    max_label_len = cfg.console_width
     for sec in sections:
         if sec["type"] == "title":
             render_title(console, sec, max_label_len)
@@ -133,7 +134,7 @@ def render_sections(console: Console, sections, config: Config):
             render_section(console, sec, max_label_len)
 
 
-def display_job_log(console: Console, log_path: Path, config: Config):
+def display_job_log(console: Console, log_path: Path):
     if not log_path.exists():
         raise RuntimeError(f"Log file not found: {log_path}")
 
@@ -141,18 +142,18 @@ def display_job_log(console: Console, log_path: Path, config: Config):
         lines = [parse_log_line(line) for line in f if parse_log_line(line)]
 
     sections = parse_sections(lines)
-    render_sections(console, sections, config)
+    render_sections(console, sections)
 
 
 def show(args):
     try:
         console = Console(force_terminal=not args.no_ansi, no_color=args.no_ansi, markup=not args.no_ansi)
 
-        config = Config()
+        cfg = config.get()
         run_name = args.run or "latest"
-        runs_dir = config.log_dir / "runs" / run_name
+        runs_dir = cfg.log_dir / "runs" / run_name
 
         log_path = Path(runs_dir / f"job-{args.job}.log")
-        display_job_log(console, log_path, config)
+        display_job_log(console, log_path)
     except Exception as e:
         print(e)

@@ -7,7 +7,7 @@ from kuristo.utils import get_default_core_limit
 
 class Config:
 
-    def __init__(self, path=None, mpi_launcher="mpirun"):
+    def __init__(self, path=None):
         self._base_dir = find_kuristo_root()
         self._config_dir = self._base_dir or Path.cwd()
 
@@ -20,7 +20,7 @@ class Config:
         self.log_cleanup = self._get("log.cleanup", "always")
         self.num_cores = self._resolve_cores()
 
-        self.mpi_launcher = os.getenv("KURISTO_MPI_LAUNCHER", self._get("runner.mpi_launcher", mpi_launcher))
+        self.mpi_launcher = os.getenv("KURISTO_MPI_LAUNCHER", self._get("runner.mpi_launcher", "mpirun"))
 
         self.batch_backend = self._get("batch.backend", None)
         self.batch_default_account = self._get("batch.default_account", None)
@@ -57,3 +57,22 @@ class Config:
             return system_default
 
         return value
+
+    def set_from_args(self, args):
+        """
+        Set configuration parameters from arguments passed via command line
+        """
+        self.no_ansi = args.no_ansi
+
+
+# Global config instance
+_instance = Config()
+
+
+def get() -> Config:
+    """
+    Get configuration object
+
+    @return Configuration object
+    """
+    return _instance

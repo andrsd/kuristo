@@ -9,8 +9,8 @@ from rich.text import Text
 from rich.console import Console
 from rich.style import Style
 import kuristo.ui as ui
+import kuristo.config as config
 from kuristo.job import Job
-from kuristo.config import Config
 from kuristo.resources import Resources
 
 
@@ -57,7 +57,7 @@ class Scheduler:
     new one(s). We run until all jobs have FINISHED status.
     """
 
-    def __init__(self, specs, rcs: Resources, out_dir, config: Config, no_ansi=False, report_path=None) -> None:
+    def __init__(self, specs, rcs: Resources, out_dir, no_ansi=False, report_path=None) -> None:
         """
         @param specs: [JobSpec] List of job specifications
         @param rcs: Resources Resource to be scheduled
@@ -65,11 +65,11 @@ class Scheduler:
         @param config: Configuration
         @param job_times_path: File name to store timing report into
         """
-        self._max_label_len = config.console_width
+        cfg = config.get()
+        self._max_label_len = cfg.console_width
         self._max_id_width = 1
         self._no_ansi = no_ansi
         self._out_dir = Path(out_dir)
-        self._config = config
         self._create_graph(specs)
         self._active_jobs = set()
         self._lock = threading.Lock()
@@ -117,7 +117,8 @@ class Scheduler:
         if self._no_ansi:
             self._progress.console.print("")
 
-        ui.line(self._progress.console, self._config.console_width)
+        cfg = config.get()
+        ui.line(self._progress.console, cfg.console_width)
         ui.stats(self._progress.console, ui.RunStats(
             n_success=self._n_success,
             n_failed=self._n_failed,
@@ -250,11 +251,11 @@ class Scheduler:
             jobs = []
             for v in variants:
                 name = spec.build_matrix_job_name(v)
-                job = Job(name, spec, self._out_dir, self._config, matrix=v)
+                job = Job(name, spec, self._out_dir, matrix=v)
                 jobs.append(job)
             return jobs
         else:
-            job = Job(spec.name, spec, self._out_dir, self._config)
+            job = Job(spec.name, spec, self._out_dir)
             return [job]
 
     def exit_code(self, *, strict=False):

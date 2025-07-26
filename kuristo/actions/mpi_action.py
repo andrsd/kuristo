@@ -1,5 +1,6 @@
 from kuristo.actions.process_action import ProcessAction
 from kuristo.context import Context
+import kuristo.config as config
 from abc import abstractmethod
 
 
@@ -29,6 +30,7 @@ class MPIAction(ProcessAction):
         pass
 
     def create_command(self):
-        launcher = self.context.config.mpi_launcher
+        cfg = config.get()
+        launcher = cfg.mpi_launcher
         cmd = self.create_sub_command()
         return f'{launcher} -np {self._n_ranks} {cmd}'
