@@ -40,15 +40,12 @@ def print_report(report):
 
 
 def status(args):
-    try:
-        cfg = config.get()
-        run_name = args.run or "latest"
-        runs_dir = cfg.log_dir / "runs" / run_name
-        report_path = runs_dir / "report.yaml"
-        if not report_path.exists():
-            raise RuntimeError("No report found. Did you run any jobs yet?")
+    cfg = config.get()
+    run_name = args.run or "latest"
+    runs_dir = cfg.log_dir / "runs" / run_name
+    report_path = runs_dir / "report.yaml"
+    if not report_path.exists():
+        raise RuntimeError("No report found. Did you run any jobs yet?")
 
-        report = utils.read_report(report_path)
-        print_report(report)
-    except Exception as e:
-        print(e)
+    report = utils.read_report(report_path)
+    print_report(report)

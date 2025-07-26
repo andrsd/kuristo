@@ -4,27 +4,30 @@ import kuristo.config as config
 
 
 def main():
-    parser = cli.build_parser()
-    args = parser.parse_args()
+    try:
+        parser = cli.build_parser()
+        args = parser.parse_args()
 
-    cfg = config.get()
-    cfg.set_from_args(args)
+        cfg = config.get()
+        cfg.set_from_args(args)
 
-    if args.command == "run":
-        exit_code = cli.run_jobs(args)
-        sys.exit(exit_code)
-    elif args.command == "doctor":
-        cli.print_diag(args)
-    elif args.command == "list":
-        cli.list_jobs(args)
-    elif args.command == "batch":
-        cli.batch(args)
-    elif args.command == "status":
-        cli.status(args)
-    elif args.command == "log":
-        cli.log(args)
-    elif args.command == "show":
-        cli.show(args)
+        if args.command == "run":
+            exit_code = cli.run_jobs(args)
+            sys.exit(exit_code)
+        elif args.command == "doctor":
+            cli.print_diag(args)
+        elif args.command == "list":
+            cli.list_jobs(args)
+        elif args.command == "batch":
+            cli.batch(args)
+        elif args.command == "status":
+            cli.status(args)
+        elif args.command == "log":
+            cli.log(args)
+        elif args.command == "show":
+            cli.show(args)
+    except Exception as e:
+        print(e)
 
 
 if __name__ == "__main__":
