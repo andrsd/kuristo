@@ -65,7 +65,7 @@ class Scheduler:
         @param config: Configuration
         @param job_times_path: File name to store timing report into
         """
-        self._max_label_len = 80
+        self._max_label_len = config.console_width
         self._max_id_width = 1
         self._no_ansi = no_ansi
         self._out_dir = Path(out_dir)
@@ -117,7 +117,7 @@ class Scheduler:
         if self._no_ansi:
             self._progress.console.print("")
 
-        prn.line(self._progress.console, self._max_label_len + 12 + self._max_id_width)
+        prn.line(self._progress.console, self._config.console_width)
         prn.stats(self._progress.console, prn.RunStats(
             n_success=self._n_success,
             n_failed=self._n_failed,

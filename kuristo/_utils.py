@@ -114,8 +114,14 @@ def human_time(elapsed_time: float) -> str:
     return " ".join(parts)
 
 
-def human_time2(elapsed_time: float) -> str:
-    return f"{elapsed_time:.2f}s"
+def human_time2(elapsed_time) -> str:
+    """
+    PLEASE, give me a BETTER name
+    """
+    if isinstance(elapsed_time, float):
+        return f"{elapsed_time:.2f}s"
+    else:
+        return ""
 
 
 def read_report(path):
