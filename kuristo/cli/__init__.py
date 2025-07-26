@@ -1,13 +1,13 @@
 import argparse
 from pathlib import Path
 from kuristo import __version__
-from ._run import run_jobs
-from ._doctor import print_diag
-from ._list import list_jobs
-from ._batch import batch
-from ._status import status
-from ._log import log
-from ._show import show
+from kuristo.cli._run import run_jobs
+from kuristo.cli._doctor import print_diag
+from kuristo.cli._list import list_jobs
+from kuristo.cli._batch import batch
+from kuristo.cli._status import status
+from kuristo.cli._log import log
+from kuristo.cli._show import show
 
 
 __all__ = [

@@ -1,10 +1,10 @@
-from ..config import Config
-from ..scheduler import Scheduler
-from ..resources import Resources
-from .._plugin_loader import load_user_steps_from_kuristo_dir
-from ..job_spec import parse_workflow_files
-from ..scanner import scan_locations
-from .._utils import create_run_output_dir, prune_old_runs, update_latest_symlink
+from kuristo.config import Config
+from kuristo.scheduler import Scheduler
+from kuristo.resources import Resources
+from kuristo._plugin_loader import load_user_steps_from_kuristo_dir
+from kuristo.job_spec import parse_workflow_files
+from kuristo.scanner import scan_locations
+from kuristo._utils import create_run_output_dir, prune_old_runs, update_latest_symlink
 
 
 def run_jobs(args):

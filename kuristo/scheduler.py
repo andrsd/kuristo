@@ -3,15 +3,15 @@ import threading
 import sys
 import time
 import yaml
-import kuristo._print as prn
 from pathlib import Path
 from rich.progress import (Progress, SpinnerColumn, TextColumn, BarColumn, ProgressColumn, TimeElapsedColumn)
 from rich.text import Text
 from rich.console import Console
 from rich.style import Style
-from .job import Job
-from .config import Config
-from .resources import Resources
+import kuristo._print as prn
+from kuristo.job import Job
+from kuristo.config import Config
+from kuristo.resources import Resources
 
 
 class StepCountColumn(ProgressColumn):
