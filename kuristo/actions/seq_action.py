@@ -1,6 +1,6 @@
-from .process_action import ProcessAction
-from kuristo import action
-from ..context import Context
+from kuristo.actions.process_action import ProcessAction
+from kuristo.registry import action
+from kuristo.context import Context
 
 
 @action("core/sequential")

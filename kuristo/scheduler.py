@@ -6,11 +6,10 @@ import yaml
 from pathlib import Path
 from rich.progress import (Progress, SpinnerColumn, TextColumn, BarColumn, ProgressColumn, TimeElapsedColumn)
 from rich.text import Text
-from rich.console import Console
 from rich.style import Style
-import kuristo._print as prn
+import kuristo.ui as ui
+import kuristo.config as config
 from kuristo.job import Job
-from kuristo.config import Config
 from kuristo.resources import Resources
 
 
@@ -23,8 +22,8 @@ class StepCountColumn(ProgressColumn):
 
 
 class NullProgress:
-    def __init__(self, no_ansi):
-        self.console = Console(force_terminal=no_ansi, no_color=no_ansi, markup=no_ansi)
+    def __init__(self):
+        self.console = ui.console()
 
     def __enter__(self):
         return self
@@ -57,7 +56,7 @@ class Scheduler:
     new one(s). We run until all jobs have FINISHED status.
     """
 
-    def __init__(self, specs, rcs: Resources, out_dir, config: Config, no_ansi=False, report_path=None) -> None:
+    def __init__(self, specs, rcs: Resources, out_dir, report_path=None) -> None:
         """
         @param specs: [JobSpec] List of job specifications
         @param rcs: Resources Resource to be scheduled
@@ -65,17 +64,16 @@ class Scheduler:
         @param config: Configuration
         @param job_times_path: File name to store timing report into
         """
-        self._max_label_len = config.console_width
+        cfg = config.get()
+        self._max_label_len = cfg.console_width
         self._max_id_width = 1
-        self._no_ansi = no_ansi
         self._out_dir = Path(out_dir)
-        self._config = config
         self._create_graph(specs)
         self._active_jobs = set()
         self._lock = threading.Lock()
         self._resources = rcs
-        if self._no_ansi:
-            self._progress = NullProgress(no_ansi=no_ansi)
+        if cfg.no_ansi:
+            self._progress = NullProgress()
         else:
             self._progress = Progress(
                 SpinnerColumn(),
@@ -85,6 +83,7 @@ class Scheduler:
                 TimeElapsedColumn(),
                 transient=True
             )
+            ui.set_console(self._progress.console)
         # tasks that are executed
         self._tasks = {}
         self._n_success = 0
@@ -106,6 +105,8 @@ class Scheduler:
         """
         Run all jobs in the queue
         """
+        cfg = config.get()
+
         self._create_out_dir()
         start_time = time.perf_counter()
         with self._progress:
@@ -114,16 +115,16 @@ class Scheduler:
                 threading.Event().wait(0.5)
         end_time = time.perf_counter()
         self._total_runtime = end_time - start_time
-        if self._no_ansi:
+        if cfg.no_ansi:
             self._progress.console.print("")
 
-        prn.line(self._progress.console, self._config.console_width)
-        prn.stats(self._progress.console, prn.RunStats(
+        ui.line(cfg.console_width)
+        ui.stats(ui.RunStats(
             n_success=self._n_success,
             n_failed=self._n_failed,
             n_skipped=self._n_skipped
         ))
-        prn.time(self._progress.console, self._total_runtime)
+        ui.time(self._total_runtime)
         self._write_report()
 
     def _create_graph(self, specs):
@@ -165,7 +166,7 @@ class Scheduler:
             for job in ready_jobs:
                 if job.is_skipped:
                     job.skip_process()
-                    prn.status_line(self._progress.console, job, "SKIP", self._max_id_width, self._max_label_len, self._no_ansi)
+                    ui.status_line(job, "SKIP", self._max_id_width, self._max_label_len)
                     self._n_skipped = self._n_skipped + 1
                     continue
 
@@ -173,26 +174,26 @@ class Scheduler:
                 if self._resources.available_cores >= required:
                     self._resources.allocate_cores(required)
                     self._active_jobs.add(job)
-                    job_name = prn.rich_job_name(job.name)
+                    job_name = ui.job_name_markup(job.name)
                     task_id = self._progress.add_task(
-                        Text.from_markup(f"[cyan]{job_name}"),
+                        Text.from_markup(f"[cyan]{job_name}[/]"),
                         total=job.num_steps
                     )
                     self._tasks[job.id] = task_id
                     job.create_step_tasks(self._progress)
                     job.start()
-                    prn.status_line(self._progress.console, job, "STARTING", self._max_id_width, self._max_label_len, self._no_ansi)
+                    ui.status_line(job, "STARTING", self._max_id_width, self._max_label_len)
 
     def _job_completed(self, job):
         with self._lock:
             if job.return_code == 0:
-                prn.status_line(self._progress.console, job, "PASS", self._max_id_width, self._max_label_len, self._no_ansi)
+                ui.status_line(job, "PASS", self._max_id_width, self._max_label_len)
                 self._n_success = self._n_success + 1
             elif job.return_code == 124:
-                prn.status_line(self._progress.console, job, "TIMEOUT", self._max_id_width, self._max_label_len, self._no_ansi)
+                ui.status_line(job, "TIMEOUT", self._max_id_width, self._max_label_len)
                 self._n_failed = self._n_failed + 1
             else:
-                prn.status_line(self._progress.console, job, "FAIL", self._max_id_width, self._max_label_len, self._no_ansi)
+                ui.status_line(job, "FAIL", self._max_id_width, self._max_label_len)
                 self._n_failed = self._n_failed + 1
             task_id = self._tasks[job.id]
             self._progress.remove_task(task_id)
@@ -250,11 +251,11 @@ class Scheduler:
             jobs = []
             for v in variants:
                 name = spec.build_matrix_job_name(v)
-                job = Job(name, spec, self._out_dir, self._config, matrix=v)
+                job = Job(name, spec, self._out_dir, matrix=v)
                 jobs.append(job)
             return jobs
         else:
-            job = Job(spec.name, spec, self._out_dir, self._config)
+            job = Job(spec.name, spec, self._out_dir)
             return [job]
 
     def exit_code(self, *, strict=False):

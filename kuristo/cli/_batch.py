@@ -2,16 +2,16 @@ import yaml
 import os
 import re
 from pathlib import Path
-from rich.console import Console
-from kuristo.config import Config
+import kuristo.config as config
+import kuristo.ui as ui
 from kuristo.scanner import scan_locations
 from kuristo.batch import get_backend
 from kuristo.batch.backend import ScriptParameters
 from kuristo.job_spec import specs_from_file
 from kuristo.action_factory import ActionFactory
 from kuristo.context import Context
-from kuristo._utils import create_run_output_dir, prune_old_runs, update_latest_symlink
-from kuristo._plugin_loader import load_user_steps_from_kuristo_dir
+from kuristo.utils import create_run_output_dir, prune_old_runs, update_latest_symlink
+from kuristo.plugin_loader import load_user_steps_from_kuristo_dir
 
 
 def build_actions(spec, context):
@@ -30,7 +30,7 @@ def required_cores(actions):
     return n_cores
 
 
-def create_script_params(job_num: int, specs, workdir: Path, config: Config):
+def create_script_params(job_num: int, specs, workdir: Path):
     """
     Create a specification for job submission into a queue
 
@@ -49,7 +49,6 @@ def create_script_params(job_num: int, specs, workdir: Path, config: Config):
             pass
         else:
             context = Context(
-                config=config,
                 base_env=None,
                 # matrix=matrix
             )
@@ -58,12 +57,13 @@ def create_script_params(job_num: int, specs, workdir: Path, config: Config):
             n_cores = max(n_cores, required_cores(actions))
             max_time += sp.timeout_minutes
 
+    cfg = config.get()
     return ScriptParameters(
         name=job_name,
         n_cores=n_cores,
         max_time=max_time,
         work_dir=workdir,
-        partition=config.batch_partition
+        partition=cfg.batch_partition
     )
 
 
@@ -102,20 +102,18 @@ def batch_submit(args):
     """
     Submit jobs into HPC queue
     """
-    console = Console(force_terminal=not args.no_ansi, no_color=args.no_ansi, markup=not args.no_ansi)
-
     try:
-        config = Config()
+        cfg = config.get()
         if args.partition is not None:
-            config.batch_partition = args.partition
+            cfg.batch_partition = args.partition
         if args.backend is not None:
-            config.batch_backend = args.backend
+            cfg.batch_backend = args.backend
 
-        backend = get_backend(config.batch_backend)
+        backend = get_backend(cfg.batch_backend)
         locations = args.location or ["."]
-        out_dir = create_run_output_dir(config.log_dir)
-        prune_old_runs(config.log_dir, config.log_history)
-        update_latest_symlink(config.log_dir, out_dir)
+        out_dir = create_run_output_dir(cfg.log_dir)
+        prune_old_runs(cfg.log_dir, cfg.log_history)
+        update_latest_symlink(cfg.log_dir, out_dir)
         load_user_steps_from_kuristo_dir()
 
         job_num = 0
@@ -126,12 +124,12 @@ def batch_submit(args):
             workdir.mkdir()
 
             specs = specs_from_file(f)
-            s = create_script_params(job_num, specs, workdir, config)
+            s = create_script_params(job_num, specs, workdir, cfg)
 
             job_id = backend.submit(s)
             write_metadata(job_id, backend.name, workdir)
 
-        console.print(f'Submitted {job_num} jobs')
+        ui.console().print(f'Submitted {job_num} jobs')
     except Exception as e:
         print(e)
 
@@ -140,9 +138,8 @@ def batch_status(args):
     """
     Get job status in queue
     """
-    console = Console(force_terminal=not args.no_ansi, no_color=args.no_ansi, markup=not args.no_ansi)
-    config = Config()
-    jobs_dir = config.log_dir / "runs" / "latest"
+    cfg = config.get()
+    jobs_dir = cfg.log_dir / "runs" / "latest"
 
     try:
         metadata = load_metadata(jobs_dir)
@@ -150,7 +147,7 @@ def batch_status(args):
             job_id = str(m["job"]["id"])
             backend = get_backend(m["job"]["backend"])
             status = backend.status(job_id)
-            console.print(f'[{job_id}] {status}')
+            ui.console().print(f'[{job_id}] {status}')
     except Exception as e:
         print(e)
 

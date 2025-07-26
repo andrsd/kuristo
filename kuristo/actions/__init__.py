@@ -1,13 +1,13 @@
-from .action import Action
-from .process_action import ProcessAction
-from .function_action import FunctionAction
-from .mpi_action import MPIAction
-from .seq_action import SeqAction
-from .checks_exodiff import ExodiffCheck
-from .checks_cvsdiff import CSVDiffCheck
-from .checks_regex import RegexCheck
-from .checks_regex_float import RegexFloatCheck
-from .composite_action import CompositeAction
+from kuristo.actions.action import Action
+from kuristo.actions.process_action import ProcessAction
+from kuristo.actions.function_action import FunctionAction
+from kuristo.actions.mpi_action import MPIAction
+from kuristo.actions.seq_action import SeqAction
+from kuristo.actions.checks_exodiff import ExodiffCheck
+from kuristo.actions.checks_cvsdiff import CSVDiffCheck
+from kuristo.actions.checks_regex import RegexCheck
+from kuristo.actions.checks_regex_float import RegexFloatCheck
+from kuristo.actions.composite_action import CompositeAction
 
 
 __all__ = [

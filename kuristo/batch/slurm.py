@@ -3,7 +3,7 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 from importlib.resources import files
 from kuristo.batch.backend import BatchBackend, ScriptParameters
-from kuristo._utils import minutes_to_hhmmss
+from kuristo.utils import minutes_to_hhmmss
 
 
 class SlurmBackend(BatchBackend):

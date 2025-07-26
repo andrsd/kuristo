@@ -1,4 +1,4 @@
-from .config import Config
+import kuristo.config as config
 
 
 class Resources:
@@ -6,8 +6,9 @@ class Resources:
     Provides resources available to the framework
     """
 
-    def __init__(self, config: Config) -> None:
-        self._max_cores = config.num_cores
+    def __init__(self) -> None:
+        cfg = config.get()
+        self._max_cores = cfg.num_cores
         self._n_cores_available = self._max_cores
 
     @property

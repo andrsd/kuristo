@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from ..context import Context
+from kuristo.context import Context
 
 
 class Action(ABC):

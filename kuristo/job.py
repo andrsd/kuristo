@@ -2,11 +2,10 @@ import threading
 import logging
 import time
 from pathlib import Path
-from .job_spec import JobSpec
-from .action_factory import ActionFactory
-from .context import Context
-from .env import Env
-from .config import Config
+from kuristo.job_spec import JobSpec
+from kuristo.action_factory import ActionFactory
+from kuristo.context import Context
+from kuristo.env import Env
 
 
 class Job:
@@ -75,7 +74,7 @@ class Job:
             for key, value in env.items():
                 self.env(key, value)
 
-    def __init__(self, name, job_spec: JobSpec, log_dir: Path, config: Config, matrix=None) -> None:
+    def __init__(self, name, job_spec: JobSpec, log_dir: Path, matrix=None) -> None:
         """
         @param job_spec Job specification
         """
@@ -98,7 +97,6 @@ class Job:
         self._status = Job.WAITING
         self._skipped = False
         self._context = Context(
-            config=config,
             base_env=self._get_base_env(),
             matrix=matrix
         )

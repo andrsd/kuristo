@@ -1,5 +1,5 @@
-from .checks_regex import RegexCheck
-from kuristo import action
+from kuristo.actions.checks_regex import RegexCheck
+from kuristo.registry import action
 import re
 import math
 

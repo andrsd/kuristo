@@ -1,5 +1,5 @@
-from .action import Action
-from ..context import Context
+from kuristo.actions.action import Action
+from kuristo.context import Context
 from io import StringIO
 import contextlib
 from abc import abstractmethod

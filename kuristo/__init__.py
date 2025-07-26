@@ -1,6 +1,6 @@
-from .registry import action
-from .context import Context
-from .actions import Action, ProcessAction, MPIAction, CompositeAction, FunctionAction
+from kuristo.registry import action
+from kuristo.context import Context
+from kuristo.actions import Action, ProcessAction, MPIAction, CompositeAction, FunctionAction
 
 try:
     from ._version import __version__

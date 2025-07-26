@@ -1,10 +1,14 @@
 import sys
 import kuristo.cli as cli
+import kuristo.config as config
 
 
 def main():
     parser = cli.build_parser()
     args = parser.parse_args()
+
+    cfg = config.get()
+    cfg.set_from_args(args)
 
     if args.command == "run":
         exit_code = cli.run_jobs(args)

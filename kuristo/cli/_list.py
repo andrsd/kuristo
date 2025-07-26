@@ -1,11 +1,11 @@
-from rich.console import Console
 from rich.text import Text
-from ..job_spec import parse_workflow_files
-from ..scanner import scan_locations
+import kuristo.ui as ui
+from kuristo.job_spec import parse_workflow_files
+from kuristo.scanner import scan_locations
 
 
 def list_jobs(args):
-    console = Console(force_terminal=not args.no_ansi, no_color=args.no_ansi, markup=not args.no_ansi)
+    console = ui.console()
     locations = args.location or ["."]
 
     workflow_files = scan_locations(locations)

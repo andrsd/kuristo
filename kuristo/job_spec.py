@@ -1,7 +1,7 @@
 import os
 import yaml
 from itertools import product
-from ._utils import interpolate_str
+from kuristo.utils import interpolate_str
 
 
 class JobSpec:

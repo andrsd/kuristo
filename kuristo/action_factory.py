@@ -1,5 +1,5 @@
-from .actions.shell_action import ShellAction
-from .registry import get_action
+from kuristo.actions.shell_action import ShellAction
+from kuristo.registry import get_action
 
 
 class ActionFactory:

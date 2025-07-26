@@ -83,10 +83,6 @@ def update_latest_symlink(log_dir: Path, latest_run_dir: Path):
     latest_link.symlink_to(relative_target, target_is_directory=True)
 
 
-def rich_job_name(job_name):
-    return job_name.replace("[", "\\[")
-
-
 def interpolate_str(text: str, variables: dict) -> str:
     normalized = text.replace("${{", "{{").replace("}}", "}}")
     template = Template(normalized)
