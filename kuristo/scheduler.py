@@ -173,9 +173,9 @@ class Scheduler:
                 if self._resources.available_cores >= required:
                     self._resources.allocate_cores(required)
                     self._active_jobs.add(job)
-                    job_name = ui.rich_job_name(job.name)
+                    job_name = ui.job_name_markup(job.name)
                     task_id = self._progress.add_task(
-                        Text.from_markup(f"[cyan]{job_name}"),
+                        Text.from_markup(f"[cyan]{job_name}[/]"),
                         total=job.num_steps
                     )
                     self._tasks[job.id] = task_id

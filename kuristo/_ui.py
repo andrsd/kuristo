@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from rich.console import Console
 from rich.text import Text
 from kuristo.job import Job
-from kuristo._utils import rich_job_name, human_time, human_time2
+from kuristo._utils import human_time, human_time2
 
 
 @dataclass
@@ -15,24 +15,28 @@ class RunStats:
     n_skipped: int
 
 
-def padded_job_id(job_id, max_width):
+def _padded_job_id(job_id, max_width):
     return f"{job_id:>{max_width}}"
+
+
+def job_name_markup(job_name):
+    return job_name.replace("[", "\\[")
 
 
 def status_line(console: Console, job, state, max_id_width, max_label_len, no_ansi):
     if isinstance(job, Job):
-        job_id = padded_job_id(job.id, max_id_width)
+        job_id = _padded_job_id(job.id, max_id_width)
         job_name_len = len(job.name)
-        job_name = rich_job_name(job.name)
+        job_name = job_name_markup(job.name)
         if job.is_skipped:
             skip_reason = job.skip_reason
         else:
             skip_reason = ""
         elapsed_time = job.elapsed_time
     elif isinstance(job, dict):
-        job_id = padded_job_id(job["id"], max_id_width)
+        job_id = _padded_job_id(job["id"], max_id_width)
         job_name_len = len(job["job name"])
-        job_name = rich_job_name(job["job name"])
+        job_name = job_name_markup(job["job name"])
         skip_reason = ""
         elapsed_time = job.get("duration", 0.0)
     else:
