@@ -21,19 +21,19 @@ def summarize(results):
     return prn.RunStats(counts['success'], counts['failed'], counts['skipped'])
 
 
-def print_report(console: Console, report, no_ansi: bool):
+def print_report(console: Console, report, no_ansi: bool, config: Config):
     results = report.get("results", [])
 
     max_id_width = len(str(len(results)))
 
-    max_label_len = 80
+    max_label_len = config.console_width
     for r in results:
         max_label_len = max(max_label_len, len(r['job name']) + 1)
 
     for entry in results:
         prn.status_line(console, entry, STATUS_LABELS.get(entry["status"], "????"), max_id_width, max_label_len, no_ansi)
     stats = summarize(results)
-    prn.line(console, max_label_len + 12 + max_id_width)
+    prn.line(console, config.console_width)
     prn.stats(console, stats)
     prn.time(console, report.get("total_runtime", 0.))
 
@@ -50,6 +50,6 @@ def status(args):
             raise RuntimeError("No report found. Did you run any jobs yet?")
 
         report = utils.read_report(report_path)
-        print_report(console, report, args.no_ansi)
+        print_report(console, report, args.no_ansi, config)
     except Exception as e:
         print(e)

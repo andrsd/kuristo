@@ -66,23 +66,25 @@ def parse_sections(lines):
 
 def render_title(console: Console, sec, max_label_len):
     title = sec["title"]
-    wd = max_label_len - 5 - len(title)
-    dots = "." * wd
 
     tm = 0.
     if sec["start_time"] and sec["end_time"]:
         tm = (sec["end_time"] - sec["start_time"]).total_seconds()
-    txt = f"Name: [white]{title}[/] [grey23]{dots}[/] [white]{utils.human_time2(tm)}[/]"
+    time_str = utils.human_time2(tm)
+
+    wd = max_label_len - 8 - len(title) - len(time_str)
+    dots = "." * wd
+
+    txt = f"Name: [white]{title}[/] [grey23]{dots}[/] [white]{time_str}[/]"
     console.print(Text.from_markup(txt))
     console.print()
 
 
 def render_section(console: Console, sec, max_label_len):
-
     title = sec["title"]
+
     rc = sec["return_code"]
     status = "PASS" if rc == 0 else "FAIL"
-
     if status == "SKIP":
         st = "[yellow]SKIP[/]"
     elif status == "PASS":
@@ -95,11 +97,12 @@ def render_section(console: Console, sec, max_label_len):
     delta = 0.
     if sec["start_time"] and sec["end_time"]:
         delta = (sec["end_time"] - sec["start_time"]).total_seconds()
+    time_str = utils.human_time2(delta)
 
-    wd = max_label_len - 6 - len(title)
+    wd = max_label_len - 9 - len(title) - len(time_str)
     dots = "." * wd
 
-    header = f"[white]*[/] {st} {title} [grey23]{dots}[/] [white]{utils.human_time2(delta)}[/]"
+    header = f"[white]*[/] {st} {title} [grey23]{dots}[/] [white]{time_str}[/]"
     console.print(Text.from_markup(header))
 
     for tag, msg in sec["lines"]:
@@ -121,8 +124,8 @@ def render_section(console: Console, sec, max_label_len):
     console.print()
 
 
-def render_sections(console: Console, sections):
-    max_label_len = 100
+def render_sections(console: Console, sections, config: Config):
+    max_label_len = config.console_width
     for sec in sections:
         if sec["type"] == "title":
             render_title(console, sec, max_label_len)
@@ -130,7 +133,7 @@ def render_sections(console: Console, sections):
             render_section(console, sec, max_label_len)
 
 
-def display_job_log(console: Console, log_path: Path):
+def display_job_log(console: Console, log_path: Path, config: Config):
     if not log_path.exists():
         raise RuntimeError(f"Log file not found: {log_path}")
 
@@ -138,7 +141,7 @@ def display_job_log(console: Console, log_path: Path):
         lines = [parse_log_line(line) for line in f if parse_log_line(line)]
 
     sections = parse_sections(lines)
-    render_sections(console, sections)
+    render_sections(console, sections, config)
 
 
 def show(args):
@@ -150,6 +153,6 @@ def show(args):
         runs_dir = config.log_dir / "runs" / run_name
 
         log_path = Path(runs_dir / f"job-{args.job}.log")
-        display_job_log(console, log_path)
+        display_job_log(console, log_path, config)
     except Exception as e:
         print(e)

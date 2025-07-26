@@ -37,7 +37,8 @@ def status_line(console: Console, job, state, max_id_width, max_label_len, no_an
         elapsed_time = job.get("duration", 0.0)
     else:
         raise ValueError("job parameter must be a dict of Job")
-    width = max_label_len - job_name_len
+    time_str = human_time2(elapsed_time)
+    width = max_label_len - 15 - job_name_len - len(time_str)
     dots = "." * width
 
     if state == "STARTING":
@@ -62,7 +63,7 @@ def status_line(console: Console, job, state, max_id_width, max_label_len, no_an
             markup += " timeout"
         else:
             markup += f" [grey23]{dots}[/]"
-            markup += f" {human_time2(elapsed_time)}"
+            markup += f" {time_str}"
         console.print(Text.from_markup(markup))
 
 
