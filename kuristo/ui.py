@@ -6,6 +6,26 @@ from kuristo.job import Job
 from kuristo.utils import human_time, human_time2
 
 
+_console_instance = None
+
+
+def console() -> Console:
+    global _console_instance
+    if _console_instance is None:
+        cfg = config.get()
+        _console_instance = Console(
+            force_terminal=not cfg.no_ansi,
+            no_color=cfg.no_ansi,
+            markup=not cfg.no_ansi,
+        )
+    return _console_instance
+
+
+def set_console(console: Console):
+    global _console_instance
+    _console_instance = console
+
+
 @dataclass
 class RunStats:
     # Number of successful
@@ -24,8 +44,9 @@ def job_name_markup(job_name):
     return job_name.replace("[", "\\[")
 
 
-def status_line(console: Console, job, state, max_id_width, max_label_len):
+def status_line(job, state, max_id_width, max_label_len):
     cfg = config.get()
+    consol = console()
     if isinstance(job, Job):
         job_id = _padded_job_id(job.id, max_id_width)
         job_name_len = len(job.name)
@@ -50,7 +71,7 @@ def status_line(console: Console, job, state, max_id_width, max_label_len):
     if state == "STARTING":
         if cfg.no_ansi:
             markup = f"         #{job_id} {job_name} "
-            console.print(Text.from_markup(markup))
+            consol.print(Text.from_markup(markup))
     else:
         markup = ""
         if state == "SKIP":
@@ -70,20 +91,24 @@ def status_line(console: Console, job, state, max_id_width, max_label_len):
         else:
             markup += f" [grey23]{dots}[/]"
             markup += f" {time_str}"
-        console.print(Text.from_markup(markup))
+        consol.print(Text.from_markup(markup))
 
 
-def line(console: Console, width: int):
+def line(width: int):
+    consol = console()
+
     line = "-" * width
-    console.print(
+    consol.print(
         Text.from_markup(f"[grey23]{line}[/]")
     )
 
 
-def stats(console: Console, stats: RunStats):
+def stats(stats: RunStats):
+    consol = console()
+
     total = stats.n_success + stats.n_failed + stats.n_skipped
 
-    console.print(
+    consol.print(
         Text.from_markup(
             f"[grey46]Success:[/] [green]{stats.n_success:,}[/]     "
             f"[grey46]Failed:[/] [red]{stats.n_failed:,}[/]     "
@@ -93,6 +118,8 @@ def stats(console: Console, stats: RunStats):
     )
 
 
-def time(console: Console, elapsed_time: float):
+def time(elapsed_time: float):
+    consol = console()
+
     markup = f"[grey46]Took:[/] {human_time(elapsed_time)}"
-    console.print(Text.from_markup(markup))
+    consol.print(Text.from_markup(markup))

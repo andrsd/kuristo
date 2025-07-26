@@ -1,12 +1,12 @@
 from rich.table import Table
 import kuristo.utils as utils
 import kuristo.config as config
-from rich.console import Console
+import kuristo.ui as ui
 
 
 def log(args):
     try:
-        console = Console(force_terminal=not args.no_ansi, no_color=args.no_ansi, markup=not args.no_ansi)
+        console = ui.console()
 
         cfg = config.get()
         runs_dir = cfg.log_dir / "runs"

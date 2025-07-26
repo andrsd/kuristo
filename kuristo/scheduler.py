@@ -6,7 +6,6 @@ import yaml
 from pathlib import Path
 from rich.progress import (Progress, SpinnerColumn, TextColumn, BarColumn, ProgressColumn, TimeElapsedColumn)
 from rich.text import Text
-from rich.console import Console
 from rich.style import Style
 import kuristo.ui as ui
 import kuristo.config as config
@@ -24,7 +23,7 @@ class StepCountColumn(ProgressColumn):
 
 class NullProgress:
     def __init__(self):
-        self.console = Console(force_terminal=True, no_color=True, markup=False)
+        self.console = ui.console()
 
     def __enter__(self):
         return self
@@ -84,6 +83,7 @@ class Scheduler:
                 TimeElapsedColumn(),
                 transient=True
             )
+            ui.set_console(self._progress.console)
         # tasks that are executed
         self._tasks = {}
         self._n_success = 0
@@ -118,13 +118,13 @@ class Scheduler:
         if cfg.no_ansi:
             self._progress.console.print("")
 
-        ui.line(self._progress.console, cfg.console_width)
-        ui.stats(self._progress.console, ui.RunStats(
+        ui.line(cfg.console_width)
+        ui.stats(ui.RunStats(
             n_success=self._n_success,
             n_failed=self._n_failed,
             n_skipped=self._n_skipped
         ))
-        ui.time(self._progress.console, self._total_runtime)
+        ui.time(self._total_runtime)
         self._write_report()
 
     def _create_graph(self, specs):
@@ -166,7 +166,7 @@ class Scheduler:
             for job in ready_jobs:
                 if job.is_skipped:
                     job.skip_process()
-                    ui.status_line(self._progress.console, job, "SKIP", self._max_id_width, self._max_label_len)
+                    ui.status_line(job, "SKIP", self._max_id_width, self._max_label_len)
                     self._n_skipped = self._n_skipped + 1
                     continue
 
@@ -182,18 +182,18 @@ class Scheduler:
                     self._tasks[job.id] = task_id
                     job.create_step_tasks(self._progress)
                     job.start()
-                    ui.status_line(self._progress.console, job, "STARTING", self._max_id_width, self._max_label_len)
+                    ui.status_line(job, "STARTING", self._max_id_width, self._max_label_len)
 
     def _job_completed(self, job):
         with self._lock:
             if job.return_code == 0:
-                ui.status_line(self._progress.console, job, "PASS", self._max_id_width, self._max_label_len)
+                ui.status_line(job, "PASS", self._max_id_width, self._max_label_len)
                 self._n_success = self._n_success + 1
             elif job.return_code == 124:
-                ui.status_line(self._progress.console, job, "TIMEOUT", self._max_id_width, self._max_label_len)
+                ui.status_line(job, "TIMEOUT", self._max_id_width, self._max_label_len)
                 self._n_failed = self._n_failed + 1
             else:
-                ui.status_line(self._progress.console, job, "FAIL", self._max_id_width, self._max_label_len)
+                ui.status_line(job, "FAIL", self._max_id_width, self._max_label_len)
                 self._n_failed = self._n_failed + 1
             task_id = self._tasks[job.id]
             self._progress.remove_task(task_id)

@@ -1,8 +1,8 @@
 import kuristo.config as config
 import kuristo.utils as utils
+import kuristo.ui as ui
 from datetime import datetime
 from pathlib import Path
-from rich.console import Console
 from rich.text import Text
 
 
@@ -64,7 +64,8 @@ def parse_sections(lines):
     return sections
 
 
-def render_title(console: Console, sec, max_label_len):
+def render_title(sec, max_label_len):
+    console = ui.console()
     title = sec["title"]
 
     tm = 0.
@@ -80,7 +81,9 @@ def render_title(console: Console, sec, max_label_len):
     console.print()
 
 
-def render_section(console: Console, sec, max_label_len):
+def render_section(sec, max_label_len):
+    console = ui.console()
+
     title = sec["title"]
 
     rc = sec["return_code"]
@@ -124,17 +127,17 @@ def render_section(console: Console, sec, max_label_len):
     console.print()
 
 
-def render_sections(console: Console, sections):
+def render_sections(sections):
     cfg = config.get()
     max_label_len = cfg.console_width
     for sec in sections:
         if sec["type"] == "title":
-            render_title(console, sec, max_label_len)
+            render_title(sec, max_label_len)
         else:
-            render_section(console, sec, max_label_len)
+            render_section(sec, max_label_len)
 
 
-def display_job_log(console: Console, log_path: Path):
+def display_job_log(log_path: Path):
     if not log_path.exists():
         raise RuntimeError(f"Log file not found: {log_path}")
 
@@ -142,18 +145,16 @@ def display_job_log(console: Console, log_path: Path):
         lines = [parse_log_line(line) for line in f if parse_log_line(line)]
 
     sections = parse_sections(lines)
-    render_sections(console, sections)
+    render_sections(sections)
 
 
 def show(args):
     try:
-        console = Console(force_terminal=not args.no_ansi, no_color=args.no_ansi, markup=not args.no_ansi)
-
         cfg = config.get()
         run_name = args.run or "latest"
         runs_dir = cfg.log_dir / "runs" / run_name
 
         log_path = Path(runs_dir / f"job-{args.job}.log")
-        display_job_log(console, log_path)
+        display_job_log(log_path)
     except Exception as e:
         print(e)

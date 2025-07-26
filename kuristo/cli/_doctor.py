@@ -3,17 +3,17 @@ import os
 import platform
 import sys
 import subprocess
-from rich.console import Console
 from rich.table import Table
 from rich.text import Text
 import kuristo.config as config
+import kuristo.ui as ui
 from kuristo.plugin_loader import find_kuristo_root, load_user_steps_from_kuristo_dir
 from kuristo.registry import _ACTION_REGISTRY
 from kuristo._version import __version__
 
 
 def print_diag(args):
-    console = Console(force_terminal=not args.no_ansi, no_color=args.no_ansi, markup=not args.no_ansi)
+    console = ui.console()
 
     cfg = config.get()
     log_dir = cfg.log_dir

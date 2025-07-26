@@ -1,7 +1,6 @@
 import kuristo.ui as ui
 import kuristo.utils as utils
 import kuristo.config as config
-from rich.console import Console
 
 
 STATUS_LABELS = {
@@ -21,7 +20,7 @@ def summarize(results):
     return ui.RunStats(counts['success'], counts['failed'], counts['skipped'])
 
 
-def print_report(console: Console, report):
+def print_report(report):
     cfg = config.get()
 
     results = report.get("results", [])
@@ -33,17 +32,15 @@ def print_report(console: Console, report):
         max_label_len = max(max_label_len, len(r['job name']) + 1)
 
     for entry in results:
-        ui.status_line(console, entry, STATUS_LABELS.get(entry["status"], "????"), max_id_width, max_label_len)
+        ui.status_line(entry, STATUS_LABELS.get(entry["status"], "????"), max_id_width, max_label_len)
     stats = summarize(results)
-    ui.line(console, cfg.console_width)
-    ui.stats(console, stats)
-    ui.time(console, report.get("total_runtime", 0.))
+    ui.line(cfg.console_width)
+    ui.stats(stats)
+    ui.time(report.get("total_runtime", 0.))
 
 
 def status(args):
     try:
-        console = Console(force_terminal=not args.no_ansi, no_color=args.no_ansi, markup=not args.no_ansi)
-
         cfg = config.get()
         run_name = args.run or "latest"
         runs_dir = cfg.log_dir / "runs" / run_name
@@ -52,6 +49,6 @@ def status(args):
             raise RuntimeError("No report found. Did you run any jobs yet?")
 
         report = utils.read_report(report_path)
-        print_report(console, report)
+        print_report(report)
     except Exception as e:
         print(e)

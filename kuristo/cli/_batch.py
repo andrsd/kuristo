@@ -2,8 +2,8 @@ import yaml
 import os
 import re
 from pathlib import Path
-from rich.console import Console
 import kuristo.config as config
+import kuristo.ui as ui
 from kuristo.scanner import scan_locations
 from kuristo.batch import get_backend
 from kuristo.batch.backend import ScriptParameters
@@ -102,8 +102,6 @@ def batch_submit(args):
     """
     Submit jobs into HPC queue
     """
-    console = Console(force_terminal=not args.no_ansi, no_color=args.no_ansi, markup=not args.no_ansi)
-
     try:
         cfg = config.get()
         if args.partition is not None:
@@ -131,7 +129,7 @@ def batch_submit(args):
             job_id = backend.submit(s)
             write_metadata(job_id, backend.name, workdir)
 
-        console.print(f'Submitted {job_num} jobs')
+        ui.console().print(f'Submitted {job_num} jobs')
     except Exception as e:
         print(e)
 
@@ -140,7 +138,6 @@ def batch_status(args):
     """
     Get job status in queue
     """
-    console = Console(force_terminal=not args.no_ansi, no_color=args.no_ansi, markup=not args.no_ansi)
     cfg = config.get()
     jobs_dir = cfg.log_dir / "runs" / "latest"
 
@@ -150,7 +147,7 @@ def batch_status(args):
             job_id = str(m["job"]["id"])
             backend = get_backend(m["job"]["backend"])
             status = backend.status(job_id)
-            console.print(f'[{job_id}] {status}')
+            ui.console().print(f'[{job_id}] {status}')
     except Exception as e:
         print(e)
 
