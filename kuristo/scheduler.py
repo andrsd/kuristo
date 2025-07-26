@@ -8,7 +8,7 @@ from rich.progress import (Progress, SpinnerColumn, TextColumn, BarColumn, Progr
 from rich.text import Text
 from rich.console import Console
 from rich.style import Style
-import kuristo._print as prn
+import kuristo._ui as ui
 from kuristo.job import Job
 from kuristo.config import Config
 from kuristo.resources import Resources
@@ -117,13 +117,13 @@ class Scheduler:
         if self._no_ansi:
             self._progress.console.print("")
 
-        prn.line(self._progress.console, self._config.console_width)
-        prn.stats(self._progress.console, prn.RunStats(
+        ui.line(self._progress.console, self._config.console_width)
+        ui.stats(self._progress.console, ui.RunStats(
             n_success=self._n_success,
             n_failed=self._n_failed,
             n_skipped=self._n_skipped
         ))
-        prn.time(self._progress.console, self._total_runtime)
+        ui.time(self._progress.console, self._total_runtime)
         self._write_report()
 
     def _create_graph(self, specs):
@@ -165,7 +165,7 @@ class Scheduler:
             for job in ready_jobs:
                 if job.is_skipped:
                     job.skip_process()
-                    prn.status_line(self._progress.console, job, "SKIP", self._max_id_width, self._max_label_len, self._no_ansi)
+                    ui.status_line(self._progress.console, job, "SKIP", self._max_id_width, self._max_label_len, self._no_ansi)
                     self._n_skipped = self._n_skipped + 1
                     continue
 
@@ -173,7 +173,7 @@ class Scheduler:
                 if self._resources.available_cores >= required:
                     self._resources.allocate_cores(required)
                     self._active_jobs.add(job)
-                    job_name = prn.rich_job_name(job.name)
+                    job_name = ui.rich_job_name(job.name)
                     task_id = self._progress.add_task(
                         Text.from_markup(f"[cyan]{job_name}"),
                         total=job.num_steps
@@ -181,18 +181,18 @@ class Scheduler:
                     self._tasks[job.id] = task_id
                     job.create_step_tasks(self._progress)
                     job.start()
-                    prn.status_line(self._progress.console, job, "STARTING", self._max_id_width, self._max_label_len, self._no_ansi)
+                    ui.status_line(self._progress.console, job, "STARTING", self._max_id_width, self._max_label_len, self._no_ansi)
 
     def _job_completed(self, job):
         with self._lock:
             if job.return_code == 0:
-                prn.status_line(self._progress.console, job, "PASS", self._max_id_width, self._max_label_len, self._no_ansi)
+                ui.status_line(self._progress.console, job, "PASS", self._max_id_width, self._max_label_len, self._no_ansi)
                 self._n_success = self._n_success + 1
             elif job.return_code == 124:
-                prn.status_line(self._progress.console, job, "TIMEOUT", self._max_id_width, self._max_label_len, self._no_ansi)
+                ui.status_line(self._progress.console, job, "TIMEOUT", self._max_id_width, self._max_label_len, self._no_ansi)
                 self._n_failed = self._n_failed + 1
             else:
-                prn.status_line(self._progress.console, job, "FAIL", self._max_id_width, self._max_label_len, self._no_ansi)
+                ui.status_line(self._progress.console, job, "FAIL", self._max_id_width, self._max_label_len, self._no_ansi)
                 self._n_failed = self._n_failed + 1
             task_id = self._tasks[job.id]
             self._progress.remove_task(task_id)

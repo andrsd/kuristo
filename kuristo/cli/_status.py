@@ -1,4 +1,4 @@
-import kuristo._print as prn
+import kuristo._ui as ui
 import kuristo._utils as utils
 from kuristo.config import Config
 from rich.console import Console
@@ -18,7 +18,7 @@ def summarize(results):
         status = r["status"]
         counts[status] += 1
 
-    return prn.RunStats(counts['success'], counts['failed'], counts['skipped'])
+    return ui.RunStats(counts['success'], counts['failed'], counts['skipped'])
 
 
 def print_report(console: Console, report, no_ansi: bool, config: Config):
@@ -31,11 +31,11 @@ def print_report(console: Console, report, no_ansi: bool, config: Config):
         max_label_len = max(max_label_len, len(r['job name']) + 1)
 
     for entry in results:
-        prn.status_line(console, entry, STATUS_LABELS.get(entry["status"], "????"), max_id_width, max_label_len, no_ansi)
+        ui.status_line(console, entry, STATUS_LABELS.get(entry["status"], "????"), max_id_width, max_label_len, no_ansi)
     stats = summarize(results)
-    prn.line(console, config.console_width)
-    prn.stats(console, stats)
-    prn.time(console, report.get("total_runtime", 0.))
+    ui.line(console, config.console_width)
+    ui.stats(console, stats)
+    ui.time(console, report.get("total_runtime", 0.))
 
 
 def status(args):
