@@ -23,7 +23,9 @@ from kuristo.cli._batch import (
 @patch("kuristo.cli._batch.prune_old_runs")
 @patch("kuristo.cli._batch.create_run_output_dir")
 @patch("kuristo.cli._batch.get_backend")
+@patch("kuristo.cli._batch.config.get")
 def test_batch_submit_basic(
+    mock_config_get,
     mock_get_backend,
     mock_create_run_output_dir,
     mock_prune_old_runs,
@@ -42,6 +44,11 @@ def test_batch_submit_basic(
         no_ansi=True,
         partition='normal'
     )
+
+    # Return value of Config()
+    mock_config_instance = MagicMock()
+    mock_config_instance.log_dir = Path("/fake/log")
+    mock_config_get.return_value = mock_config_instance
 
     # Mock backend
     mock_backend = MagicMock()
@@ -162,9 +169,15 @@ def test_required_cores_all_below_default():
 
 
 @patch("kuristo.cli._batch.build_actions")
-def test_create_script_params_basic(mock_build_actions):
+@patch("kuristo.cli._batch.config.get")
+def test_create_script_params_basic(mock_config_get, mock_build_actions):
     # Arrange
     workdir = Path("/fake/workdir")
+
+    # Return value of Config()
+    mock_config_instance = MagicMock()
+    mock_config_instance.batch_partition = 'normal'
+    mock_config_get.return_value = mock_config_instance
 
     # 2 specs: one skipped, one active
     skipped_spec = SimpleNamespace(skip=True, timeout_minutes=0)
@@ -187,7 +200,13 @@ def test_create_script_params_basic(mock_build_actions):
 
 
 @patch("kuristo.cli._batch.build_actions")
-def test_create_script_params_all_skipped(mock_build_actions):
+@patch("kuristo.cli._batch.config.get")
+def test_create_script_params_all_skipped(mock_config_get, mock_build_actions):
+    # Return value of Config()
+    mock_config_instance = MagicMock()
+    mock_config_instance.batch_partition = 'normal'
+    mock_config_get.return_value = mock_config_instance
+
     workdir = Path("/workdir")
     specs = [SimpleNamespace(skip=True, timeout_minutes=15) for _ in range(3)]
 
@@ -202,7 +221,13 @@ def test_create_script_params_all_skipped(mock_build_actions):
 
 
 @patch("kuristo.cli._batch.build_actions")
-def test_create_script_params_accumulates_time_and_max_cores(mock_build_actions):
+@patch("kuristo.cli._batch.config.get")
+def test_create_script_params_accumulates_time_and_max_cores(mock_config_get, mock_build_actions):
+    # Return value of Config()
+    mock_config_instance = MagicMock()
+    mock_config_instance.batch_partition = 'normal'
+    mock_config_get.return_value = mock_config_instance
+
     workdir = Path("/data")
     specs = [
         SimpleNamespace(skip=False, timeout_minutes=10),

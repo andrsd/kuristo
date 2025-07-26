@@ -149,12 +149,9 @@ def display_job_log(log_path: Path):
 
 
 def show(args):
-    try:
-        cfg = config.get()
-        run_name = args.run or "latest"
-        runs_dir = cfg.log_dir / "runs" / run_name
+    cfg = config.get()
+    run_name = args.run or "latest"
+    runs_dir = cfg.log_dir / "runs" / run_name
 
-        log_path = Path(runs_dir / f"job-{args.job}.log")
-        display_job_log(log_path)
-    except Exception as e:
-        print(e)
+    log_path = Path(runs_dir / f"job-{args.job}.log")
+    display_job_log(log_path)

@@ -102,36 +102,33 @@ def batch_submit(args):
     """
     Submit jobs into HPC queue
     """
-    try:
-        cfg = config.get()
-        if args.partition is not None:
-            cfg.batch_partition = args.partition
-        if args.backend is not None:
-            cfg.batch_backend = args.backend
+    cfg = config.get()
+    if args.partition is not None:
+        cfg.batch_partition = args.partition
+    if args.backend is not None:
+        cfg.batch_backend = args.backend
 
-        backend = get_backend(cfg.batch_backend)
-        locations = args.location or ["."]
-        out_dir = create_run_output_dir(cfg.log_dir)
-        prune_old_runs(cfg.log_dir, cfg.log_history)
-        update_latest_symlink(cfg.log_dir, out_dir)
-        load_user_steps_from_kuristo_dir()
+    backend = get_backend(cfg.batch_backend)
+    locations = args.location or ["."]
+    out_dir = create_run_output_dir(cfg.log_dir)
+    prune_old_runs(cfg.log_dir, cfg.log_history)
+    update_latest_symlink(cfg.log_dir, out_dir)
+    load_user_steps_from_kuristo_dir()
 
-        job_num = 0
-        workflow_files = scan_locations(locations)
-        for f in workflow_files:
-            job_num += 1
-            workdir = out_dir / f"job-{job_num}"
-            workdir.mkdir()
+    job_num = 0
+    workflow_files = scan_locations(locations)
+    for f in workflow_files:
+        job_num += 1
+        workdir = out_dir / f"job-{job_num}"
+        workdir.mkdir()
 
-            specs = specs_from_file(f)
-            s = create_script_params(job_num, specs, workdir, cfg)
+        specs = specs_from_file(f)
+        s = create_script_params(job_num, specs, workdir, cfg)
 
-            job_id = backend.submit(s)
-            write_metadata(job_id, backend.name, workdir)
+        job_id = backend.submit(s)
+        write_metadata(job_id, backend.name, workdir)
 
-        ui.console().print(f'Submitted {job_num} jobs')
-    except Exception as e:
-        print(e)
+    ui.console().print(f'Submitted {job_num} jobs')
 
 
 def batch_status(args):
@@ -141,15 +138,12 @@ def batch_status(args):
     cfg = config.get()
     jobs_dir = cfg.log_dir / "runs" / "latest"
 
-    try:
-        metadata = load_metadata(jobs_dir)
-        for m in metadata:
-            job_id = str(m["job"]["id"])
-            backend = get_backend(m["job"]["backend"])
-            status = backend.status(job_id)
-            ui.console().print(f'[{job_id}] {status}')
-    except Exception as e:
-        print(e)
+    metadata = load_metadata(jobs_dir)
+    for m in metadata:
+        job_id = str(m["job"]["id"])
+        backend = get_backend(m["job"]["backend"])
+        status = backend.status(job_id)
+        ui.console().print(f'[{job_id}] {status}')
 
 
 def batch(args):
