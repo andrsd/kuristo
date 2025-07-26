@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from rich.console import Console
 from rich.text import Text
 from kuristo.job import Job
-from kuristo._utils import human_time, human_time2
+from kuristo.utils import human_time, human_time2
 
 
 @dataclass

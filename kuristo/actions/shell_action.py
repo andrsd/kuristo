@@ -1,5 +1,5 @@
 from .process_action import ProcessAction
-from .._utils import interpolate_str
+from kuristo.utils import interpolate_str
 from ..context import Context
 
 

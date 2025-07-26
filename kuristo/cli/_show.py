@@ -1,5 +1,5 @@
 from kuristo.config import Config
-import kuristo._utils as utils
+import kuristo.utils as utils
 from datetime import datetime
 from pathlib import Path
 from rich.console import Console

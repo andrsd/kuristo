@@ -1,8 +1,8 @@
 import yaml
 import os
 from pathlib import Path
-from ._plugin_loader import find_kuristo_root
-from ._utils import get_default_core_limit
+from kuristo.plugin_loader import find_kuristo_root
+from kuristo.utils import get_default_core_limit
 
 
 class Config:

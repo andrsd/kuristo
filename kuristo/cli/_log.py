@@ -1,5 +1,5 @@
 from rich.table import Table
-import kuristo._utils as utils
+import kuristo.utils as utils
 from kuristo.config import Config
 from rich.console import Console
 

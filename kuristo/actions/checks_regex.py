@@ -1,7 +1,7 @@
 import re
 from kuristo import action
 from .action import Action
-from .._utils import interpolate_str
+from kuristo.utils import interpolate_str
 
 
 @action("checks/regex")

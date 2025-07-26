@@ -10,8 +10,8 @@ from kuristo.batch.backend import ScriptParameters
 from kuristo.job_spec import specs_from_file
 from kuristo.action_factory import ActionFactory
 from kuristo.context import Context
-from kuristo._utils import create_run_output_dir, prune_old_runs, update_latest_symlink
-from kuristo._plugin_loader import load_user_steps_from_kuristo_dir
+from kuristo.utils import create_run_output_dir, prune_old_runs, update_latest_symlink
+from kuristo.plugin_loader import load_user_steps_from_kuristo_dir
 
 
 def build_actions(spec, context):

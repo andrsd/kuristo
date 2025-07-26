@@ -1,5 +1,5 @@
-import kuristo._ui as ui
-import kuristo._utils as utils
+import kuristo.ui as ui
+import kuristo.utils as utils
 from kuristo.config import Config
 from rich.console import Console
 

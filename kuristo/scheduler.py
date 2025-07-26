@@ -8,7 +8,7 @@ from rich.progress import (Progress, SpinnerColumn, TextColumn, BarColumn, Progr
 from rich.text import Text
 from rich.console import Console
 from rich.style import Style
-import kuristo._ui as ui
+import kuristo.ui as ui
 from kuristo.job import Job
 from kuristo.config import Config
 from kuristo.resources import Resources

@@ -2,7 +2,7 @@ import os
 import shlex
 from kuristo import action
 from .process_action import ProcessAction
-from .._utils import resolve_path
+from kuristo.utils import resolve_path
 from ..context import Context
 
 
