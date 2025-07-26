@@ -20,7 +20,7 @@ def run_jobs(args):
     workflow_files = scan_locations(locations)
     specs = parse_workflow_files(workflow_files)
     rcs = Resources()
-    scheduler = Scheduler(specs, rcs, out_dir, no_ansi=args.no_ansi, report_path=args.report)
+    scheduler = Scheduler(specs, rcs, out_dir, report_path=args.report)
     scheduler.check()
     scheduler.run_all_jobs()
 

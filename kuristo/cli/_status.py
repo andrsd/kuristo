@@ -21,7 +21,7 @@ def summarize(results):
     return ui.RunStats(counts['success'], counts['failed'], counts['skipped'])
 
 
-def print_report(console: Console, report, no_ansi: bool):
+def print_report(console: Console, report):
     cfg = config.get()
 
     results = report.get("results", [])
@@ -33,7 +33,7 @@ def print_report(console: Console, report, no_ansi: bool):
         max_label_len = max(max_label_len, len(r['job name']) + 1)
 
     for entry in results:
-        ui.status_line(console, entry, STATUS_LABELS.get(entry["status"], "????"), max_id_width, max_label_len, no_ansi)
+        ui.status_line(console, entry, STATUS_LABELS.get(entry["status"], "????"), max_id_width, max_label_len)
     stats = summarize(results)
     ui.line(console, cfg.console_width)
     ui.stats(console, stats)
@@ -52,6 +52,6 @@ def status(args):
             raise RuntimeError("No report found. Did you run any jobs yet?")
 
         report = utils.read_report(report_path)
-        print_report(console, report, args.no_ansi)
+        print_report(console, report)
     except Exception as e:
         print(e)

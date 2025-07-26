@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from rich.console import Console
 from rich.text import Text
+import kuristo.config as config
 from kuristo.job import Job
 from kuristo.utils import human_time, human_time2
 
@@ -23,7 +24,8 @@ def job_name_markup(job_name):
     return job_name.replace("[", "\\[")
 
 
-def status_line(console: Console, job, state, max_id_width, max_label_len, no_ansi):
+def status_line(console: Console, job, state, max_id_width, max_label_len):
+    cfg = config.get()
     if isinstance(job, Job):
         job_id = _padded_job_id(job.id, max_id_width)
         job_name_len = len(job.name)
@@ -46,7 +48,7 @@ def status_line(console: Console, job, state, max_id_width, max_label_len, no_an
     dots = "." * width
 
     if state == "STARTING":
-        if no_ansi:
+        if cfg.no_ansi:
             markup = f"         #{job_id} {job_name} "
             console.print(Text.from_markup(markup))
     else:

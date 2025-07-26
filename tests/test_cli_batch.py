@@ -78,15 +78,15 @@ def test_batch_submit_basic(
 @patch("rich.console.Console.print")
 @patch("kuristo.cli._batch.get_backend")
 @patch("kuristo.cli._batch.load_metadata")
-@patch("kuristo.cli._batch.Config")
-def test_batch_status_basic(mock_config, mock_load_metadata, mock_get_backend, mock_console_print):
+@patch("kuristo.cli._batch.config.get")
+def test_batch_status_basic(mock_config_get, mock_load_metadata, mock_get_backend, mock_console_print):
     # Fake CLI args
     args = SimpleNamespace(no_ansi=True)
 
     # Return value of Config()
     mock_config_instance = MagicMock()
     mock_config_instance.log_dir = Path("/fake/log")
-    mock_config.return_value = mock_config_instance
+    mock_config_get.return_value = mock_config_instance
 
     # Fake metadata from a previous submission
     mock_load_metadata.return_value = [
@@ -164,9 +164,6 @@ def test_required_cores_all_below_default():
 @patch("kuristo.cli._batch.build_actions")
 def test_create_script_params_basic(mock_build_actions):
     # Arrange
-    config = SimpleNamespace(
-        batch_partition='normal'
-    )
     workdir = Path("/fake/workdir")
 
     # 2 specs: one skipped, one active
@@ -177,7 +174,7 @@ def test_create_script_params_basic(mock_build_actions):
     mock_build_actions.return_value = [SimpleNamespace(num_cores=4)]
 
     # Act
-    params = create_script_params(1, [skipped_spec, active_spec], workdir, config)
+    params = create_script_params(1, [skipped_spec, active_spec], workdir)
 
     # Assert
     assert isinstance(params, ScriptParameters)
@@ -191,13 +188,10 @@ def test_create_script_params_basic(mock_build_actions):
 
 @patch("kuristo.cli._batch.build_actions")
 def test_create_script_params_all_skipped(mock_build_actions):
-    config = SimpleNamespace(
-        batch_partition='normal'
-    )
     workdir = Path("/workdir")
     specs = [SimpleNamespace(skip=True, timeout_minutes=15) for _ in range(3)]
 
-    params = create_script_params(0, specs, workdir, config)
+    params = create_script_params(0, specs, workdir)
 
     assert params.name == "kuristo-job-0"
     assert params.n_cores == 1  # default
@@ -209,9 +203,6 @@ def test_create_script_params_all_skipped(mock_build_actions):
 
 @patch("kuristo.cli._batch.build_actions")
 def test_create_script_params_accumulates_time_and_max_cores(mock_build_actions):
-    config = SimpleNamespace(
-        batch_partition='normal'
-    )
     workdir = Path("/data")
     specs = [
         SimpleNamespace(skip=False, timeout_minutes=10),
@@ -223,7 +214,7 @@ def test_create_script_params_accumulates_time_and_max_cores(mock_build_actions)
         [SimpleNamespace(num_cores=8)]
     ]
 
-    params = create_script_params(2, specs, workdir, config)
+    params = create_script_params(2, specs, workdir)
 
     assert params.n_cores == 8  # max of both
     assert params.max_time == 30  # sum

@@ -23,8 +23,8 @@ class StepCountColumn(ProgressColumn):
 
 
 class NullProgress:
-    def __init__(self, no_ansi):
-        self.console = Console(force_terminal=no_ansi, no_color=no_ansi, markup=no_ansi)
+    def __init__(self):
+        self.console = Console(force_terminal=True, no_color=True, markup=False)
 
     def __enter__(self):
         return self
@@ -57,7 +57,7 @@ class Scheduler:
     new one(s). We run until all jobs have FINISHED status.
     """
 
-    def __init__(self, specs, rcs: Resources, out_dir, no_ansi=False, report_path=None) -> None:
+    def __init__(self, specs, rcs: Resources, out_dir, report_path=None) -> None:
         """
         @param specs: [JobSpec] List of job specifications
         @param rcs: Resources Resource to be scheduled
@@ -68,14 +68,13 @@ class Scheduler:
         cfg = config.get()
         self._max_label_len = cfg.console_width
         self._max_id_width = 1
-        self._no_ansi = no_ansi
         self._out_dir = Path(out_dir)
         self._create_graph(specs)
         self._active_jobs = set()
         self._lock = threading.Lock()
         self._resources = rcs
-        if self._no_ansi:
-            self._progress = NullProgress(no_ansi=no_ansi)
+        if cfg.no_ansi:
+            self._progress = NullProgress()
         else:
             self._progress = Progress(
                 SpinnerColumn(),
@@ -106,6 +105,8 @@ class Scheduler:
         """
         Run all jobs in the queue
         """
+        cfg = config.get()
+
         self._create_out_dir()
         start_time = time.perf_counter()
         with self._progress:
@@ -114,10 +115,9 @@ class Scheduler:
                 threading.Event().wait(0.5)
         end_time = time.perf_counter()
         self._total_runtime = end_time - start_time
-        if self._no_ansi:
+        if cfg.no_ansi:
             self._progress.console.print("")
 
-        cfg = config.get()
         ui.line(self._progress.console, cfg.console_width)
         ui.stats(self._progress.console, ui.RunStats(
             n_success=self._n_success,
@@ -166,7 +166,7 @@ class Scheduler:
             for job in ready_jobs:
                 if job.is_skipped:
                     job.skip_process()
-                    ui.status_line(self._progress.console, job, "SKIP", self._max_id_width, self._max_label_len, self._no_ansi)
+                    ui.status_line(self._progress.console, job, "SKIP", self._max_id_width, self._max_label_len)
                     self._n_skipped = self._n_skipped + 1
                     continue
 
@@ -182,18 +182,18 @@ class Scheduler:
                     self._tasks[job.id] = task_id
                     job.create_step_tasks(self._progress)
                     job.start()
-                    ui.status_line(self._progress.console, job, "STARTING", self._max_id_width, self._max_label_len, self._no_ansi)
+                    ui.status_line(self._progress.console, job, "STARTING", self._max_id_width, self._max_label_len)
 
     def _job_completed(self, job):
         with self._lock:
             if job.return_code == 0:
-                ui.status_line(self._progress.console, job, "PASS", self._max_id_width, self._max_label_len, self._no_ansi)
+                ui.status_line(self._progress.console, job, "PASS", self._max_id_width, self._max_label_len)
                 self._n_success = self._n_success + 1
             elif job.return_code == 124:
-                ui.status_line(self._progress.console, job, "TIMEOUT", self._max_id_width, self._max_label_len, self._no_ansi)
+                ui.status_line(self._progress.console, job, "TIMEOUT", self._max_id_width, self._max_label_len)
                 self._n_failed = self._n_failed + 1
             else:
-                ui.status_line(self._progress.console, job, "FAIL", self._max_id_width, self._max_label_len, self._no_ansi)
+                ui.status_line(self._progress.console, job, "FAIL", self._max_id_width, self._max_label_len)
                 self._n_failed = self._n_failed + 1
             task_id = self._tasks[job.id]
             self._progress.remove_task(task_id)
