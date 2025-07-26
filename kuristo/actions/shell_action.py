@@ -1,6 +1,6 @@
-from .process_action import ProcessAction
+from kuristo.actions.process_action import ProcessAction
 from kuristo.utils import interpolate_str
-from ..context import Context
+from kuristo.context import Context
 
 
 class ShellAction(ProcessAction):

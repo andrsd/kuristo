@@ -1,5 +1,5 @@
-from .process_action import ProcessAction
-from ..context import Context
+from kuristo.actions.process_action import ProcessAction
+from kuristo.context import Context
 from abc import abstractmethod
 
 

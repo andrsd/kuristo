@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from .action import Action
+from kuristo.actions.action import Action
 
 
 class CompositeAction(Action):

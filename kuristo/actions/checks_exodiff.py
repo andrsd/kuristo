@@ -1,9 +1,9 @@
 import os
 import shlex
 from kuristo import action
-from .process_action import ProcessAction
+from kuristo.actions.process_action import ProcessAction
 from kuristo.utils import resolve_path
-from ..context import Context
+from kuristo.context import Context
 
 
 @action("checks/exodiff")

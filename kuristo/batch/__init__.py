@@ -1,5 +1,5 @@
-from .backend import BatchBackend
-from .slurm import SlurmBackend
+from kuristo.batch.backend import BatchBackend
+from kuristo.batch.slurm import SlurmBackend
 
 
 BACKENDS = {

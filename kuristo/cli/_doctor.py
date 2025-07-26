@@ -6,9 +6,9 @@ import subprocess
 from rich.console import Console
 from rich.table import Table
 from rich.text import Text
-from ..config import Config
+from kuristo.config import Config
 from kuristo.plugin_loader import find_kuristo_root, load_user_steps_from_kuristo_dir
-from ..registry import _ACTION_REGISTRY
+from kuristo.registry import _ACTION_REGISTRY
 from kuristo import __version__
 
 

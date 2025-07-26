@@ -1,7 +1,7 @@
 from rich.console import Console
 from rich.text import Text
-from ..job_spec import parse_workflow_files
-from ..scanner import scan_locations
+from kuristo.job_spec import parse_workflow_files
+from kuristo.scanner import scan_locations
 
 
 def list_jobs(args):

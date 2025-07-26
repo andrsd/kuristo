@@ -1,7 +1,7 @@
 import csv
 import math
 from kuristo import action
-from .action import Action
+from kuristo.actions.action import Action
 
 
 @action("checks/csv-diff")

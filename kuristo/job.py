@@ -2,11 +2,11 @@ import threading
 import logging
 import time
 from pathlib import Path
-from .job_spec import JobSpec
-from .action_factory import ActionFactory
-from .context import Context
-from .env import Env
-from .config import Config
+from kuristo.job_spec import JobSpec
+from kuristo.action_factory import ActionFactory
+from kuristo.context import Context
+from kuristo.env import Env
+from kuristo.config import Config
 
 
 class Job:

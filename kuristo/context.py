@@ -1,5 +1,5 @@
-from .env import Env
-from .config import Config
+from kuristo.env import Env
+from kuristo.config import Config
 
 
 class Context:

@@ -1,4 +1,4 @@
-from .config import Config
+from kuristo.config import Config
 
 
 class Resources:
