@@ -1,5 +1,5 @@
 from kuristo.actions.process_action import ProcessAction
-from kuristo import action
+from kuristo.registry import action
 from kuristo.context import Context
 
 

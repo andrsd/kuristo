@@ -1,6 +1,6 @@
 import argparse
 from pathlib import Path
-from kuristo import __version__
+from kuristo._version import __version__
 from kuristo.cli._run import run_jobs
 from kuristo.cli._doctor import print_diag
 from kuristo.cli._list import list_jobs
@@ -11,6 +11,7 @@ from kuristo.cli._show import show
 
 
 __all__ = [
+    "__version__",
     "run_jobs",
     "print_diag",
     "list_jobs",

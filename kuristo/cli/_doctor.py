@@ -9,7 +9,7 @@ from rich.text import Text
 from kuristo.config import Config
 from kuristo.plugin_loader import find_kuristo_root, load_user_steps_from_kuristo_dir
 from kuristo.registry import _ACTION_REGISTRY
-from kuristo import __version__
+from kuristo._version import __version__
 
 
 def print_diag(args):

@@ -1,5 +1,5 @@
 import re
-from kuristo import action
+from kuristo.registry import action
 from kuristo.actions.action import Action
 from kuristo.utils import interpolate_str
 

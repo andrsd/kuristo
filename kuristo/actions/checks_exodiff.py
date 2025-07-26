@@ -1,6 +1,6 @@
 import os
 import shlex
-from kuristo import action
+from kuristo.registry import action
 from kuristo.actions.process_action import ProcessAction
 from kuristo.utils import resolve_path
 from kuristo.context import Context

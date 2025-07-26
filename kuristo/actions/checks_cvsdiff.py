@@ -1,6 +1,6 @@
 import csv
 import math
-from kuristo import action
+from kuristo.registry import action
 from kuristo.actions.action import Action
 
 
