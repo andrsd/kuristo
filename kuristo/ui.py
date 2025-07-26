@@ -60,7 +60,10 @@ def status_line(job, state, max_id_width, max_label_len):
         job_id = _padded_job_id(job["id"], max_id_width)
         job_name_len = len(job["job name"])
         job_name = job_name_markup(job["job name"])
-        skip_reason = ""
+        if job['status'] == 'skipped':
+            skip_reason = job["reason"]
+        else:
+            skip_reason = ""
         elapsed_time = job.get("duration", 0.0)
     else:
         raise ValueError("job parameter must be a dict of Job")

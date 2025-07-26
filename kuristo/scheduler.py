@@ -300,22 +300,20 @@ class Scheduler:
         report = []
         for job in self._graph.nodes:
             if job.is_skipped:
-                status = "skipped"
-                duration = None
-            elif job.return_code == 0:
-                status = "success"
-                duration = round(job.elapsed_time, 3)
+                report.append({
+                    "id": job.id,
+                    "job name": job.name,
+                    "status": "skipped",
+                    "reason": job.skip_reason
+                })
             else:
-                status = "failed"
-                duration = round(job.elapsed_time, 3)
-
-            report.append({
-                "id": job.id,
-                "job name": job.name,
-                "status": status,
-                "duration": duration,
-                "return code": job.return_code,
-            })
+                report.append({
+                    "id": job.id,
+                    "job name": job.name,
+                    "return code": job.return_code,
+                    "status": "success" if job.return_code == 0 else "failed",
+                    "duration": round(job.elapsed_time, 3)
+                })
 
         with open(yaml_path, "w") as f:
             yaml.safe_dump({
