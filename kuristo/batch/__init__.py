@@ -7,7 +7,7 @@ BACKENDS = {
 }
 
 
-def get_backend(name: str, **kwargs) -> BatchBackend:
+def get_backend(name, **kwargs) -> BatchBackend:
     if name is None:
         raise RuntimeError("No queue backend specified, use --backend switch to specify one.")
     backend_cls = BACKENDS.get(name.lower())
