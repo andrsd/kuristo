@@ -2,7 +2,6 @@ import networkx as netx
 import threading
 import sys
 import time
-import yaml
 from pathlib import Path
 from rich.progress import (Progress, SpinnerColumn, TextColumn, BarColumn, ProgressColumn, TimeElapsedColumn)
 from rich.text import Text
@@ -56,7 +55,7 @@ class Scheduler:
     new one(s). We run until all jobs have FINISHED status.
     """
 
-    def __init__(self, specs, rcs: Resources, out_dir, report_path=None) -> None:
+    def __init__(self, specs, rcs: Resources, out_dir) -> None:
         """
         @param specs: [JobSpec] List of job specifications
         @param rcs: Resources Resource to be scheduled
@@ -90,8 +89,14 @@ class Scheduler:
         self._n_failed = 0
         self._n_skipped = 0
         self._total_runtime = 0.
-        #
-        self._report_path = report_path
+
+    @property
+    def total_runtime(self):
+        return self._total_runtime
+
+    @property
+    def jobs(self):
+        return self._graph.nodes
 
     def check(self):
         """
@@ -125,7 +130,6 @@ class Scheduler:
             n_skipped=self._n_skipped
         ))
         ui.time(self._total_runtime)
-        self._write_report()
 
     def _create_graph(self, specs):
         self._graph = netx.DiGraph()
@@ -277,49 +281,3 @@ class Scheduler:
 
         job_task_num = self._tasks[job.num]
         self._progress.update(job_task_num, advance=1)
-
-    def _write_report(self):
-        self._write_report_yaml(self._out_dir / "report.yaml")
-        if self._report_path:
-            self._write_report_csv(self._report_path)
-
-    def _write_report_csv(self, csv_path: Path):
-        import csv
-        with open(csv_path, "w", newline="") as f:
-            writer = csv.writer(f)
-            writer.writerow(["id", "job name", "status", "duration [s]", "return code"])
-            for job in self._graph.nodes:
-                duration = "" if job.is_skipped else round(job.elapsed_time, 3)
-                if job.is_skipped:
-                    status = "skipped"
-                elif job.return_code == 0:
-                    status = "success"
-                else:
-                    status = "failed"
-                writer.writerow([job.num, job.name, status, duration, job.return_code])
-
-    def _write_report_yaml(self, yaml_path: Path):
-        report = []
-        for job in self._graph.nodes:
-            if isinstance(job, Job):
-                if job.is_skipped:
-                    report.append({
-                        "id": job.num,
-                        "job name": job.name,
-                        "status": "skipped",
-                        "reason": job.skip_reason
-                    })
-                else:
-                    report.append({
-                        "id": job.num,
-                        "job name": job.name,
-                        "return code": job.return_code,
-                        "status": "success" if job.return_code == 0 else "failed",
-                        "duration": round(job.elapsed_time, 3)
-                    })
-
-        with open(yaml_path, "w") as f:
-            yaml.safe_dump({
-                "results": report,
-                "total_runtime": self._total_runtime
-            }, f, sort_keys=False)
