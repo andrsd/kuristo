@@ -11,8 +11,11 @@ def run_jobs(args):
     locations = args.locations or ["."]
 
     cfg = config.get()
-    out_dir = create_run_output_dir(cfg.log_dir)
-    prune_old_runs(cfg.log_dir, cfg.log_history)
+    if args.run_id:
+        out_dir = create_run_output_dir(cfg.log_dir, args.run_id)
+    else:
+        out_dir = create_run_output_dir(cfg.log_dir)
+        prune_old_runs(cfg.log_dir, cfg.log_history)
     update_latest_symlink(cfg.log_dir, out_dir)
 
     load_user_steps_from_kuristo_dir()

@@ -54,12 +54,23 @@ def resolve_path(path_str, source_root, build_root):
     raise FileNotFoundError(f"Could not resolve path: {path_str}")
 
 
-def create_run_output_dir(base_log_dir: Path) -> Path:
+def create_run_output_dir(base_log_dir: Path, sub_dir=None) -> Path:
+    """
+    Create a directory for log files
+
+    @param base_log_dir Base directory that stores the information with runs, i.e. `.kuristo-out`
+    @param sub_dir Optional parameter that can specify the sub-directory name. If `None` date time stamp is used.
+    """
     runs_dir = base_log_dir / "runs"
     runs_dir.mkdir(parents=True, exist_ok=True)
-    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
+    if sub_dir is None:
+        timestamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
+    elif RUN_DIR_PATTERN.match(sub_dir):
+        timestamp = sub_dir
+    else:
+        raise RuntimeError("run-id must have the YYYYmmDD-HHMMSS pattern")
     run_dir = runs_dir / timestamp
-    run_dir.mkdir()
+    run_dir.mkdir(exist_ok=True)
     return run_dir
 
 

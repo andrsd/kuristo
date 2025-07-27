@@ -97,7 +97,7 @@ def test_status_reads_report_and_calls_print(mock_cfg_get, mock_read_report, moc
     mock_read_report.return_value = expected_report
 
     args = MagicMock()
-    args.run = None
+    args.run_id = None
     args.failed = False
     args.skipped = False
     args.passed = False

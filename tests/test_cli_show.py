@@ -317,7 +317,7 @@ def test_display_job_log_missing_file():
 @patch("kuristo.cli._show.config.get")
 def test_show_uses_correct_log_path(mock_cfg_get, mock_display_job_log):
     args = MagicMock()
-    args.run = None
+    args.run_id = None
     args.job = 42
 
     mock_cfg = MagicMock()
