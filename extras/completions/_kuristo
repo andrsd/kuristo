@@ -72,7 +72,7 @@ case $state in
       status)
         _arguments \
           '--help[Show help message and exit]' \
-          '--run[Run ID to display results for]:string' \
+          '--run-id[Run ID to display results for]:string' \
           '--failed[Show only tests that failed]' \
           '--skipped[Show only tests that were skipped]' \
           '--passed[Show only tests that passed]'
@@ -84,7 +84,7 @@ case $state in
       show)
         _arguments \
           '--help[Show help message and exit]' \
-          '--run[Run ID to display results for]:string' \
+          '--run-id[Run ID to display results for]:string' \
           '--job[Job ID]:int'
         ;;
     esac
