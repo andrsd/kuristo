@@ -8,7 +8,7 @@ from kuristo.utils import create_run_output_dir, prune_old_runs, update_latest_s
 
 
 def run_jobs(args):
-    locations = args.location or ["."]
+    locations = args.locations or ["."]
 
     cfg = config.get()
     out_dir = create_run_output_dir(cfg.log_dir)

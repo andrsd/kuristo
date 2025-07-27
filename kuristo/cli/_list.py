@@ -6,7 +6,7 @@ from kuristo.scanner import scan_locations
 
 def list_jobs(args):
     console = ui.console()
-    locations = args.location or ["."]
+    locations = args.locations or ["."]
 
     workflow_files = scan_locations(locations)
     specs = parse_workflow_files(workflow_files)

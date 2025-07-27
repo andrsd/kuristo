@@ -35,6 +35,11 @@ def scan_locations(locations):
     """
     workflow_files = []
     for loc in locations:
-        scanner = Scanner(loc)
-        workflow_files.extend(scanner.scan())
+        if os.path.isdir(loc):
+            scanner = Scanner(loc)
+            workflow_files.extend(scanner.scan())
+        elif os.path.isfile(loc):
+            workflow_files.append(loc)
+        else:
+            raise RuntimeError(f"No such file or directory: {loc}")
     return workflow_files
