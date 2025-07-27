@@ -53,12 +53,12 @@ def build_parser():
     batch_subparsers.add_parser("status", help="Check HPC job status")
 
     status_parser = subparsers.add_parser("status", help="Display status of runs")
-    status_parser.add_argument("--run", type=str, help="Run ID to display results for")
+    status_parser.add_argument("--run-id", type=str, help="Run ID to display results for")
 
     subparsers.add_parser("log", help="List runs")
 
     show_parser = subparsers.add_parser("show", help="Show job log")
-    show_parser.add_argument("--run", type=str, help="Run ID to display results for")
+    show_parser.add_argument("--run-id", type=str, help="Run ID to display results for")
     show_parser.add_argument("--job", required=True, type=int, help="Job ID")
 
     return parser
