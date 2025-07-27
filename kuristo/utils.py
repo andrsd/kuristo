@@ -9,7 +9,7 @@ from datetime import datetime
 from pathlib import Path
 
 
-RUN_DIR_PATTERN = re.compile(r"\d{8}_\d{6}")
+RUN_DIR_PATTERN = re.compile(r"\d{8}-\d{6}")
 
 
 def get_default_core_limit():
@@ -57,7 +57,7 @@ def resolve_path(path_str, source_root, build_root):
 def create_run_output_dir(base_log_dir: Path) -> Path:
     runs_dir = base_log_dir / "runs"
     runs_dir.mkdir(parents=True, exist_ok=True)
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
     run_dir = runs_dir / timestamp
     run_dir.mkdir()
     return run_dir
