@@ -32,6 +32,7 @@ def build_parser():
     run_parser = subparsers.add_parser("run", help="Run jobs")
     run_parser.add_argument("--verbose", "-v", type=int, default=0, help="Verbose level")
     run_parser.add_argument("--report", type=Path, help="Save report with the runtime information to a CSV file")
+    run_parser.add_argument("--run-id", type=str, help="ID of the run. Do not use directly unless you know what you are doing.")
     run_parser.add_argument("locations", nargs="*", help="Locations to scan for workflow files")
 
     # Doctor command
