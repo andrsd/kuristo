@@ -39,7 +39,7 @@ def build_parser():
 
     # List command
     list_parser = subparsers.add_parser("list", help="List available jobs")
-    list_parser.add_argument("--location", "-l", action="append", help="Location to scan for workflow files")
+    list_parser.add_argument("locations", nargs="*", help="Locations to scan for workflow files")
 
     # Batch command
     batch_parser = subparsers.add_parser("batch", help="HPC queueing system commands")
