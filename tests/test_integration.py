@@ -8,7 +8,7 @@ ASSETS_DIR = Path(__file__).parent / "assets"
 def test_traversal():
     test_dir = ASSETS_DIR / "tests1"
     result = subprocess.run(
-        ["kuristo", "--no-ansi", "run", "-l", str(test_dir)],
+        ["kuristo", "--no-ansi", "run", str(test_dir)],
         capture_output=True,
         text=True,
     )
@@ -21,7 +21,7 @@ def test_traversal():
 def test_multiple_in_one_file():
     test_dir = ASSETS_DIR / "tests2"
     result = subprocess.run(
-        ["kuristo", "--no-ansi", "run", "-l", str(test_dir)],
+        ["kuristo", "--no-ansi", "run", str(test_dir)],
         capture_output=True,
         text=True,
     )
@@ -35,7 +35,7 @@ def test_multiple_in_one_file():
 def test_failed():
     test_dir = ASSETS_DIR / "tests3"
     result = subprocess.run(
-        ["kuristo", "--no-ansi", "run", "-l", str(test_dir)],
+        ["kuristo", "--no-ansi", "run", str(test_dir)],
         capture_output=True,
         text=True,
     )
@@ -50,7 +50,7 @@ def test_failed():
 def test_user_defined():
     test_dir = ASSETS_DIR / "tests5"
     result = subprocess.run(
-        ["kuristo", "--no-ansi", "run", "-l", str(test_dir)],
+        ["kuristo", "--no-ansi", "run", str(test_dir)],
         capture_output=True,
         text=True,
     )
@@ -65,7 +65,7 @@ def test_user_defined():
 def test_exodiff():
     test_dir = ASSETS_DIR / "tests6"
     result = subprocess.run(
-        ["kuristo", "--no-ansi", "run", "-l", str(test_dir)],
+        ["kuristo", "--no-ansi", "run", str(test_dir)],
         capture_output=True,
         text=True,
     )
@@ -80,7 +80,7 @@ def test_exodiff():
 def test_deps():
     test_dir = ASSETS_DIR / "tests7"
     result = subprocess.run(
-        ["kuristo", "--no-ansi", "run", "-l", str(test_dir)],
+        ["kuristo", "--no-ansi", "run", str(test_dir)],
         capture_output=True,
         text=True,
     )
@@ -95,7 +95,7 @@ def test_deps():
 def test_env():
     test_dir = ASSETS_DIR / "tests8"
     result = subprocess.run(
-        ["kuristo", "--no-ansi", "run", "-l", str(test_dir)],
+        ["kuristo", "--no-ansi", "run", str(test_dir)],
         capture_output=True,
         text=True,
     )
@@ -110,7 +110,7 @@ def test_env():
 def test_matrix():
     test_dir = ASSETS_DIR / "tests10"
     result = subprocess.run(
-        ["kuristo", "--no-ansi", "run", "-l", str(test_dir)],
+        ["kuristo", "--no-ansi", "run", str(test_dir)],
         capture_output=True,
         text=True,
     )
@@ -125,7 +125,7 @@ def test_matrix():
 def test_float_check_str():
     test_dir = ASSETS_DIR / "tests4"
     result = subprocess.run(
-        ["kuristo", "--no-ansi", "run", "-l", str(test_dir)],
+        ["kuristo", "--no-ansi", "run", str(test_dir)],
         capture_output=True,
         text=True,
     )
