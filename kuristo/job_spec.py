@@ -159,7 +159,25 @@ class JobSpec:
             steps.append(self.Step.from_dict(**entry))
         return steps
 
-    def expand_matrix_value(self):
+    def build_matrix_values(self):
+        """
+        Build matrix values
+
+        @return list[tuple[str, dict | None]] first entry is the job name, second is the variant that has keys and values
+        """
+        if self.strategy:
+            variants = self._expand_matrix_value()
+            jobs = []
+            for v in variants:
+                name = self._build_matrix_job_name(v)
+                job = (name, v)
+                jobs.append(job)
+            return jobs
+        else:
+            job = (self.name, None)
+            return [job]
+
+    def _expand_matrix_value(self):
         """
         Expand matrix specification into actual (key,value) pairs
 
@@ -194,7 +212,7 @@ class JobSpec:
         else:
             return []
 
-    def build_matrix_job_name(self, variant):
+    def _build_matrix_job_name(self, variant):
         """
         Create job name for a job from a matrix
 

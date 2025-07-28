@@ -246,17 +246,13 @@ class Scheduler:
         @param spec Job specification
         @return List of `Job`s
         """
-        if spec.strategy:
-            variants = spec.expand_matrix_value()
-            jobs = []
-            for v in variants:
-                name = spec.build_matrix_job_name(v)
-                job = Job(name, spec, self._out_dir, matrix=v)
-                jobs.append(job)
-            return jobs
-        else:
-            job = Job(spec.name, spec, self._out_dir)
-            return [job]
+        jobs = []
+        for name, variant in spec.build_matrix_values():
+            if variant:
+                jobs.append(Job(name, spec, self._out_dir, matrix=variant))
+            else:
+                jobs.append(Job(name, spec, self._out_dir))
+        return jobs
 
     def exit_code(self, *, strict=False):
         if self._n_failed > 0:
