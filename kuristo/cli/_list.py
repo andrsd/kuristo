@@ -11,13 +11,16 @@ def list_jobs(args):
     workflow_files = scan_locations(locations)
     specs = parse_workflow_files(workflow_files)
 
+    n_jobs = 0
     for sp in specs:
-        name = Text.from_markup(sp.name, style="bold cyan")
-        description = Text.from_markup(sp.description, style="dim")
-        txt = Text("• ")
-        txt.append(name)
-        txt.append(": ")
-        txt.append(description)
-        console.print(txt)
+        job_names = sp.build_matrix_values()
+        n_jobs += len(job_names)
+        for name, _ in job_names:
+            jnm = ui.job_name_markup(name)
+            txt = Text("• ")
+            txt.append(Text.from_markup(jnm, style="bold cyan"))
+            txt.append(": ")
+            txt.append(Text.from_markup(sp.description, style="dim"))
+            console.print(txt)
     console.print()
-    console.print(Text.from_markup(f"Found jobs: [green]{len(specs)}[/]"))
+    console.print(Text.from_markup(f"Found jobs: [green]{n_jobs}[/]"))
