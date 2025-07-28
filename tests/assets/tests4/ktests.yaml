@@ -11,7 +11,7 @@ jobs:
         uses: checks/regex-float
         with:
           input: ${{ steps.result.output }}
-          pattern: "Value: ([-+]?(?:\\d*\\.\\d+|\\d+)(?:[eE][-+]?\\d+)?)"
+          pattern: "Value: {:float:}"
           gold: 1.23456789
           rel_tol: 1e-5
 
@@ -27,6 +27,6 @@ jobs:
         uses: checks/regex-float
         with:
           input: ${{ steps.result.output }}
-          pattern: "Final: ([-+]?(?:\\d*\\.\\d+|\\d+)(?:[eE][-+]?\\d+)?)"
+          pattern: "Final: {:float:}"
           gold: 2.4
           abs_tol: 1e-10
