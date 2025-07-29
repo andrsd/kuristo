@@ -41,19 +41,20 @@ To run the workflow:
 
 .. code-block:: bash
 
-   kuristo run -l /path/
+   kuristo run /path/
 
 Kuristo will traverse the directory structure and try to find ``ktests.yaml`` files with workflows.
 Then, it will execute each job in order, tracking progress and logging output into the ``.kuristo-out/`` directory.
+If no parameter is used it will search from the current working directory.
 
 The command-line output will look like this:
 
 .. code-block:: text
 
-   ✔ [1] simple test finished with return code 0 [1.01s]
+   [ PASS ] #19 simple test ............................................. 1.01s
 
-   ✔ Success: 1    x Failed: 0    - Skipped: 0    Total: 1
-     Took: 1.5s
+   Success: 1    Failed: 0    Skipped: 0    Total: 1
+   Took: 1.5s
 
 By default, output is printed to the terminal and stored in per-run and per-job subdirectories under ``.kuristo-out/``.
 
@@ -73,6 +74,12 @@ Verbosity levels:
 - `2`: default
 - `3`: detailed output for each step
 
+It is possible to specify multiple locations to scan, i.e.:
+
+.. code-block:: bash
+
+   kuristo run /path1 /path2
+
 
 List available jobs
 -------------------
@@ -84,7 +91,11 @@ Use this to see what jobs are would be executed:
    kuristo list
 
 This will traverse the directory structure from the current working directory and look for ``ktests.yaml`` files.
-You can specify different location via ``-l /path/to/start/search/from``.
+You can specify different location via
+
+.. code-block:: bash
+
+   kuristo list /path/to/start/search/from
 
 
 Environment diagnostics

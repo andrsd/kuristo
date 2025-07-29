@@ -124,7 +124,9 @@
 <h2>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Only the <strong>first capture group</strong> in the regex is used; the pattern must match the number format fully.</p></li>
-<li><p>Use raw strings or escape characters properly (e.g., <cite>[0-9\.]+</cite> in YAML).</p></li>
+<li><p>Use raw strings or escape characters properly (e.g., <code class="docutils literal notranslate"><span class="pre">[0-9\\.]+</span></code> in YAML).</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">{:float:}</span></code> alias to capture floating point numbers. This will use the correct regular expression under the hood.
+Do not use the group <code class="docutils literal notranslate"><span class="pre">(...)</span></code> operator, it is included in the alias for convenience.</p></li>
 </ul>
 </section>
 <section id="see-also">

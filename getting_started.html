@@ -112,16 +112,17 @@ pip<span class="w"> </span>install<span class="w"> </span>.
 <section id="running-the-workflow">
 <h2>Running the Workflow<a class="headerlink" href="#running-the-workflow" title="Link to this heading"></a></h2>
 <p>To run the workflow:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>kuristo<span class="w"> </span>run<span class="w"> </span>-l<span class="w"> </span>/path/
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>kuristo<span class="w"> </span>run<span class="w"> </span>/path/
 </pre></div>
 </div>
 <p>Kuristo will traverse the directory structure and try to find <code class="docutils literal notranslate"><span class="pre">ktests.yaml</span></code> files with workflows.
-Then, it will execute each job in order, tracking progress and logging output into the <code class="docutils literal notranslate"><span class="pre">.kuristo-out/</span></code> directory.</p>
+Then, it will execute each job in order, tracking progress and logging output into the <code class="docutils literal notranslate"><span class="pre">.kuristo-out/</span></code> directory.
+If no parameter is used it will search from the current working directory.</p>
 <p>The command-line output will look like this:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>✔ [1] simple test finished with return code 0 [1.01s]
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>[ PASS ] #19 simple test ............................................. 1.01s
 
-✔ Success: 1    x Failed: 0    - Skipped: 0    Total: 1
-  Took: 1.5s
+Success: 1    Failed: 0    Skipped: 0    Total: 1
+Took: 1.5s
 </pre></div>
 </div>
 <p>By default, output is printed to the terminal and stored in per-run and per-job subdirectories under <code class="docutils literal notranslate"><span class="pre">.kuristo-out/</span></code>.</p>
@@ -137,6 +138,10 @@ Then, it will execute each job in order, tracking progress and logging output in
 <li><p><cite>2</cite>: default</p></li>
 <li><p><cite>3</cite>: detailed output for each step</p></li>
 </ul>
+<p>It is possible to specify multiple locations to scan, i.e.:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>kuristo<span class="w"> </span>run<span class="w"> </span>/path1<span class="w"> </span>/path2
+</pre></div>
+</div>
 </section>
 <section id="list-available-jobs">
 <h2>List available jobs<a class="headerlink" href="#list-available-jobs" title="Link to this heading"></a></h2>
@@ -145,7 +150,10 @@ Then, it will execute each job in order, tracking progress and logging output in
 </pre></div>
 </div>
 <p>This will traverse the directory structure from the current working directory and look for <code class="docutils literal notranslate"><span class="pre">ktests.yaml</span></code> files.
-You can specify different location via <code class="docutils literal notranslate"><span class="pre">-l</span> <span class="pre">/path/to/start/search/from</span></code>.</p>
+You can specify different location via</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>kuristo<span class="w"> </span>list<span class="w"> </span>/path/to/start/search/from
+</pre></div>
+</div>
 </section>
 <section id="environment-diagnostics">
 <h2>Environment diagnostics<a class="headerlink" href="#environment-diagnostics" title="Link to this heading"></a></h2>
