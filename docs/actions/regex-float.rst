@@ -38,7 +38,9 @@ Notes
 -----
 
 - Only the **first capture group** in the regex is used; the pattern must match the number format fully.
-- Use raw strings or escape characters properly (e.g., `[0-9\\.]+` in YAML).
+- Use raw strings or escape characters properly (e.g., ``[0-9\\.]+`` in YAML).
+- Use ``{:float:}`` alias to capture floating point numbers. This will use the correct regular expression under the hood.
+  Do not use the group ``(...)`` operator, it is included in the alias for convenience.
 
 
 See Also
