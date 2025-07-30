@@ -1,6 +1,7 @@
 import threading
 import logging
 import time
+import os
 from pathlib import Path
 from kuristo.job_spec import JobSpec
 from kuristo.action_factory import ActionFactory
@@ -81,6 +82,7 @@ class Job:
         Job.ID = Job.ID + 1
         self._id = Job.ID
         self._env_file = log_dir / f"job-{self._id}.env"
+        self._path_file = log_dir / f"job-{self._id}.path"
         self._thread = None
         self._process = None
         self._stdout = None
@@ -306,9 +308,24 @@ class Job:
         if self._env_file.exists():
             self._context.env.update_from_file(self._env_file)
 
+        if self._path_file.exists():
+            current_path = self._context.env.get("PATH", os.environ.get("PATH", ""))
+            current = current_path.split(":")
+            try:
+                additional_paths = self._path_file.read_text().splitlines()
+            except (FileNotFoundError, PermissionError, UnicodeDecodeError) as e:
+                self._logger.log(f"Error reading path file {self._path_file}: {e}", tag="ERROR")
+                additional_paths = []
+            for p in reversed(additional_paths):
+                sanitized_path = p.strip()
+                if os.path.isabs(sanitized_path) and os.path.exists(sanitized_path) and sanitized_path not in current:
+                    current.insert(0, sanitized_path)
+            self._context.env["PATH"] = ":".join(current)
+
     def _get_base_env(self):
         return {
             "KURISTO_ENV": self._env_file,
+            "KURISTO_PATH": self._path_file,
             "KURISTO_JOB": self._name,
             "KURISTO_JOBID": self._id
         }
