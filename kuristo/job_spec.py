@@ -1,94 +1,116 @@
 import os
 import yaml
+from pydantic import BaseModel, Field, PrivateAttr, ValidationError, model_validator
+from typing import List, Optional, Union, Dict, Any
 from itertools import product
 from kuristo.utils import interpolate_str
 
 
-class JobSpec:
+class StrategyMatrix(BaseModel):
+    include: Optional[List[dict]] = []
+    raw_matrix: Optional[Dict[str, List[Any]]] = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def parse_matrix(cls, data):
+        if "include" in data:
+            return {"include": data["include"]}
+        else:
+            return {"raw_matrix": data}
+
+    def combinations(self) -> List[Dict[str, Any]]:
+        """
+        Get combinations provided by the matrix
+        """
+        variants = []
+        seen = set()
+
+        if self.raw_matrix:
+            keys = list(self.raw_matrix.keys())
+            values = list(self.raw_matrix.values())
+
+            # build Cartesian product if we have keys and values
+            for combo in product(*values):
+                combo_dict = dict(zip(keys, combo))
+                frozen = frozenset(combo_dict.items())
+                if frozen not in seen:
+                    variants.append(combo_dict)
+                    seen.add(frozen)
+
+        # Add explicit 'include' entries
+        if self.include:
+            for extra in self.include:
+                frozen = frozenset(extra.items())
+                if frozen not in seen:
+                    variants.append(extra)
+
+        return variants
+
+
+class Strategy(BaseModel):
+    matrix: StrategyMatrix
+
+
+class Step(BaseModel):
+    """
+    Data class with description of a job step
+    """
+
+    # Step description
+    description: Optional[str] = ""
+    # Step name
+    name: Optional[str] = None
+    # Action name to use
+    uses: Optional[str] = None
+    # Parameters used with action specified by 'uses'
+    with_: Optional[dict] = Field(alias="with", default={})
+    # Things to run (i.e. script)
+    run: Optional[str] = None
+    # Shell to use
+    shell: Optional[str] = "sh"
+    # Step ID
+    id: Optional[str] = None
+    # Working directory
+    working_directory: Optional[str] = Field(alias='working-directory', default=None)
+    # Timeout in minutes
+    timeout_minutes: Optional[int] = Field(alias='timeout-minutes', default=60)
+
+    model_config = {
+        "populate_by_name": True
+    }
+
+    @property
+    def params(self):
+        """
+        Return the step parameters
+        """
+        return self.with_
+
+    @staticmethod
+    def from_dict(**kwargs):
+        step = Step(**kwargs)
+        return step
+
+
+class JobSpec(BaseModel):
     """
     Data class with a job specification
     """
 
-    class Step:
-        """
-        Data class with description of a step
-        """
-
-        def __init__(self, **kwargs):
-            self._description = kwargs.get("description", "")
-            self._name = kwargs.get("name", None)
-            self._uses = kwargs.get("uses", None)
-            self._with = kwargs.get("with", {})
-            self._run = kwargs.get("run", None)
-            self._shell = kwargs.get("shell", "sh")
-            self._id = kwargs.get("id", None)
-            self._work_dir = kwargs.get("working-directory", None)
-            self._timeout_minutes = kwargs.get("timeout-minutes", 60)
-
-        @property
-        def name(self):
-            """
-            Return step name
-            """
-            return self._name
-
-        @property
-        def uses(self):
-            """
-            Return the action name that is used by the step
-            """
-            return self._uses
-
-        @property
-        def run(self):
-            """
-            Return the "script" that should be executed
-            """
-            return self._run
-
-        @property
-        def id(self):
-            """
-            Return the step ID
-            """
-            return self._id
-
-        @property
-        def working_directory(self):
-            """
-            Return the step working directory
-            """
-            return self._work_dir
-
-        @property
-        def timeout_minutes(self):
-            """
-            Return the timeout in minutes
-            """
-            return self._timeout_minutes
-
-        @property
-        def params(self):
-            """
-            Return the step ID
-            """
-            return self._with
-
-        @staticmethod
-        def from_dict(**kwargs):
-            step = JobSpec.Step(**kwargs)
-            return step
-
-    def __init__(self, name, **kwargs) -> None:
-        self._name = name
-        self._description = kwargs.get("description", "")
-        self._steps = self._build_steps(kwargs.get("steps"))
-        self._skip = kwargs.get("skip", None)
-        self._timeout_minutes = kwargs.get("timeout-minutes", 60)
-        val = kwargs.get("needs", [])
-        self._needs = val if isinstance(val, list) else [val]
-        self._strategy = kwargs.get("strategy", None)
-        self._location = None
+    # Job description
+    description: Optional[str] = ""
+    # Job steps
+    steps: List[Step]
+    # Should the job be skipped?
+    skip_: Optional[str] = Field(alias='skip', default=None)
+    # Timeout in minutes
+    timeout_minutes: Optional[int] = Field(alias='timeout-minutes', default=60)
+    # Strategy
+    strategy: Optional[Strategy] = None
+    #
+    needs_: Optional[Union[str, List[str]]] = Field(alias='needs', default=None)
+    #
+    _name: str = PrivateAttr()
 
     @property
     def name(self):
@@ -98,66 +120,27 @@ class JobSpec:
         return self._name
 
     @property
-    def steps(self):
-        """
-        Return job steps
-        """
-        return self._steps
-
-    @property
-    def description(self):
-        """
-        Return job description
-        """
-        return self._description
+    def needs(self) -> List[str]:
+        if self.needs_ is None:
+            return []
+        elif isinstance(self.needs_, str):
+            return [self.needs_]
+        else:
+            return self.needs_
 
     @property
     def skip(self):
         """
         Should the job be skipped?
         """
-        return self._skip is not None
+        return self.skip_ is not None
 
     @property
     def skip_reason(self):
         """
         Return the reason why job is marked as skipped
         """
-        return self._skip
-
-    @property
-    def needs(self):
-        """
-        Return the dependencies
-        """
-        return self._needs
-
-    @property
-    def timeout_minutes(self):
-        """
-        Return the timeout in minutes
-        """
-        return self._timeout_minutes
-
-    @property
-    def strategy(self):
-        """
-        Return the strategy
-        """
-        return self._strategy
-
-    @property
-    def location(self):
-        return self._location
-
-    def _build_steps(self, data):
-        """
-        Build job steps
-        """
-        steps = []
-        for entry in data:
-            steps.append(self.Step.from_dict(**entry))
-        return steps
+        return self.skip_
 
     def build_matrix_values(self):
         """
@@ -183,32 +166,8 @@ class JobSpec:
 
         @return List of combinations from the matrix
         """
-        if self._strategy:
-            matrix = self._strategy.get("matrix", {})
-            include = matrix.pop("include", [])
-            # TODO: implement exclude
-            keys = list(matrix.keys())
-            values = list(matrix.values())
-
-            variants = []
-            seen = set()
-
-            if keys and values:
-                # build Cartesian product if we have keys and values
-                for combo in product(*values):
-                    combo_dict = dict(zip(keys, combo))
-                    frozen = frozenset(combo_dict.items())
-                    if frozen not in seen:
-                        variants.append(combo_dict)
-                        seen.add(frozen)
-
-            # Add explicit 'include' entries
-            for extra in include:
-                frozen = frozenset(extra.items())
-                if frozen not in seen:
-                    variants.append(extra)
-
-            return variants
+        if self.strategy:
+            return self.strategy.matrix.combinations()
         else:
             return []
 
@@ -226,14 +185,14 @@ class JobSpec:
         else:
             return ipol_name
 
-    def set_location(self, location):
-        self._location = location
+    def set_name(self, name: str):
+        self._name = name
 
     @staticmethod
     def from_dict(name, data):
         if isinstance(data, dict):
-            job_name = data.pop("name", name)
-            ts = JobSpec(job_name, **data)
+            ts = JobSpec(**data)
+            ts.set_name(data.get("name", name))
             return ts
         else:
             raise RuntimeError("Expected dict as 'data'")
@@ -256,7 +215,15 @@ def specs_from_file(file_path):
         data = yaml.safe_load(file)
         jobs = data.get('jobs', {})
         for t, params in jobs.items():
-            jspec = JobSpec.from_dict(t, params)
-            jspec.set_location(location)
-            specs.append(jspec)
+            try:
+                jspec = JobSpec.from_dict(t, params)
+                specs.append(jspec)
+            except ValidationError as exp:
+                msgs = []
+                n = len(exp.errors())
+                msgs.append(f"{n} syntax error found in {location}:")
+                for error in exp.errors():
+                    loc_str = ".".join(str(p) for p in error['loc'])
+                    msgs.append(f"- {loc_str}: {error['msg']}")
+                raise RuntimeError("\n".join(msgs))
     return specs
