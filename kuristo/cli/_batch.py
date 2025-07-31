@@ -123,7 +123,7 @@ def batch_submit(args):
         workdir.mkdir()
 
         specs = specs_from_file(f)
-        s = create_script_params(job_num, specs, workdir, cfg)
+        s = create_script_params(job_num, specs, workdir)
 
         job_id = backend.submit(s)
         write_metadata(job_id, backend.name, workdir)
