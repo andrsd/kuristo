@@ -15,3 +15,9 @@ jobs:
           echo GOLD_FILE="$GOLD_FILE"
           echo TOL="$TOL"
           echo NORM="$NORM"
+
+  step-with-path:
+    steps:
+      - name: Add PATH
+        run: |
+          echo "$PWD" >> $KURISTO_PATH
