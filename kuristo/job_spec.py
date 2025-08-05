@@ -1,5 +1,6 @@
 import os
 import yaml
+from pathlib import Path
 from pydantic import BaseModel, Field, PrivateAttr, ValidationError, model_validator
 from typing import List, Optional, Union, Dict, Any
 from itertools import product
@@ -198,7 +199,7 @@ class JobSpec(BaseModel):
             raise RuntimeError("Expected dict as 'data'")
 
 
-def parse_workflow_files(workflow_files):
+def parse_workflow_files(workflow_files: list[Path]) -> list[JobSpec]:
     """
     Parse workflow files (ktests.yaml)
     """
@@ -208,7 +209,7 @@ def parse_workflow_files(workflow_files):
     return specs
 
 
-def specs_from_file(file_path):
+def specs_from_file(file_path) -> list[JobSpec]:
     location = os.path.dirname(file_path)
     specs = []
     with open(file_path, 'r') as file:

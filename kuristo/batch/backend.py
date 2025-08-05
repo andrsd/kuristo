@@ -6,6 +6,10 @@ from typing import Optional
 
 @dataclass
 class ScriptParameters:
+    # Kuristo Run ID
+    run_id: str
+    # Workflow file to execute
+    workflow_file: Path
     # Job name
     name: str
     # Working directory

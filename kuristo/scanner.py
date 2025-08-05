@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 
 class Scanner:
@@ -18,18 +19,18 @@ class Scanner:
         """
         return self._location
 
-    def scan(self):
+    def scan(self) -> list[Path]:
         """
         Scan the location
         """
         specs = []
         for root, dirs, files in os.walk(self._location):
             if Scanner.FILENAME in files:
-                specs.append(os.path.join(root, Scanner.FILENAME))
+                specs.append(Path(os.path.join(root, Scanner.FILENAME)))
         return specs
 
 
-def scan_locations(locations):
+def scan_locations(locations) -> list[Path]:
     """
     Scan the locations for the workflow files
     """
@@ -39,7 +40,7 @@ def scan_locations(locations):
             scanner = Scanner(loc)
             workflow_files.extend(scanner.scan())
         elif os.path.isfile(loc):
-            workflow_files.append(loc)
+            workflow_files.append(Path(loc))
         else:
             raise RuntimeError(f"No such file or directory: {loc}")
     return workflow_files
