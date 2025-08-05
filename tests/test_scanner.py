@@ -1,4 +1,5 @@
 import pytest
+from pathlib import Path
 from unittest.mock import patch, MagicMock
 from kuristo.scanner import Scanner, scan_locations  # adjust import path
 
@@ -25,8 +26,8 @@ def test_scanner_scan_finds_files(mock_config):
         scanner = Scanner("/some/path")
         results = scanner.scan()
         assert results == [
-            "/some/path/workflow.yml",
-            "/some/path/dir1/workflow.yml"
+            Path("/some/path/workflow.yml"),
+            Path("/some/path/dir1/workflow.yml")
         ]
 
 
@@ -41,14 +42,14 @@ def test_scan_locations_with_directory(mock_config):
     with patch("os.path.isdir", return_value=True), \
          patch("os.walk", return_value=[("/loc", [], ["workflow.yml"])]):
         results = scan_locations(["/loc"])
-        assert results == ["/loc/workflow.yml"]
+        assert results == [Path("/loc/workflow.yml")]
 
 
 def test_scan_locations_with_file(mock_config):
     with patch("os.path.isfile", return_value=True), \
          patch("os.path.isdir", return_value=False):
         results = scan_locations(["/file/path"])
-        assert results == ["/file/path"]
+        assert results == [Path("/file/path")]
 
 
 def test_scan_locations_invalid_path_raises(mock_config):

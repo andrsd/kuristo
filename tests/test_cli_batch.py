@@ -63,7 +63,9 @@ def test_batch_submit_basic(
     mock_specs_from_file.side_effect = lambda path: {"dummy": "spec"}
 
     # Mock script param creation
-    mock_create_script_params.side_effect = lambda num, spec, wd, cfg: ScriptParameters(
+    mock_create_script_params.side_effect = lambda workflow_file, run_id, num, spec, wd: ScriptParameters(
+        run_id=run_id,
+        workflow_file=workflow_file,
         name=f"job{num}",
         work_dir=wd,
         n_cores=4,
@@ -187,7 +189,7 @@ def test_create_script_params_basic(mock_config_get, mock_build_actions):
     mock_build_actions.return_value = [SimpleNamespace(num_cores=4)]
 
     # Act
-    params = create_script_params(1, [skipped_spec, active_spec], workdir)
+    params = create_script_params(Path("wf.yaml"), "12", 1, [skipped_spec, active_spec], workdir)
 
     # Assert
     assert isinstance(params, ScriptParameters)
@@ -210,7 +212,7 @@ def test_create_script_params_all_skipped(mock_config_get, mock_build_actions):
     workdir = Path("/workdir")
     specs = [SimpleNamespace(skip=True, timeout_minutes=15) for _ in range(3)]
 
-    params = create_script_params(0, specs, workdir)
+    params = create_script_params(Path("wf.yaml"), "12", 0, specs, workdir)
 
     assert params.name == "kuristo-job-0"
     assert params.n_cores == 1  # default
@@ -239,7 +241,7 @@ def test_create_script_params_accumulates_time_and_max_cores(mock_config_get, mo
         [SimpleNamespace(num_cores=8)]
     ]
 
-    params = create_script_params(2, specs, workdir)
+    params = create_script_params(Path("wf.yaml"), "12", 2, specs, workdir)
 
     assert params.n_cores == 8  # max of both
     assert params.max_time == 30  # sum
