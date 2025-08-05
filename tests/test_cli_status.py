@@ -38,7 +38,7 @@ def test_print_report_outputs_correctly(
     mock_cfg.console_width = 20
     mock_config_get.return_value = mock_cfg
 
-    print_report(report)
+    print_report(report, [])
 
     # Check status_line called per entry
     assert mock_status_line.call_count == 2
@@ -60,16 +60,20 @@ def test_status_reads_report_and_calls_print(mock_cfg_get, mock_read_report, moc
     mock_cfg.log_dir = tmp_path
     mock_cfg_get.return_value = mock_cfg
 
-    dummy_report = {"results": [{"status": "success", "job name": "Job X"}]}
-    mock_read_report.return_value = dummy_report
+    expected_report = {"results": [{"status": "success", "job name": "Job X"}]}
+    expected_filters = []
+    mock_read_report.return_value = expected_report
 
     args = MagicMock()
     args.run = None
+    args.failed = False
+    args.skipped = False
+    args.passed = False
 
     status(args)
 
     mock_read_report.assert_called_once_with(report_path)
-    mock_print_report.assert_called_once_with(dummy_report)
+    mock_print_report.assert_called_once_with(expected_report, expected_filters)
 
 
 @patch("kuristo.cli._status.config.get")

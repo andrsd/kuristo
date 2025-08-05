@@ -20,20 +20,35 @@ def summarize(results):
     return ui.RunStats(counts['success'], counts['failed'], counts['skipped'])
 
 
-def print_report(report):
+def build_filters(args):
+    filters = []
+    if args.failed:
+        filters.append("failed")
+    if args.skipped:
+        filters.append("skipped")
+    if args.passed:
+        filters.append("success")
+    return filters
+
+
+def print_report(report, filters: list):
     cfg = config.get()
 
     results = report.get("results", [])
+    if not filters:
+        filtered = results
+    else:
+        filtered = [r for r in results if r["status"] in filters]
 
     max_id_width = len(str(len(results)))
 
     max_label_len = cfg.console_width
-    for r in results:
+    for r in filtered:
         max_label_len = max(max_label_len, len(r['job name']) + 1)
 
-    for entry in results:
+    for entry in filtered:
         ui.status_line(entry, STATUS_LABELS.get(entry["status"], "????"), max_id_width, max_label_len)
-    stats = summarize(results)
+    stats = summarize(filtered)
     ui.line(cfg.console_width)
     ui.stats(stats)
     ui.time(report.get("total_runtime", 0.))
@@ -48,4 +63,5 @@ def status(args):
         raise RuntimeError("No report found. Did you run any jobs yet?")
 
     report = utils.read_report(report_path)
-    print_report(report)
+    filters = build_filters(args)
+    print_report(report, filters)
