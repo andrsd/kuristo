@@ -98,13 +98,13 @@ class JobSpec(BaseModel):
     """
 
     # Job description
-    description: Optional[str] = ""
+    description: str = ""
     # Job steps
     steps: List[Step]
     # Should the job be skipped?
     skip_: Optional[str] = Field(alias='skip', default=None)
     # Timeout in minutes
-    timeout_minutes: Optional[int] = Field(alias='timeout-minutes', default=60)
+    timeout_minutes: int = Field(alias='timeout-minutes', default=60)
     # Strategy
     strategy: Optional[Strategy] = None
     #
