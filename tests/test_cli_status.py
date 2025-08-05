@@ -38,7 +38,7 @@ def test_print_report_outputs_correctly(
     mock_cfg.console_width = 20
     mock_config_get.return_value = mock_cfg
 
-    print_report(report)
+    print_report(report, [])
 
     # Check status_line called per entry
     assert mock_status_line.call_count == 2
@@ -46,6 +46,38 @@ def test_print_report_outputs_correctly(
     mock_stats.assert_called_once()
     mock_time.assert_called_once_with(12.34)
     mock_RunStats.assert_called_once_with(1, 1, 0)
+
+
+@patch("kuristo.cli._status.ui.status_line")
+@patch("kuristo.cli._status.ui.line")
+@patch("kuristo.cli._status.ui.stats")
+@patch("kuristo.cli._status.ui.time")
+@patch("kuristo.cli._status.ui.RunStats")
+@patch("kuristo.cli._status.config.get")
+def test_print_report_outputs_filtered(
+    mock_config_get, mock_RunStats, mock_time, mock_stats, mock_line, mock_status_line
+):
+    report = {
+        "results": [
+            {"status": "success", "job name": "Test A"},
+            {"status": "success", "job name": "Test B"},
+            {"status": "failed", "job name": "Another"},
+        ],
+        "total_runtime": 12.34
+    }
+
+    mock_cfg = MagicMock()
+    mock_cfg.console_width = 20
+    mock_config_get.return_value = mock_cfg
+
+    print_report(report, ["failed"])
+
+    # Check status_line called per entry
+    assert mock_status_line.call_count == 1
+    mock_line.assert_called_once()
+    mock_stats.assert_called_once()
+    mock_time.assert_called_once_with(12.34)
+    mock_RunStats.assert_called_once_with(0, 1, 0)
 
 
 @patch("kuristo.cli._status.print_report")
@@ -60,16 +92,20 @@ def test_status_reads_report_and_calls_print(mock_cfg_get, mock_read_report, moc
     mock_cfg.log_dir = tmp_path
     mock_cfg_get.return_value = mock_cfg
 
-    dummy_report = {"results": [{"status": "success", "job name": "Job X"}]}
-    mock_read_report.return_value = dummy_report
+    expected_report = {"results": [{"status": "success", "job name": "Job X"}]}
+    expected_filters = []
+    mock_read_report.return_value = expected_report
 
     args = MagicMock()
     args.run = None
+    args.failed = False
+    args.skipped = False
+    args.passed = False
 
     status(args)
 
     mock_read_report.assert_called_once_with(report_path)
-    mock_print_report.assert_called_once_with(dummy_report)
+    mock_print_report.assert_called_once_with(expected_report, expected_filters)
 
 
 @patch("kuristo.cli._status.config.get")

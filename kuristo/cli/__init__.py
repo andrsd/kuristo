@@ -54,6 +54,10 @@ def build_parser():
 
     status_parser = subparsers.add_parser("status", help="Display status of runs")
     status_parser.add_argument("--run", type=str, help="Run ID to display results for")
+    group = status_parser.add_mutually_exclusive_group()
+    group.add_argument("--failed", action="store_true", help="Show only tests that failed")
+    group.add_argument("--skipped", action="store_true", help="Show only tests that were skipped")
+    group.add_argument("--passed", action="store_true", help="Show only tests that passed")
 
     subparsers.add_parser("log", help="List runs")
 
