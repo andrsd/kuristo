@@ -8,3 +8,4 @@ kuristo/_version.py
 .pytest_cache/
 docs/_build/
 dist/
+htmlcov/
