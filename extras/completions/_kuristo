@@ -1,0 +1,92 @@
+#compdef kuristo
+#description:automation tool in python
+#
+# ZSH Completion for kuristo (https://github.com/andrsd/kuristo)
+
+local context state state_descr line
+typeset -A opt_args
+local -a commands
+
+commands=(
+  'run:Run jobs'
+  'doctor:Show diagnostic info'
+  'list:List available jobs'
+  'batch:HPC queueing system commands'
+  'status:Display status of runs'
+  'log:List runs'
+  'show:Show job log'
+)
+
+_arguments -C \
+  '--version[Show version and exit]' \
+  '--no-ansi[Disable rich output (no colors or progress bars)]' \
+  '--help[Show help message and exit]' \
+  '1:command:->command' \
+  '*::arg:->args'
+
+case $state in
+  command)
+    _describe 'command' commands
+    ;;
+  args)
+    case $words[1] in
+      run)
+        _arguments \
+          '--help[Show help message and exit]' \
+          '--verbose[Verbose level]:int' \
+          '--report[Save report to a CSV file]:file:_files' \
+          '*:Locations to scan:_files'
+        ;;
+      doctor)
+        _arguments \
+          '--help[Show help message and exit]'
+        ;;
+      list)
+        _arguments \
+          '--help[Show help message and exit]' \
+          '*:Locations to scan:_files'
+        ;;
+      batch)
+        case $words[2] in
+          submit)
+            _arguments \
+              '--help[Show help message and exit]' \
+              '--location[-l Location to scan]:file:_files' \
+              '--backend[Batch backend to use]:backend:(slurm)' \
+              '--partition[Partition name to use]:string'
+            ;;
+          status)
+            _arguments \
+              '--help[Show help message and exit]'
+            ;;
+          *)
+            local -a batch_cmds
+            batch_cmds=(
+              'submit:Submit jobs to HPC queue'
+              'status:Check job status'
+            )
+            _describe 'batch-command' batch_cmds
+            ;;
+        esac
+        ;;
+      status)
+        _arguments \
+          '--help[Show help message and exit]' \
+          '--run[Run ID to display results for]:string' \
+          '--failed[Show only tests that failed]' \
+          '--skipped[Show only tests that were skipped]' \
+          '--passed[Show only tests that passed]'
+        ;;
+      log)
+        _arguments \
+          '--help[Show help message and exit]'
+        ;;
+      show)
+        _arguments \
+          '--help[Show help message and exit]' \
+          '--run[Run ID to display results for]:string' \
+          '--job[Job ID]:int'
+        ;;
+    esac
+    ;;
+esac
