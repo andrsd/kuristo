@@ -13,7 +13,10 @@ def list_jobs(args):
 
     n_jobs = 0
     for sp in specs:
-        job_names = sp.build_matrix_values()
+        if sp.strategy:
+            job_names = sp.build_matrix_values()
+        else:
+            job_names = [(sp.id, None)]
         n_jobs += len(job_names)
         for name, _ in job_names:
             jnm = ui.job_name_markup(name)

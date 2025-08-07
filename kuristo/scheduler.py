@@ -9,7 +9,7 @@ from rich.text import Text
 from rich.style import Style
 import kuristo.ui as ui
 import kuristo.config as config
-from kuristo.job import Job
+from kuristo.job import Job, JobJoiner
 from kuristo.resources import Resources
 
 
@@ -131,22 +131,21 @@ class Scheduler:
         self._graph = netx.DiGraph()
         job_map = {}
         for sp in specs:
-            jobs = self._create_jobs(sp)
-            for j in jobs:
-                j.on_finish = self._job_completed
-                j.on_step_start = self._on_step_start
-                j.on_step_finish = self._on_step_finish
-                self._graph.add_node(j)
-                job_map[j.name] = j
-                self._max_label_len = max(self._max_label_len, len(j.name) + 1)
+            spec_jobs = self._create_jobs(sp)
+            for job in spec_jobs:
+                job.on_finish = self._job_completed
+                job.on_step_start = self._on_step_start
+                job.on_step_finish = self._on_step_finish
+                self._graph.add_node(job)
+                job_map[job.id] = job
+                self._max_label_len = max(self._max_label_len, len(job.name) + 1)
         self._max_id_width = len(str(self._graph.number_of_nodes()))
 
-        for sp in specs:
-            for dep_name in sp.needs:
+        for job in self._graph.nodes:
+            for dep_name in job.needs:
                 if dep_name not in job_map:
-                    # TODO: improve this error message (like tell the user which file this was found in)
-                    raise ValueError(f"Job '{sp.name}' depends on unknown job '{dep_name}'")
-                self._graph.add_edge(job_map[dep_name], job_map[sp.name])
+                    raise ValueError(f"{job.spec.file_name}: Job '{job.spec.id}' depends on unknown job '{dep_name}'")
+                self._graph.add_edge(job_map[dep_name], job_map[job.id])
 
     def _get_ready_jobs(self):
         """
@@ -170,19 +169,22 @@ class Scheduler:
                     self._n_skipped = self._n_skipped + 1
                     continue
 
-                required = job.required_cores
-                if self._resources.available_cores >= required:
-                    self._resources.allocate_cores(required)
-                    self._active_jobs.add(job)
-                    job_name = ui.job_name_markup(job.name)
-                    task_id = self._progress.add_task(
-                        Text.from_markup(f"[cyan]{job_name}[/]"),
-                        total=job.num_steps
-                    )
-                    self._tasks[job.id] = task_id
-                    job.create_step_tasks(self._progress)
+                if isinstance(job, JobJoiner):
                     job.start()
-                    ui.status_line(job, "STARTING", self._max_id_width, self._max_label_len)
+                else:
+                    required = job.required_cores
+                    if self._resources.available_cores >= required:
+                        self._resources.allocate_cores(required)
+                        self._active_jobs.add(job)
+                        job_name = ui.job_name_markup(job.name)
+                        task_id = self._progress.add_task(
+                            Text.from_markup(f"[cyan]{job_name}[/]"),
+                            total=job.num_steps
+                        )
+                        self._tasks[job.num] = task_id
+                        job.create_step_tasks(self._progress)
+                        job.start()
+                        ui.status_line(job, "STARTING", self._max_id_width, self._max_label_len)
 
     def _job_completed(self, job):
         with self._lock:
@@ -195,9 +197,9 @@ class Scheduler:
             else:
                 ui.status_line(job, "FAIL", self._max_id_width, self._max_label_len)
                 self._n_failed = self._n_failed + 1
-            task_id = self._tasks[job.id]
+            task_id = self._tasks[job.num]
             self._progress.remove_task(task_id)
-            del self._tasks[job.id]
+            del self._tasks[job.num]
             self._active_jobs.remove(job)
             self._resources.free_cores(job.required_cores)
         self._schedule_next_job()
@@ -247,11 +249,15 @@ class Scheduler:
         @return List of `Job`s
         """
         jobs = []
-        for name, variant in spec.build_matrix_values():
-            if variant:
-                jobs.append(Job(name, spec, self._out_dir, matrix=variant))
-            else:
-                jobs.append(Job(name, spec, self._out_dir))
+        if spec.strategy:
+            needs = []
+            for id, variant in spec.build_matrix_values():
+                j = Job(id, spec, self._out_dir, matrix=variant)
+                jobs.append(j)
+                needs.append(id)
+            jobs.append(JobJoiner(spec.id, spec, needs))
+        else:
+            jobs.append(Job(spec.id, spec, self._out_dir))
         return jobs
 
     def exit_code(self, *, strict=False):
@@ -269,8 +275,8 @@ class Scheduler:
         step_task_id = job.step_task_id(step)
         self._progress.remove_task(step_task_id)
 
-        job_task_id = self._tasks[job.id]
-        self._progress.update(job_task_id, advance=1)
+        job_task_num = self._tasks[job.num]
+        self._progress.update(job_task_num, advance=1)
 
     def _write_report(self):
         self._write_report_yaml(self._out_dir / "report.yaml")
@@ -290,26 +296,27 @@ class Scheduler:
                     status = "success"
                 else:
                     status = "failed"
-                writer.writerow([job.id, job.name, status, duration, job.return_code])
+                writer.writerow([job.num, job.name, status, duration, job.return_code])
 
     def _write_report_yaml(self, yaml_path: Path):
         report = []
         for job in self._graph.nodes:
-            if job.is_skipped:
-                report.append({
-                    "id": job.id,
-                    "job name": job.name,
-                    "status": "skipped",
-                    "reason": job.skip_reason
-                })
-            else:
-                report.append({
-                    "id": job.id,
-                    "job name": job.name,
-                    "return code": job.return_code,
-                    "status": "success" if job.return_code == 0 else "failed",
-                    "duration": round(job.elapsed_time, 3)
-                })
+            if isinstance(job, Job):
+                if job.is_skipped:
+                    report.append({
+                        "id": job.num,
+                        "job name": job.name,
+                        "status": "skipped",
+                        "reason": job.skip_reason
+                    })
+                else:
+                    report.append({
+                        "id": job.num,
+                        "job name": job.name,
+                        "return code": job.return_code,
+                        "status": "success" if job.return_code == 0 else "failed",
+                        "duration": round(job.elapsed_time, 3)
+                    })
 
         with open(yaml_path, "w") as f:
             yaml.safe_dump({

@@ -7,6 +7,7 @@ from kuristo.job_spec import JobSpec
 from kuristo.action_factory import ActionFactory
 from kuristo.context import Context
 from kuristo.env import Env
+from kuristo.utils import interpolate_str
 
 
 class Job:
@@ -75,27 +76,26 @@ class Job:
             for key, value in env.items():
                 self.env(key, value)
 
-    def __init__(self, name, job_spec: JobSpec, log_dir: Path, matrix=None) -> None:
+    def __init__(self, id, job_spec: JobSpec, log_dir: Path, matrix=None) -> None:
         """
         @param job_spec Job specification
         """
         Job.ID = Job.ID + 1
-        self._id = Job.ID
-        self._env_file = log_dir / f"job-{self._id}.env"
-        self._path_file = log_dir / f"job-{self._id}.path"
+        self._num = Job.ID
+        self._spec = job_spec
+        self._env_file = log_dir / f"job-{self._num}.env"
+        self._path_file = log_dir / f"job-{self._num}.path"
         self._thread = None
         self._process = None
         self._stdout = None
         self._stderr = None
         self._logger = self.Logger(
-            self._id,
-            log_dir / f'job-{self._id}.log'
+            self._num,
+            log_dir / f'job-{self._num}.log'
         )
         self._return_code = None
-        if name is None:
-            self._name = "job" + str(self._id)
-        else:
-            self._name = name
+        self._id = id
+        self._name = self._create_job_name(job_spec, matrix)
         self._status = Job.WAITING
         self._skipped = False
         self._context = Context(
@@ -109,7 +109,6 @@ class Job:
         self._elapsed_time = 0.
         self._cancelled = threading.Event()
         self._timeout_timer = None
-        self._timeout_minutes = job_spec.timeout_minutes
         self._step_lock = threading.Lock()
         self._active_step = None
         self._on_finish = self._noop
@@ -123,7 +122,7 @@ class Job:
         self._status = Job.RUNNING
         self._thread = threading.Thread(target=self._target)
         self._thread.start()
-        self._timeout_timer = threading.Timer(self._timeout_minutes * 60, self._on_timeout)
+        self._timeout_timer = threading.Timer(self.timeout_minutes * 60, self._on_timeout)
         self._timeout_timer.start()
 
     def wait(self):
@@ -145,11 +144,39 @@ class Job:
             self._skip_reason = reason
 
     @property
+    def spec(self):
+        """
+        Return job specification
+        """
+        return self._spec
+
+    @property
     def name(self):
         """
         Return job name
         """
         return self._name
+
+    @property
+    def id(self):
+        """
+        Return job ID
+        """
+        return self._id
+
+    @property
+    def needs(self):
+        """
+        Return job IDs this job depends on
+        """
+        return self._spec.needs
+
+    @property
+    def timeout_minutes(self):
+        """
+        Return timeout in minutes
+        """
+        return self._spec.timeout_minutes
 
     @property
     def return_code(self):
@@ -159,11 +186,11 @@ class Job:
         return self._return_code
 
     @property
-    def id(self):
+    def num(self):
         """
-        Return job ID
+        Return job number
         """
-        return self._id
+        return self._num
 
     @property
     def status(self):
@@ -264,7 +291,7 @@ class Job:
                 self._logger.log(line)
 
             if self._cancelled.is_set():
-                self._logger.log(f'* Job timed out after {self._timeout_minutes} minutes', tag="TASK_END")
+                self._logger.log(f'* Job timed out after {self.timeout_minutes} minutes', tag="TASK_END")
                 self._return_code = 124
             elif step.return_code == 124:
                 self._logger.log(f'* Step timed out after {step.timeout_minutes} minutes', tag="TASK_END")
@@ -327,11 +354,19 @@ class Job:
             "KURISTO_ENV": self._env_file,
             "KURISTO_PATH": self._path_file,
             "KURISTO_JOB": self._name,
-            "KURISTO_JOBID": self._id
+            "KURISTO_JOBID": self._num
         }
 
     def _noop(self, *args, **kwargs):
         pass
+
+    def _create_job_name(self, job_spec, matrix):
+        ipol_name = interpolate_str(job_spec.name, {"matrix" : matrix})
+        if ipol_name == job_spec.name and matrix is not None:
+            param_str = ",".join(f"{k}={v}" for k, v in matrix.items())
+            return f"{job_spec.name}[{param_str}]"
+        else:
+            return ipol_name
 
     def create_step_tasks(self, progress):
         self._step_task_ids = {
@@ -343,3 +378,128 @@ class Job:
 
     def step_task_id(self, step):
         return self._step_task_ids.get(step.name)
+
+
+class JobJoiner:
+    """
+    Auxiliary class that is created in the background (i.e. not displayed to the user) and
+    serves for defining dependencies between jobs that use `strategy.matrix`.
+    There is no action that this class does. It really only serves for defining dependencies.
+
+    For example:
+    ```
+    multiple-job:
+      strategy:
+        matrix:
+          include:
+            - animal: dog
+              color: red
+            - animal: cat
+              color: black
+    dep-job-a:
+      needs: [multiple-job]
+    ```
+    The dependency graph then looks like this:
+    ```
+    multiple-job[red, dog]  ----+
+                                +-->  multiple-job  -->  dep-job-a
+    multiple-job[black, cat]  --+
+    ```
+    The `multiple-job` in the middle is represented by this class.
+    """
+
+    def __init__(self, id, spec: JobSpec, needs: list) -> None:
+        """
+        @param job_spec Job specification
+        """
+        Job.ID = Job.ID + 1
+        self._num = Job.ID
+        self._id = id
+        self._name = id
+        self._spec = spec
+        self._status = Job.WAITING
+        self._needs = needs
+
+    @property
+    def spec(self):
+        """
+        Return job specification
+        """
+        return self._spec
+
+    @property
+    def id(self):
+        """
+        Return job ID
+        """
+        return self._id
+
+    @property
+    def name(self):
+        """
+        Return job name
+        """
+        return self._name
+
+    @property
+    def num(self):
+        """
+        Return job number
+        """
+        return self._num
+
+    @property
+    def is_skipped(self):
+        """
+        Return `True` if the job should be skipped
+        """
+        return False
+
+    @property
+    def is_processed(self):
+        """
+        Check if the job is processed
+        """
+        return self._status == Job.FINISHED
+
+    @property
+    def required_cores(self):
+        return 0
+
+    @property
+    def num_steps(self):
+        return 0
+
+    @property
+    def needs(self):
+        """
+        Return job IDs this job depends on
+        """
+        return self._needs
+
+    @property
+    def return_code(self):
+        """
+        Return code of the process
+        """
+        return 0
+
+    @property
+    def elapsed_time(self):
+        """
+        Return time it took to run this job
+        """
+        return 0
+
+    @property
+    def status(self):
+        """
+        Return job status
+        """
+        return self._status
+
+    def create_step_tasks(self, progress):
+        pass
+
+    def start(self):
+        self._status = Job.FINISHED
