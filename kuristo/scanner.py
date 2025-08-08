@@ -1,4 +1,5 @@
 import os
+import kuristo.config as config
 
 
 class Scanner:
@@ -6,10 +7,10 @@ class Scanner:
     Scans a location to discover workflows
     """
 
-    FILENAME = "ktests.yaml"
-
     def __init__(self, location: str) -> None:
         self._location = location
+        cfg = config.get()
+        self._workflow_filename = cfg.workflow_filename
 
     @property
     def location(self):
@@ -24,8 +25,8 @@ class Scanner:
         """
         specs = []
         for root, dirs, files in os.walk(self._location):
-            if Scanner.FILENAME in files:
-                specs.append(os.path.join(root, Scanner.FILENAME))
+            if self._workflow_filename in files:
+                specs.append(os.path.join(root, self._workflow_filename))
         return specs
 
 

@@ -217,7 +217,7 @@ class JobSpec(BaseModel):
 
 def parse_workflow_files(workflow_files):
     """
-    Parse workflow files (ktests.yaml)
+    Parse workflow files (kuristo.yaml)
     """
     specs = []
     for file in workflow_files:
