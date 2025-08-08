@@ -3,10 +3,11 @@ name: Create a release
 on:
   push:
     tags:
-      - "v*.*.*"
+      - "v*"
 
 permissions:
-  contents: read
+  contents: write
+  discussions: write
 
 jobs:
   build-and-publish:
@@ -35,3 +36,15 @@ jobs:
           TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
         run: |
           twine upload dist/*
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "version=${GITHUB_REF_NAME:1}" >> "$GITHUB_OUTPUT"
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ steps.get_version.outputs.version }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
