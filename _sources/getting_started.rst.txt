@@ -61,7 +61,7 @@ Or run all workflows from a location:
 
    kuristo run /root/dir/with/workflows
 
-Kuristo will traverse the directory structure and try to find ``ktests.yaml`` files with workflows.
+Kuristo will traverse the directory structure and try to find ``kuristo.yaml`` files with workflows.
 Then, it will execute each job in order, tracking progress and logging output into the ``.kuristo-out/`` directory.
 If no parameter is used it will search from the current working directory.
 
@@ -108,7 +108,7 @@ Use this to see what jobs are would be executed:
 
    kuristo list
 
-This will traverse the directory structure from the current working directory and look for ``ktests.yaml`` files.
+This will traverse the directory structure from the current working directory and look for ``kuristo.yaml`` files.
 You can specify different location via
 
 .. code-block:: bash
