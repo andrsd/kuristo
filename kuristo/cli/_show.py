@@ -71,7 +71,7 @@ def render_title(sec, max_label_len):
     tm = 0.
     if sec["start_time"] and sec["end_time"]:
         tm = (sec["end_time"] - sec["start_time"]).total_seconds()
-    time_str = utils.human_time2(tm)
+    time_str = utils.human_time(tm)
 
     wd = max_label_len - 8 - len(title) - len(time_str)
     dots = "." * wd
@@ -100,7 +100,7 @@ def render_section(sec, max_label_len):
     delta = 0.
     if sec["start_time"] and sec["end_time"]:
         delta = (sec["end_time"] - sec["start_time"]).total_seconds()
-    time_str = utils.human_time2(delta)
+    time_str = utils.human_time(delta)
 
     wd = max_label_len - 9 - len(title) - len(time_str)
     dots = "." * wd

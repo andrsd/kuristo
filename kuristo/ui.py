@@ -3,7 +3,7 @@ from rich.console import Console
 from rich.text import Text
 import kuristo.config as config
 from kuristo.job import Job, JobJoiner
-from kuristo.utils import human_time, human_time2
+from kuristo.utils import human_time
 
 
 _console_instance = None
@@ -69,7 +69,7 @@ def status_line(job, state, max_id_width, max_label_len):
         return
     else:
         raise ValueError("job parameter must be a dict of Job")
-    time_str = human_time2(elapsed_time)
+    time_str = human_time(elapsed_time)
     width = max_label_len - 15 - job_name_len - len(time_str)
     dots = "." * width
 
