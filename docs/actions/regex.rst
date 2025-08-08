@@ -30,15 +30,13 @@ Arguments
 - ``pattern`` (string, required): The regular expression to match (interpreted using Python’s `re` module).
 
 
-Notes
------
+.. admonition:: Notes
 
-- This action uses **exact string matching** (not float-aware); use :doc:`regex-float` for numerical comparisons.
-- Useful for checking message logs, printed summaries, or warnings.
+   - This action uses **exact string matching** (not float-aware); use :doc:`regex-float` for numerical comparisons.
+   - Useful for checking message logs, printed summaries, or warnings.
 
 
-See Also
---------
+.. seealso::
 
-- :doc:`regex-float`
-- :doc:`csv-diff`
+   - :doc:`regex-float`
+   - :doc:`csv-diff`

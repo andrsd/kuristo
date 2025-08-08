@@ -7,13 +7,25 @@ This guide walks you through installing Kuristo, writing your first workflow, an
 Installation
 ------------
 
-Clone the repository and install it from source:
+.. tab-set::
 
-.. code-block:: bash
+   .. tab-item:: pip
 
-   git clone https://github.com/andrsd/kuristo.git
-   cd kuristo
-   pip install .
+      Install from PyPI:
+
+      .. code-block:: bash
+
+         pip install kuristo
+
+   .. tab-item:: source
+
+      Clone the repository and install it from source:
+
+      .. code-block:: bash
+
+         git clone https://github.com/andrsd/kuristo.git
+         cd kuristo
+         pip install .
 
 
 Basic Workflow
@@ -37,11 +49,17 @@ Save this as ``ktests.yml``.
 Running the Workflow
 --------------------
 
-To run the workflow:
+To run a workflow:
 
 .. code-block:: bash
 
-   kuristo run /path/
+   kuristo run /path/to/workflow-file.yaml
+
+Or run all workflows from a location:
+
+.. code-block:: bash
+
+   kuristo run /root/dir/with/workflows
 
 Kuristo will traverse the directory structure and try to find ``ktests.yaml`` files with workflows.
 Then, it will execute each job in order, tracking progress and logging output into the ``.kuristo-out/`` directory.
