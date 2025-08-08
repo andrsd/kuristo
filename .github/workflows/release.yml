@@ -3,7 +3,7 @@ name: Create a release
 on:
   push:
     tags:
-      - "v*.*.*" # Match version tags like v0.1.0, v1.2.3
+      - "v*.*.*"
 
 permissions:
   contents: read
