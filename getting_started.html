@@ -88,11 +88,25 @@
 <p>This guide walks you through installing Kuristo, writing your first workflow, and running it locally.</p>
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-0">
+pip</label><div class="sd-tab-content docutils">
+<p>Install from PyPI:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>kuristo
+</pre></div>
+</div>
+</div>
+<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" for="sd-tab-item-1">
+source</label><div class="sd-tab-content docutils">
 <p>Clone the repository and install it from source:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/andrsd/kuristo.git
 <span class="nb">cd</span><span class="w"> </span>kuristo
 pip<span class="w"> </span>install<span class="w"> </span>.
 </pre></div>
+</div>
+</div>
 </div>
 </section>
 <section id="basic-workflow">
@@ -111,8 +125,12 @@ pip<span class="w"> </span>install<span class="w"> </span>.
 </section>
 <section id="running-the-workflow">
 <h2>Running the Workflow<a class="headerlink" href="#running-the-workflow" title="Link to this heading"></a></h2>
-<p>To run the workflow:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>kuristo<span class="w"> </span>run<span class="w"> </span>/path/
+<p>To run a workflow:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>kuristo<span class="w"> </span>run<span class="w"> </span>/path/to/workflow-file.yaml
+</pre></div>
+</div>
+<p>Or run all workflows from a location:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>kuristo<span class="w"> </span>run<span class="w"> </span>/root/dir/with/workflows
 </pre></div>
 </div>
 <p>Kuristo will traverse the directory structure and try to find <code class="docutils literal notranslate"><span class="pre">ktests.yaml</span></code> files with workflows.

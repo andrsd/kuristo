@@ -29,14 +29,12 @@ Arguments
 - ``rtol`` (float, optional): Relative difference threshold.
 
 
-Notes
------
+.. admonition:: Notes
 
-- This action assumes the input files use compatible mesh topologies and metadata.
-- Uses ``exodiff`` from SEACAS. Make sure it is on your PATH when running kuristo.
+   - This action assumes the input files use compatible mesh topologies and metadata.
+   - Uses ``exodiff`` from SEACAS. Make sure it is on your PATH when running kuristo.
 
 
-See Also
---------
+.. seealso::
 
-- :doc:`csv-diff`
+   - :doc:`csv-diff`

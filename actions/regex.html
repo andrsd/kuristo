@@ -53,8 +53,6 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">checks/regex</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#example-usage">Example Usage</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#arguments">Arguments</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#notes">Notes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#see-also">See Also</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="regex-float.html">checks/regex-float</a></li>
@@ -115,20 +113,20 @@ It is typically used to validate log or text output (e.g., looking for convergen
 <li><p><code class="docutils literal notranslate"><span class="pre">input</span></code> (string, required): Input that will be checked</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">pattern</span></code> (string, required): The regular expression to match (interpreted using Python’s <cite>re</cite> module).</p></li>
 </ul>
-</section>
-<section id="notes">
-<h2>Notes<a class="headerlink" href="#notes" title="Link to this heading"></a></h2>
+<div class="admonition-notes admonition">
+<p class="admonition-title">Notes</p>
 <ul class="simple">
 <li><p>This action uses <strong>exact string matching</strong> (not float-aware); use <a class="reference internal" href="regex-float.html"><span class="doc">checks/regex-float</span></a> for numerical comparisons.</p></li>
 <li><p>Useful for checking message logs, printed summaries, or warnings.</p></li>
 </ul>
-</section>
-<section id="see-also">
-<h2>See Also<a class="headerlink" href="#see-also" title="Link to this heading"></a></h2>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="regex-float.html"><span class="doc">checks/regex-float</span></a></p></li>
 <li><p><a class="reference internal" href="csv-diff.html"><span class="doc">checks/csv-diff</span></a></p></li>
 </ul>
+</div>
 </section>
 </section>
 
