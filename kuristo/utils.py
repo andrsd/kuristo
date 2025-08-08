@@ -84,7 +84,7 @@ def update_latest_symlink(log_dir: Path, latest_run_dir: Path):
 
 
 def interpolate_str(text: str, variables: dict) -> str:
-    normalized = text.replace("${{", "{{").replace("}}", "}}")
+    normalized = text.replace("${{", "{{")
     template = Template(normalized)
     return template.render(**variables)
 
