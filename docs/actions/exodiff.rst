@@ -36,7 +36,6 @@ Notes
 - Uses ``exodiff`` from SEACAS. Make sure it is on your PATH when running kuristo.
 
 
-See Also
---------
+.. seealso::
 
-- :doc:`csv-diff`
+   - :doc:`csv-diff`

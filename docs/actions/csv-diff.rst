@@ -27,7 +27,6 @@ Arguments
 - ``rel_tol`` (float, optional): Allowed relative difference per value. Default is 1e-6.
 
 
-See Also
---------
+.. seealso::
 
-- :doc:`exodiff`
+   - :doc:`exodiff`

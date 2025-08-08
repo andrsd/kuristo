@@ -43,8 +43,7 @@ Notes
   Do not use the group ``(...)`` operator, it is included in the alias for convenience.
 
 
-See Also
---------
+.. seealso::
 
-- :doc:`regex`
-- :doc:`csv-diff`
+   - :doc:`regex`
+   - :doc:`csv-diff`

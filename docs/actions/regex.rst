@@ -37,8 +37,7 @@ Notes
 - Useful for checking message logs, printed summaries, or warnings.
 
 
-See Also
---------
+.. seealso::
 
-- :doc:`regex-float`
-- :doc:`csv-diff`
+   - :doc:`regex-float`
+   - :doc:`csv-diff`
