@@ -7,7 +7,7 @@
 [![Scc Count Badge](https://sloc.xyz/github/andrsd/kuristo/)](https://github.com/andrsd/kuristo/)
 [![PyPI](https://img.shields.io/pypi/v/kuristo.svg)](https://pypi.org/project/kuristo/)
 
-Kuristo is a flexible, plugin-enabled automation framework designed for scientific and HPC workflows. 
+Kuristo is a flexible, plugin-enabled automation framework designed for scientific and HPC workflows.
 It supports sequential and parallel job execution, workflow definition via YAML, resource-aware scheduling, custom step and action definitions, and rich output with optional headless mode.
 
 ![Demo](docs/_static/demo.gif)
@@ -29,7 +29,13 @@ It supports sequential and parallel job execution, workflow definition via YAML,
 
 ## Install
 
-Kuristo is not yet on PyPI. Clone the repo and install locally:
+Install from PyPI:
+
+```bash
+pip install kuristo
+```
+
+Or clone the repo and install locally:
 
 ```bash
 git clone https://github.com/andrsd/kuristo.git
@@ -42,13 +48,13 @@ pip install -e .
 Run all tests in a directory:
 
 ```bash
-kuristo run -l tests/assets/
+kuristo run tests/assets/
 ```
 
 Run a specific test set:
 
 ```bash
-kuristo run -l tests/assets/tests1
+kuristo run tests/assets/tests1
 ```
 
 Check your environment:
@@ -60,7 +66,7 @@ kuristo doctor
 Headless/CI-safe mode
 
 ```bash
-kuristo run -l tests --no-ansi
+kuristo run tests --no-ansi
 ```
 
 ### Workflow YAML Example
@@ -144,7 +150,7 @@ log:
 To output a CSV of job timings:
 
 ```bash
-kuristo run -l tests --report timing.csv
+kuristo run tests --report timing.csv
 ```
 
 ## Configuration
@@ -162,7 +168,7 @@ runner:
 Or override via environment variable:
 
 ```bash
-KURISTO_MPI_LAUNCHER=mpiexec2 kuristo run -l tests/
+KURISTO_MPI_LAUNCHER=mpiexec2 kuristo run tests/
 ```
 
 ## Testing & Coverage
