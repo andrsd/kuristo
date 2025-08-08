@@ -90,14 +90,26 @@ def interpolate_str(text: str, variables: dict) -> str:
 
 
 def minutes_to_hhmmss(minutes: int) -> str:
+    """
+    Convert minutes into "H:MM:SS"
+
+    @param minutes Number of minutes to convert
+    @return String formatted as "H:MM:SS"
+    """
     hours = minutes // 60
     mins = minutes % 60
     seconds = 0
     return f"{hours:0d}:{mins:02d}:{seconds:02d}"
 
 
-def human_time(elapsed_time: float) -> str:
-    hours, rem = divmod(elapsed_time, 3600)
+def human_time(seconds: float) -> str:
+    """
+    Convert time to human form
+
+    @param seconds Number of seconds
+    @return <H>h <M>m <S>s
+    """
+    hours, rem = divmod(seconds, 3600)
     minutes, seconds = divmod(rem, 60)
 
     parts = []
@@ -110,12 +122,15 @@ def human_time(elapsed_time: float) -> str:
     return " ".join(parts)
 
 
-def human_time2(elapsed_time) -> str:
+def human_time2(seconds) -> str:
     """
-    PLEASE, give me a BETTER name
+    Convert number of seconds to a formatted string "<S.ss>s"
+
+    @param seconds
+    NOTE: PLEASE, give me a BETTER name
     """
-    if isinstance(elapsed_time, float):
-        return f"{elapsed_time:.2f}s"
+    if isinstance(seconds, float):
+        return f"{seconds:.2f}s"
     else:
         return ""
 
