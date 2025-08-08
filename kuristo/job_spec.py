@@ -3,7 +3,6 @@ import yaml
 from pydantic import BaseModel, Field, PrivateAttr, ValidationError, model_validator
 from typing import List, Optional, Union, Dict, Any
 from itertools import product
-from kuristo.utils import interpolate_str
 
 
 class StrategyMatrix(BaseModel):
@@ -109,8 +108,19 @@ class JobSpec(BaseModel):
     strategy: Optional[Strategy] = None
     #
     needs_: Optional[Union[str, List[str]]] = Field(alias='needs', default=None)
-    #
+    # Job ID
+    _id: str = PrivateAttr()
+    # Job name
     _name: str = PrivateAttr()
+    # File name where the job specification was defined
+    _file_name: str = PrivateAttr()
+
+    @property
+    def id(self):
+        """
+        Return job ID
+        """
+        return self._id
 
     @property
     def name(self):
@@ -142,23 +152,35 @@ class JobSpec(BaseModel):
         """
         return self.skip_
 
+    @property
+    def file_name(self):
+        """
+        Return file name where this job specification was
+        """
+        return self._file_name
+
+    def set_id(self, id):
+        self._id = id
+
+    def set_name(self, name: str):
+        self._name = name
+
+    def set_file_name(self, file_name):
+        self._file_name = file_name
+
     def build_matrix_values(self):
         """
         Build matrix values
 
         @return list[tuple[str, dict | None]] first entry is the job name, second is the variant that has keys and values
         """
-        if self.strategy:
-            variants = self._expand_matrix_value()
-            jobs = []
-            for v in variants:
-                name = self._build_matrix_job_name(v)
-                job = (name, v)
-                jobs.append(job)
-            return jobs
-        else:
-            job = (self.name, None)
-            return [job]
+        variants = self._expand_matrix_value()
+        jobs = []
+        for v in variants:
+            id = self._build_matrix_job_id(v)
+            job = (id, v)
+            jobs.append(job)
+        return jobs
 
     def _expand_matrix_value(self):
         """
@@ -171,28 +193,23 @@ class JobSpec(BaseModel):
         else:
             return []
 
-    def _build_matrix_job_name(self, variant):
+    def _build_matrix_job_id(self, variant):
         """
         Create job name for a job from a matrix
 
         @param variant Combination of keys and values (k, v) with values form startegy.matrix
         @return Job name
         """
-        ipol_name = interpolate_str(self.name, {"matrix" : variant})
-        if ipol_name == self.name:
-            param_str = ",".join(f"{k}={v}" for k, v in variant.items())
-            return f"{self.name}[{param_str}]"
-        else:
-            return ipol_name
-
-    def set_name(self, name: str):
-        self._name = name
+        param_str = ",".join(f"{k}={v}" for k, v in variant.items())
+        return f"{self.id}[{param_str}]"
 
     @staticmethod
-    def from_dict(name, data):
+    def from_dict(file_name, id, data):
         if isinstance(data, dict):
             ts = JobSpec(**data)
-            ts.set_name(data.get("name", name))
+            ts.set_file_name(file_name)
+            ts.set_id(id)
+            ts.set_name(data.get("name", id))
             return ts
         else:
             raise RuntimeError("Expected dict as 'data'")
@@ -214,9 +231,9 @@ def specs_from_file(file_path):
     with open(file_path, 'r') as file:
         data = yaml.safe_load(file)
         jobs = data.get('jobs', {})
-        for t, params in jobs.items():
+        for id, params in jobs.items():
             try:
-                jspec = JobSpec.from_dict(t, params)
+                jspec = JobSpec.from_dict(file_path, id, params)
                 specs.append(jspec)
             except ValidationError as exp:
                 msgs = []

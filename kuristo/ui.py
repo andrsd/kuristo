@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from rich.console import Console
 from rich.text import Text
 import kuristo.config as config
-from kuristo.job import Job
+from kuristo.job import Job, JobJoiner
 from kuristo.utils import human_time, human_time2
 
 
@@ -48,7 +48,7 @@ def status_line(job, state, max_id_width, max_label_len):
     cfg = config.get()
     consol = console()
     if isinstance(job, Job):
-        job_id = _padded_job_id(job.id, max_id_width)
+        job_id = _padded_job_id(job.num, max_id_width)
         job_name_len = len(job.name)
         job_name = job_name_markup(job.name)
         if job.is_skipped:
@@ -65,6 +65,8 @@ def status_line(job, state, max_id_width, max_label_len):
         else:
             skip_reason = ""
         elapsed_time = job.get("duration", 0.0)
+    elif isinstance(job, JobJoiner):
+        return
     else:
         raise ValueError("job parameter must be a dict of Job")
     time_str = human_time2(elapsed_time)

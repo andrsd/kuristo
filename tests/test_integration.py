@@ -116,10 +116,10 @@ def test_matrix():
     )
 
     assert result.returncode == 0
-    assert "Success: 7" in result.stdout
+    assert "Success: 9" in result.stdout
     assert "Failed: 0" in result.stdout
     assert "Skipped: 0" in result.stdout
-    assert "Total: 7" in result.stdout
+    assert "Total: 9" in result.stdout
 
 
 def test_float_check_str():
