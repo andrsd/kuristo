@@ -122,19 +122,6 @@ def human_time(seconds: float) -> str:
     return " ".join(parts)
 
 
-def human_time2(seconds) -> str:
-    """
-    Convert number of seconds to a formatted string "<S.ss>s"
-
-    @param seconds
-    NOTE: PLEASE, give me a BETTER name
-    """
-    if isinstance(seconds, float):
-        return f"{seconds:.2f}s"
-    else:
-        return ""
-
-
 def read_report(path):
     with open(path, "r") as f:
         return yaml.safe_load(f)

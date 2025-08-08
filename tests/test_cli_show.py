@@ -141,43 +141,43 @@ def make_section(title="My Task", rc=0, duration=1.23, lines=None, missing_times
 
 
 @patch("kuristo.cli._show.ui.console")
-@patch("kuristo.cli._show.utils.human_time2")
-def test_render_title_normal(mock_human_time2, mock_console):
-    mock_human_time2.return_value = "2.3s"
+@patch("kuristo.cli._show.utils.human_time")
+def test_render_title_normal(mock_human_time, mock_console):
+    mock_human_time.return_value = "2.30s"
     mock_console_instance = MagicMock()
     mock_console.return_value = mock_console_instance
 
     sec = make_section()
     render_title(sec, max_label_len=50)
 
-    assert mock_human_time2.called
+    assert mock_human_time.called
     printed_text = mock_console_instance.print.call_args_list[0][0][0]
     assert isinstance(printed_text, Text)
     assert "My Task" in str(printed_text)
-    assert "2.3s" in str(printed_text)
+    assert "2.30s" in str(printed_text)
     assert "." in str(printed_text)
 
 
 @patch("kuristo.cli._show.ui.console")
-@patch("kuristo.cli._show.utils.human_time2")
-def test_render_title_missing_times(mock_human_time2, mock_console):
-    mock_human_time2.return_value = "0.0s"
+@patch("kuristo.cli._show.utils.human_time")
+def test_render_title_missing_times(mock_human_time, mock_console):
+    mock_human_time.return_value = "0.00s"
     mock_console_instance = MagicMock()
     mock_console.return_value = mock_console_instance
 
     sec = make_section(missing_times=True)
     render_title(sec, max_label_len=40)
 
-    mock_human_time2.assert_called_with(0.0)
+    mock_human_time.assert_called_with(0.0)
     txt = mock_console_instance.print.call_args_list[0][0][0]
     assert "My Task" in str(txt)
-    assert "0.0s" in str(txt)
+    assert "0.00s" in str(txt)
 
 
 @patch("kuristo.cli._show.ui.console")
-@patch("kuristo.cli._show.utils.human_time2")
-def test_render_title_long_title(mock_human_time2, mock_console):
-    mock_human_time2.return_value = "99.9s"
+@patch("kuristo.cli._show.utils.human_time")
+def test_render_title_long_title(mock_human_time, mock_console):
+    mock_human_time.return_value = "99.9s"
     mock_console_instance = MagicMock()
     mock_console.return_value = mock_console_instance
 
@@ -191,9 +191,9 @@ def test_render_title_long_title(mock_human_time2, mock_console):
 
 
 @patch("kuristo.cli._show.ui.console")
-@patch("kuristo.cli._show.utils.human_time2")
-def test_render_section_pass(mock_human_time2, mock_console, capsys):
-    mock_human_time2.return_value = "1.2s"
+@patch("kuristo.cli._show.utils.human_time")
+def test_render_section_pass(mock_human_time, mock_console, capsys):
+    mock_human_time.return_value = "1.20s"
     console = MagicMock()
     mock_console.return_value = console
 
@@ -211,9 +211,9 @@ def test_render_section_pass(mock_human_time2, mock_console, capsys):
 
 
 @patch("kuristo.cli._show.ui.console")
-@patch("kuristo.cli._show.utils.human_time2")
-def test_render_section_fail_with_env(mock_human_time2, mock_console):
-    mock_human_time2.return_value = "2.3s"
+@patch("kuristo.cli._show.utils.human_time")
+def test_render_section_fail_with_env(mock_human_time, mock_console):
+    mock_human_time.return_value = "2.30s"
     console = MagicMock()
     mock_console.return_value = console
 
@@ -241,24 +241,24 @@ def test_render_section_fail_with_env(mock_human_time2, mock_console):
 
 
 @patch("kuristo.cli._show.ui.console")
-@patch("kuristo.cli._show.utils.human_time2")
-def test_render_section_missing_times(mock_human_time2, mock_console):
-    mock_human_time2.return_value = "0.0s"
+@patch("kuristo.cli._show.utils.human_time")
+def test_render_section_missing_times(mock_human_time, mock_console):
+    mock_human_time.return_value = "0.00s"
     console = MagicMock()
     mock_console.return_value = console
 
     sec = make_section(rc=0, missing_times=True)
     render_section(sec, max_label_len=40)
 
-    assert mock_human_time2.called
+    assert mock_human_time.called
     output = str(console.print.call_args_list[0][0][0])
-    assert "0.0s" in output
+    assert "0.00s" in output
 
 
 @patch("kuristo.cli._show.ui.console")
-@patch("kuristo.cli._show.utils.human_time2")
-def test_render_section_handles_dot_padding(mock_human_time2, mock_console):
-    mock_human_time2.return_value = "1.2s"
+@patch("kuristo.cli._show.utils.human_time")
+def test_render_section_handles_dot_padding(mock_human_time, mock_console):
+    mock_human_time.return_value = "1.20s"
     console = MagicMock()
     mock_console.return_value = console
 
