@@ -39,3 +39,4 @@ Contents
    actions/index
    custom_actions
    configuration
+   architecture
