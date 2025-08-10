@@ -35,6 +35,7 @@ Contents
    :maxdepth: 2
 
    getting_started
+   user_interface
    writing_workflows
    actions/index
    custom_actions

@@ -76,33 +76,29 @@ The command-line output will look like this:
 
 By default, output is printed to the terminal and stored in per-run and per-job subdirectories under ``.kuristo-out/``.
 
+Status of a run
+---------------
 
-**Options and Verbosity**
-
-You can control verbosity with the ``--verbosity`` option:
-
-.. code-block:: bash
-
-   kuristo run workflow.yml --verbosity=2
-
-Verbosity levels:
-
-- `0`: silent
-- `1`: errors only
-- `2`: default
-- `3`: detailed output for each step
-
-It is possible to specify multiple locations to scan, i.e.:
+To display status of a run:
 
 .. code-block:: bash
 
-   kuristo run /path1 /path2
+   kuristo status
+
+Which will show somthing like this:
+
+.. code-block:: text
+
+   [ PASS ] #19 simple test ............................................. 1.01s
+
+   Success: 1    Failed: 0    Skipped: 0    Total: 1
+   Took: 1.5s
 
 
 List available jobs
 -------------------
 
-Use this to see what jobs are would be executed:
+Use this to see what jobs would be executed:
 
 .. code-block:: bash
 
@@ -114,22 +110,3 @@ You can specify different location via
 .. code-block:: bash
 
    kuristo list /path/to/start/search/from
-
-
-Environment diagnostics
------------------------
-
-Use the ``doctor`` command to generate a diagnostic report about your Kuristo environment:
-
-.. code-block:: bash
-
-   kuristo doctor
-
-This outputs detailed information including:
-
-- Kuristo version and Python interpreter
-- Platform and CPU configuration
-- Log and config file locations
-- MPI launcher
-- Active plugins, registered actions
-- Logging and cleanup policies
