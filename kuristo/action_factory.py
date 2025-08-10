@@ -10,25 +10,25 @@ class ActionFactory:
     registered_actions = {}
 
     @staticmethod
-    def create(ts, context):
-        if ts.uses is None:
+    def create(step, context):
+        if step.uses is None:
             return ShellAction(
-                ts.name,
+                step.name,
                 context,
-                id=ts.id,
-                working_dir=ts.working_directory,
-                timeout_minutes=ts.timeout_minutes,
-                commands=ts.run,
+                id=step.id,
+                working_dir=step.working_directory,
+                timeout_minutes=step.timeout_minutes,
+                commands=step.run,
             )
-        elif get_action(ts.uses):
-            cls = get_action(ts.uses)
+        elif get_action(step.uses):
+            cls = get_action(step.uses)
             return cls(
-                ts.name,
+                step.name,
                 context,
-                id=ts.id,
-                working_dir=ts.working_directory,
-                timeout_minutes=ts.timeout_minutes,
-                **ts.params
+                id=step.id,
+                working_dir=step.working_directory,
+                timeout_minutes=step.timeout_minutes,
+                **step.params
             )
         else:
-            raise RuntimeError(f"Requested unknown action: {ts.uses}")
+            raise RuntimeError(f"Requested unknown action: {step.uses}")
