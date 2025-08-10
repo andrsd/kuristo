@@ -45,6 +45,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_interface.html">User Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="writing_workflows.html">Writing Workflows</a></li>
 <li class="toctree-l1"><a class="reference internal" href="actions/index.html">Built-in Actions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="custom_actions.html">Custom Actions</a></li>
@@ -104,60 +105,14 @@ It allows you to define and run simulation-based validation and verification tas
 <h2>Contents<a class="headerlink" href="#contents" title="Link to this heading"></a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#installation">Installation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#basic-workflow">Basic Workflow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#running-the-workflow">Running the Workflow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#list-available-jobs">List available jobs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#environment-diagnostics">Environment diagnostics</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="writing_workflows.html">Writing Workflows</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="writing_workflows.html#basic-structure">Basic Structure</a></li>
-<li class="toctree-l2"><a class="reference internal" href="writing_workflows.html#step-fields">Step Fields</a></li>
-<li class="toctree-l2"><a class="reference internal" href="writing_workflows.html#job-dependencies">Job Dependencies</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="actions/index.html">Built-in Actions</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="actions/csv-diff.html">checks/csv-diff</a></li>
-<li class="toctree-l2"><a class="reference internal" href="actions/exodiff.html">checks/exodiff</a></li>
-<li class="toctree-l2"><a class="reference internal" href="actions/regex.html">checks/regex</a></li>
-<li class="toctree-l2"><a class="reference internal" href="actions/regex-float.html">checks/regex-float</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_interface.html">User Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="writing_workflows.html">Writing Workflows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="actions/index.html">Built-in Actions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="custom_actions.html">Custom Actions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html#basic-options">Basic options</a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html#logging-options">Logging options</a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html#runner">Runner</a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html#batch">Batch</a></li>
-<li class="toctree-l2"><a class="reference internal" href="configuration.html#example">Example</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
 <li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
-<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="reference.html#jobs">jobs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference.html#jobs-id">jobs.&lt;id&gt;</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference.html#jobs-id-name">jobs.&lt;id&gt;.name</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference.html#jobs-id-description">jobs.&lt;id&gt;.description</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference.html#jobs-id-needs">jobs.&lt;id&gt;.needs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference.html#jobs-id-skip">jobs.&lt;id&gt;.skip</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference.html#jobs-id-timeout-minutes">jobs.&lt;id&gt;.timeout-minutes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference.html#jobs-id-strategy">jobs.&lt;id&gt;.strategy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference.html#jobs-id-strategy-matrix">jobs.&lt;id&gt;.strategy.matrix</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference.html#jobs-id-strategy-matrix-include">jobs.&lt;id&gt;.strategy.matrix.include</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference.html#jobs-id-steps">jobs.&lt;id&gt;.steps</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference.html#jobs-id-steps-id">jobs.&lt;id&gt;.steps[*].id</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference.html#jobs-id-steps-name">jobs.&lt;id&gt;.steps[*].name</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference.html#jobs-id-steps-description">jobs.&lt;id&gt;.steps[*].description</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference.html#jobs-id-steps-uses">jobs.&lt;id&gt;.steps[*].uses</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference.html#jobs-id-steps-with">jobs.&lt;id&gt;.steps[*].with</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference.html#jobs-id-steps-run">jobs.&lt;id&gt;.steps[*].run</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference.html#jobs-id-steps-shell">jobs.&lt;id&gt;.steps[*].shell</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference.html#jobs-id-steps-working-directory">jobs.&lt;id&gt;.steps[*].working-directory</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference.html#jobs-id-steps-timeout-minutes">jobs.&lt;id&gt;.steps[*].timeout-minutes</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a></li>
 </ul>
 </div>
 </section>

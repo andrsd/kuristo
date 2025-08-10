@@ -46,11 +46,15 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user_interface.html">User Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="writing_workflows.html">Writing Workflows</a></li>
 <li class="toctree-l1"><a class="reference internal" href="actions/index.html">Built-in Actions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="custom_actions.html">Custom Actions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Architecture</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#scheduler">Scheduler</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a></li>
 </ul>
 
@@ -105,6 +109,21 @@
 <div class="line"><em>Resources</em> describe the available capacity the scheduler can use.</div>
 </div>
 <p>When you submit jobs to a queue, each workflow is placed in that queue, and the queue’s own scheduler handles the execution order.</p>
+<section id="scheduler">
+<h2>Scheduler<a class="headerlink" href="#scheduler" title="Link to this heading"></a></h2>
+<p>Scheduler is the heart of the system.
+It builds up a directed acyclic graph to connect jobs together such that it captures the dependecies betweeen them.
+Jobs start as <code class="docutils literal notranslate"><span class="pre">waiting</span></code> to be executed.
+When scheduled, they are marked as <code class="docutils literal notranslate"><span class="pre">running</span></code>.
+When they are done they are marked as <code class="docutils literal notranslate"><span class="pre">finished</span></code>.
+Jobs carry information about their exit code which determines if the finished sucessfully, failed, or timed out.</p>
+<figure class="align-center" id="id2" style="width: 90%">
+<img alt="job status" src="_images/kuristo-job-status.svg" />
+<figcaption>
+<p><span class="caption-text">Job statuses</span><a class="headerlink" href="#id2" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+</section>
 </section>
 
 

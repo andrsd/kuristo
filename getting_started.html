@@ -21,7 +21,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Writing Workflows" href="writing_workflows.html" />
+    <link rel="next" title="User Interface" href="user_interface.html" />
     <link rel="prev" title="Kuristo" href="index.html" /> 
 </head>
 
@@ -49,10 +49,11 @@
 <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#basic-workflow">Basic Workflow</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#running-the-workflow">Running the Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#status-of-a-run">Status of a run</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#list-available-jobs">List available jobs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#environment-diagnostics">Environment diagnostics</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="user_interface.html">User Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="writing_workflows.html">Writing Workflows</a></li>
 <li class="toctree-l1"><a class="reference internal" href="actions/index.html">Built-in Actions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="custom_actions.html">Custom Actions</a></li>
@@ -146,26 +147,24 @@ Took: 1.5s
 </pre></div>
 </div>
 <p>By default, output is printed to the terminal and stored in per-run and per-job subdirectories under <code class="docutils literal notranslate"><span class="pre">.kuristo-out/</span></code>.</p>
-<p><strong>Options and Verbosity</strong></p>
-<p>You can control verbosity with the <code class="docutils literal notranslate"><span class="pre">--verbosity</span></code> option:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>kuristo<span class="w"> </span>run<span class="w"> </span>workflow.yml<span class="w"> </span>--verbosity<span class="o">=</span><span class="m">2</span>
+</section>
+<section id="status-of-a-run">
+<h2>Status of a run<a class="headerlink" href="#status-of-a-run" title="Link to this heading"></a></h2>
+<p>To display status of a run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>kuristo<span class="w"> </span>status
 </pre></div>
 </div>
-<p>Verbosity levels:</p>
-<ul class="simple">
-<li><p><cite>0</cite>: silent</p></li>
-<li><p><cite>1</cite>: errors only</p></li>
-<li><p><cite>2</cite>: default</p></li>
-<li><p><cite>3</cite>: detailed output for each step</p></li>
-</ul>
-<p>It is possible to specify multiple locations to scan, i.e.:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>kuristo<span class="w"> </span>run<span class="w"> </span>/path1<span class="w"> </span>/path2
+<p>Which will show somthing like this:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>[ PASS ] #19 simple test ............................................. 1.01s
+
+Success: 1    Failed: 0    Skipped: 0    Total: 1
+Took: 1.5s
 </pre></div>
 </div>
 </section>
 <section id="list-available-jobs">
 <h2>List available jobs<a class="headerlink" href="#list-available-jobs" title="Link to this heading"></a></h2>
-<p>Use this to see what jobs are would be executed:</p>
+<p>Use this to see what jobs would be executed:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>kuristo<span class="w"> </span>list
 </pre></div>
 </div>
@@ -175,22 +174,6 @@ You can specify different location via</p>
 </pre></div>
 </div>
 </section>
-<section id="environment-diagnostics">
-<h2>Environment diagnostics<a class="headerlink" href="#environment-diagnostics" title="Link to this heading"></a></h2>
-<p>Use the <code class="docutils literal notranslate"><span class="pre">doctor</span></code> command to generate a diagnostic report about your Kuristo environment:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>kuristo<span class="w"> </span>doctor
-</pre></div>
-</div>
-<p>This outputs detailed information including:</p>
-<ul class="simple">
-<li><p>Kuristo version and Python interpreter</p></li>
-<li><p>Platform and CPU configuration</p></li>
-<li><p>Log and config file locations</p></li>
-<li><p>MPI launcher</p></li>
-<li><p>Active plugins, registered actions</p></li>
-<li><p>Logging and cleanup policies</p></li>
-</ul>
-</section>
 </section>
 
 
@@ -198,7 +181,7 @@ You can specify different location via</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="index.html" class="btn btn-neutral float-left" title="Kuristo" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="writing_workflows.html" class="btn btn-neutral float-right" title="Writing Workflows" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="user_interface.html" class="btn btn-neutral float-right" title="User Interface" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

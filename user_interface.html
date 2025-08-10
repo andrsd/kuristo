@@ -1,0 +1,203 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Interface &mdash; kuristo 0.2.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=37f418d5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Writing Workflows" href="writing_workflows.html" />
+    <link rel="prev" title="Getting Started" href="getting_started.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            kuristo
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">User Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#run">run</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#list">list</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#status">status</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#show">show</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#batch">batch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#doctor">doctor</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="writing_workflows.html">Writing Workflows</a></li>
+<li class="toctree-l1"><a class="reference internal" href="actions/index.html">Built-in Actions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="custom_actions.html">Custom Actions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Reference</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">kuristo</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">User Interface</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/user_interface.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="user-interface">
+<h1>User Interface<a class="headerlink" href="#user-interface" title="Link to this heading"></a></h1>
+<section id="run">
+<h2>run<a class="headerlink" href="#run" title="Link to this heading"></a></h2>
+<p>Run workflow(s).</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">&lt;file&gt;</span></code></dt><dd><p>Run a specific workflow</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&lt;location&gt;</span> <span class="pre">[&lt;location&gt;]</span></code></dt><dd><p>Find all workflow files and run them.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--verbose=&lt;num&gt;</span></code></dt><dd><p>Control verbosity.</p>
+<p>Verbosity levels:</p>
+<ul class="simple">
+<li><p><cite>0</cite>: silent</p></li>
+<li><p><cite>1</cite>: errors only</p></li>
+<li><p><cite>2</cite>: default</p></li>
+<li><p><cite>3</cite>: detailed output for each step</p></li>
+</ul>
+</dd>
+</dl>
+</section>
+<section id="list">
+<h2>list<a class="headerlink" href="#list" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">&lt;location&gt;</span></code></dt><dd><p>Find tests in the location that would be executed.</p>
+</dd>
+</dl>
+</section>
+<section id="status">
+<h2>status<a class="headerlink" href="#status" title="Link to this heading"></a></h2>
+<p>Display status of a run.
+By default, it will show the latest run status.</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">--run</span> <span class="pre">&lt;id&gt;</span></code></dt><dd><p>Show status of a particular run</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--failed</span></code></dt><dd><p>Show only failed jobs.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--skipped</span></code></dt><dd><p>Show only skipped jobs.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--passed</span></code></dt><dd><p>Show only successful jobs.</p>
+</dd>
+</dl>
+</section>
+<section id="show">
+<h2>show<a class="headerlink" href="#show" title="Link to this heading"></a></h2>
+<p>Show the output (log) of a specified job.</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">--job</span></code></dt><dd><p>Job ID to display information about.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--run</span></code></dt><dd><p>Run ID. If not specified, the latest run is assumed.</p>
+</dd>
+</dl>
+</section>
+<section id="batch">
+<h2>batch<a class="headerlink" href="#batch" title="Link to this heading"></a></h2>
+<p>Interact with a batch system</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">submit</span></code></dt><dd><p>Submit workflows into a batch system.</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">--backend</span></code></dt><dd><p>Secify the backend. Possible value <code class="docutils literal notranslate"><span class="pre">slurm</span></code>.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--partition</span></code></dt><dd><p>Partition name to submit into.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+<section id="doctor">
+<h2>doctor<a class="headerlink" href="#doctor" title="Link to this heading"></a></h2>
+<p>Show diagnostic report about your environment.
+This outputs detailed information including:</p>
+<ul class="simple">
+<li><p>Kuristo version and Python interpreter</p></li>
+<li><p>Platform and CPU configuration</p></li>
+<li><p>Log and config file locations</p></li>
+<li><p>MPI launcher</p></li>
+<li><p>Active plugins, registered actions</p></li>
+<li><p>Logging and cleanup policies</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="getting_started.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="writing_workflows.html" class="btn btn-neutral float-right" title="Writing Workflows" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, David Andrs.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
