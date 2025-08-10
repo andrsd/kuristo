@@ -26,8 +26,12 @@ Example Usage
 Arguments
 ---------
 
-- ``input`` (string, required): Input that will be checked
-- ``pattern`` (string, required): The regular expression to match (interpreted using Python’s `re` module).
+``input`` (string, required)
+   Input that will be checked
+
+``pattern`` (string, required)
+   The regular expression to match (interpreted using Python’s `re` module).
+
 
 
 .. admonition:: Notes

@@ -27,11 +27,22 @@ Example Usage
 Arguments
 ---------
 
-- ``input`` (string, required): Input that will be checked.
-- ``pattern`` (string, required): Regular expression with **one capture group** for the float value.
-- ``gold`` (float or list of floats, required): Reference value(s) to compare against.
-- ``abs_tol`` (float, optional): Maximum absolute difference allowed. Default is `0.0`.
-- ``rel_tol`` (float, optional): Maximum relative difference allowed. Default is `1e-8`.
+``input`` (string, required)
+   Input that will be checked.
+
+``pattern`` (string, required)
+   Regular expression with **one capture group** for the float value.
+
+``gold`` (float or list of floats, required)
+   Reference value(s) to compare against.
+
+``abs_tol`` (float, optional)
+   | Maximum absolute difference allowed.
+   | Default is ``0.0``.
+
+``rel_tol`` (float, optional)
+   | Maximum relative difference allowed.
+   | Default is ``1e-8``.
 
 
 .. admonition:: Notes

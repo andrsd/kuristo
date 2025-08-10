@@ -23,10 +23,18 @@ Example Usage
 Arguments
 ---------
 
-- ``gold`` (string, required): Path to the reference Exodus file.
-- ``test`` (string, required): Path to the simulation output file to compare.
-- ``atol`` (float, optional): Absolute difference threshold.
-- ``rtol`` (float, optional): Relative difference threshold.
+``gold`` (string, required)
+   Path to the reference Exodus file.
+
+``test`` (string, required)
+   Path to the simulation output file to compare.
+
+``atol`` (float, optional)
+   Absolute difference threshold.
+
+``rtol`` (float, optional)
+   Relative difference threshold.
+
 
 
 .. admonition:: Notes
