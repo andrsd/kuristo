@@ -40,3 +40,4 @@ Contents
    custom_actions
    configuration
    architecture
+   reference
