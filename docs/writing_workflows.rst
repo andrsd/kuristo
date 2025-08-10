@@ -58,11 +58,11 @@ Each step represents a unit of work (e.g., a script or an action).
 
    jobs:
       mesh:
-      name: Generate mesh
-      steps:
-         - uses: my-action/execute
-           with:
-             input: input_file.txt
+         name: Generate mesh
+         steps:
+            - uses: my-action/execute
+            with:
+               input: input_file.txt
 
 ``jobs.<id>.steps[*].uses`` (string)
    The name of the action to execute
