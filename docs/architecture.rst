@@ -1,5 +1,5 @@
 Architecture
-====
+============
 
 .. figure:: images/kuristo-arch.svg
    :alt: kuristo architecture
@@ -24,3 +24,20 @@ Each job:
 | *Resources* describe the available capacity the scheduler can use.
 
 When you submit jobs to a queue, each workflow is placed in that queue, and the queue’s own scheduler handles the execution order.
+
+Scheduler
+---------
+
+Scheduler is the heart of the system.
+It builds up a directed acyclic graph to connect jobs together such that it captures the dependecies betweeen them.
+Jobs start as ``waiting`` to be executed.
+When scheduled, they are marked as ``running``.
+When they are done they are marked as ``finished``.
+Jobs carry information about their exit code which determines if the finished sucessfully, failed, or timed out.
+
+.. figure:: images/kuristo-job-status.svg
+   :alt: job status
+   :align: center
+   :figwidth: 90%
+
+   Job statuses
