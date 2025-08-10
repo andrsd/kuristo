@@ -48,7 +48,14 @@
 <li class="toctree-l1"><a class="reference internal" href="writing_workflows.html">Writing Workflows</a></li>
 <li class="toctree-l1"><a class="reference internal" href="actions/index.html">Built-in Actions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="custom_actions.html">Custom Actions</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#basic-options">Basic options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#logging-options">Logging options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#runner">Runner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#batch">Batch</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example">Example</a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -77,7 +84,75 @@
              
   <section id="configuration">
 <h1>Configuration<a class="headerlink" href="#configuration" title="Link to this heading"></a></h1>
-<p>Under construction</p>
+<p>Kuristo’s behavior can be customized using a configuration file named <code class="docutils literal notranslate"><span class="pre">config.yaml</span></code>.
+Kuristo searches for this file in a <code class="docutils literal notranslate"><span class="pre">.kuristo</span></code> directory, starting from the current working directory and moving up through parent directories until it finds the first match.
+The available configuration options are listed below.</p>
+<section id="basic-options">
+<h2>Basic options<a class="headerlink" href="#basic-options" title="Link to this heading"></a></h2>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">base:</span></code></dt><dd><p>Logging settings section.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">workflow_filename</span></code></dt><dd><p>Name of files that contain workflow descriptions.
+These files are looked for whne we have kuristo execute workflows from a location.</p>
+<p>Default value: <code class="docutils literal notranslate"><span class="pre">kuristo.yaml</span></code></p>
+</dd>
+</dl>
+</section>
+<section id="logging-options">
+<h2>Logging options<a class="headerlink" href="#logging-options" title="Link to this heading"></a></h2>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">log:</span></code></dt><dd><p>Logging settings section.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">log.dir_name</span></code></dt><dd><p>Directory where logs will be stored.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">log.history</span></code></dt><dd><p>Number of past log files to keep.</p>
+<p>Default value: <code class="docutils literal notranslate"><span class="pre">5</span></code></p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">log.cleanup</span></code></dt><dd><p>Currently, does nothing.</p>
+</dd>
+</dl>
+</section>
+<section id="runner">
+<h2>Runner<a class="headerlink" href="#runner" title="Link to this heading"></a></h2>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">runner:</span></code></dt><dd><p>Main runner settings.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">runner.mpi_launcher</span></code></dt><dd><p>MPI command used to launch jobs.</p>
+<p>Default value: <code class="docutils literal notranslate"><span class="pre">mpirun</span></code></p>
+</dd>
+</dl>
+</section>
+<section id="batch">
+<h2>Batch<a class="headerlink" href="#batch" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">batch:</span></code></dt><dd><p>Batch submission settings.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">batch.backend</span></code></dt><dd><p>Which batch system to use (e.g., slurm).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">batch.default_account</span></code></dt><dd><p>Currently, does nothing.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">batch.partition</span></code></dt><dd><p>Cluster partition or queue to submit jobs to.</p>
+</dd>
+</dl>
+</section>
+<section id="example">
+<h2>Example<a class="headerlink" href="#example" title="Link to this heading"></a></h2>
+<p>This example shows how to setup kuristo for a slurm queue, submitting into
+a <code class="docutils literal notranslate"><span class="pre">default</span></code> partition.
+The MPI launcher is set to <code class="docutils literal notranslate"><span class="pre">mpiexec</span></code>.
+And we want to keep 10 previous runs.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">log</span><span class="p">:</span>
+<span class="w">   </span><span class="nt">history</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10</span>
+
+<span class="nt">runner</span><span class="p">:</span>
+<span class="w">   </span><span class="nt">mpi_launcher</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpiexec</span>
+
+<span class="nt">batch</span><span class="p">:</span>
+<span class="w">   </span><span class="nt">backend</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">slurm</span>
+<span class="w">   </span><span class="nt">partition</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+</pre></div>
+</div>
+</section>
 </section>
 
 
