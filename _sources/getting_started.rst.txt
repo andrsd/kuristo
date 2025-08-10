@@ -43,7 +43,7 @@ Kuristo workflows are written in YAML. Here's a minimal example:
            - run: ./simulate --input mesh.exo
            - run: ./check_results output.csv
 
-Save this as ``ktests.yml``.
+Save this as ``kuristo.yml``.
 
 
 Running the Workflow

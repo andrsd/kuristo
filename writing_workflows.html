@@ -48,7 +48,6 @@
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Writing Workflows</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#basic-structure">Basic Structure</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#job-fields">Job Fields</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#step-fields">Step Fields</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#job-dependencies">Job Dependencies</a></li>
 </ul>
@@ -90,54 +89,64 @@
 <h2>Basic Structure<a class="headerlink" href="#basic-structure" title="Link to this heading"></a></h2>
 <p>A Kuristo workflow defines a set of <strong>jobs</strong>, each identified by a unique job ID.
 Jobs contain one or more <strong>steps</strong> to execute.</p>
-<p>Example:</p>
+<p class="rubric">Example of a workflow file</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">jobs</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">job1</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">simulation</span>
-<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./prepare.sh</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./simulate --input data.in</span>
-<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./postprocess.sh</span>
+<span class="w">   </span><span class="nt">job1</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">simulation</span>
+<span class="w">      </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">         </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./prepare.sh</span>
+<span class="w">         </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./simulate --input data.in</span>
+<span class="w">         </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./postprocess.sh</span>
 </pre></div>
 </div>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">job1</span></code> is the job ID (must be unique within the workflow)</p></li>
-</ul>
-</section>
-<section id="job-fields">
-<h2>Job Fields<a class="headerlink" href="#job-fields" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">name</span></code> (string, optional): Descriptive job name shown in logs and reports</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">needs</span></code> (list of job IDs, optional): Defines job execution order</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">steps</span></code> (list, required): Commands or structured actions to run</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">strategy</span></code>: TODO</p></li>
-</ul>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">jobs.&lt;id&gt;</span></code> (string, required)</dt><dd><p>Job ID that is unique within the workflow file</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">jobs.&lt;id&gt;.name</span></code> (string, optional)</dt><dd><p>Descriptive job name shown in logs and reports</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">jobs.&lt;id&gt;.steps</span></code> (list, required)</dt><dd><p>Commands or structured actions to run</p>
+</dd>
+</dl>
 </section>
 <section id="step-fields">
 <h2>Step Fields<a class="headerlink" href="#step-fields" title="Link to this heading"></a></h2>
-<p>Each step represents a unit of work (e.g., a script or an action).
-You can also customize the runtime environment.</p>
-<p>Supported step fields:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">run</span></code> (string): Shell command to execute</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">working-directory</span></code> (string, optional): Directory to run the command in</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code> (string, optional): Assign unique identified to a step</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">uses:</span></code> (string): Name of the action to run</p></li>
-</ul>
-<p>Example:</p>
+<p>Each step represents a unit of work (e.g., a script or an action).</p>
+<p class="rubric">Example of running a shell command</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">jobs</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">mesh</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate mesh</span>
 <span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./mesh.sh</span>
-<span class="w">        </span><span class="nt">shell</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/bin/bash</span>
-<span class="w">        </span><span class="nt">workdir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">scripts/</span>
+<span class="w">        </span><span class="nt">working-directory</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">scripts/</span>
 </pre></div>
 </div>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">jobs.&lt;id&gt;.steps[*].run</span></code> (string)</dt><dd><p>Shell command to execute</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">jobs.&lt;id&gt;.steps[*].working-directory</span></code> (string, optional)</dt><dd><p>Directory to run the command in</p>
+</dd>
+</dl>
+<p class="rubric">Example of running an action</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">jobs</span><span class="p">:</span>
+<span class="w">   </span><span class="nt">mesh</span><span class="p">:</span>
+<span class="w">   </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Generate mesh</span>
+<span class="w">   </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-action/execute</span>
+<span class="w">        </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">input_file.txt</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">jobs.&lt;id&gt;.steps[*].uses</span></code> (string)</dt><dd><p>The name of the action to execute</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">jobs.&lt;id&gt;.steps[*].with:</span></code></dt><dd><p>Specify parameters that are used by the action</p>
+</dd>
+</dl>
 </section>
 <section id="job-dependencies">
 <h2>Job Dependencies<a class="headerlink" href="#job-dependencies" title="Link to this heading"></a></h2>
 <p>Use the <code class="docutils literal notranslate"><span class="pre">needs</span></code> field to create dependencies between jobs. This controls execution order.</p>
+<p class="rubric">Example of setting dependencies</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">jobs</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">prep</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Prepare</span>
@@ -151,6 +160,10 @@ You can also customize the runtime environment.</p>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./simulate</span>
 </pre></div>
 </div>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">jobs.&lt;id&gt;.needs</span></code> (list of job IDs, optional)</dt><dd><p>Name of the job that must finish before this job starts</p>
+</dd>
+</dl>
 <p>Jobs without dependencies may run in parallel, depending on available system resources.</p>
 </section>
 </section>
