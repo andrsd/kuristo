@@ -11,7 +11,7 @@ Basic options
 ``base:``
    Logging settings section.
 
-``workflow_filename``
+``workflow-filename``
    Name of files that contain workflow descriptions.
    These files are looked for whne we have kuristo execute workflows from a location.
 

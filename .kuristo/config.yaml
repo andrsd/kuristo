@@ -1,5 +1,5 @@
 base:
-  workflow_filename: ktests.yaml
+  workflow-filename: ktests.yaml
 
 log:
   history: 5
