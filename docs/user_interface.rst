@@ -34,7 +34,7 @@ status
 Display status of a run.
 By default, it will show the latest run status.
 
-``--run <id>``
+``--run-id <id>``
    Show status of a particular run
 
 ``--failed``
@@ -54,7 +54,7 @@ Show the output (log) of a specified job.
 ``--job``
    Job ID to display information about.
 
-``--run``
+``--run-id``
    Run ID. If not specified, the latest run is assumed.
 
 batch

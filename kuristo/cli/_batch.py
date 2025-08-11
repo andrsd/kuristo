@@ -1,13 +1,14 @@
 import yaml
 import os
 import re
+from datetime import datetime
 from pathlib import Path
 import kuristo.config as config
 import kuristo.ui as ui
 from kuristo.scanner import scan_locations
 from kuristo.batch import get_backend
 from kuristo.batch.backend import ScriptParameters
-from kuristo.job_spec import specs_from_file
+from kuristo.job_spec import JobSpec, specs_from_file
 from kuristo.action_factory import ActionFactory
 from kuristo.context import Context
 from kuristo.utils import create_run_output_dir, prune_old_runs, update_latest_symlink
@@ -30,10 +31,12 @@ def required_cores(actions):
     return n_cores
 
 
-def create_script_params(job_num: int, specs, workdir: Path):
+def create_script_params(workflow_file: Path, run_id: str, job_num: int, specs: list[JobSpec], workdir: Path):
     """
     Create a specification for job submission into a queue
 
+    @param workflow_file Workflow file to run
+    @param run_id Kuristo run ID
     @param job_num Kuristo job number (i.e. NOT a job ID in the queue)
     @param specs `JobSpec`s from a workflow file
     @param workdir Working directory (this is where the job is gonna run)
@@ -63,7 +66,9 @@ def create_script_params(job_num: int, specs, workdir: Path):
         n_cores=n_cores,
         max_time=max_time,
         work_dir=workdir,
-        partition=cfg.batch_partition
+        partition=cfg.batch_partition,
+        run_id=run_id,
+        workflow_file=workflow_file
     )
 
 
@@ -110,7 +115,8 @@ def batch_submit(args):
 
     backend = get_backend(cfg.batch_backend)
     locations = args.location or ["."]
-    out_dir = create_run_output_dir(cfg.log_dir)
+    run_id = datetime.now().strftime("%Y%m%d-%H%M%S")
+    out_dir = create_run_output_dir(cfg.log_dir, sub_dir=run_id)
     prune_old_runs(cfg.log_dir, cfg.log_history)
     update_latest_symlink(cfg.log_dir, out_dir)
     load_user_steps_from_kuristo_dir()
@@ -123,7 +129,7 @@ def batch_submit(args):
         workdir.mkdir()
 
         specs = specs_from_file(f)
-        s = create_script_params(job_num, specs, workdir, cfg)
+        s = create_script_params(f, run_id, job_num, specs, workdir)
 
         job_id = backend.submit(s)
         write_metadata(job_id, backend.name, workdir)

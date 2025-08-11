@@ -9,6 +9,8 @@ class TestSlurmBackend(unittest.TestCase):
     def setUp(self):
         self.backend = SlurmBackend()
         self.params = ScriptParameters(
+            run_id="1",
+            workflow_file=Path("ktests.yaml"),
             name="test_job",
             work_dir=Path("test_dir"),
             n_cores=4,

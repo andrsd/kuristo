@@ -40,6 +40,8 @@ class SlurmBackend(BatchBackend):
             'workdir': params.work_dir,
             'num_tasks': params.n_cores,
             'walltime': minutes_to_hhmmss(params.max_time),
-            'partition': params.partition
+            'partition': params.partition,
+            'workflow_file': params.workflow_file.resolve(),
+            'run_id': params.run_id
         }
         return template.render({"job": job})
