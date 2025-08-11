@@ -57,7 +57,7 @@ Batch
 ``batch.backend``
    Which batch system to use (e.g., slurm).
 
-``batch.default_account``
+``batch.default-account``
    Currently, does nothing.
 
 ``batch.partition``

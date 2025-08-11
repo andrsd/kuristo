@@ -25,7 +25,7 @@ class Config:
         self.mpi_launcher = os.getenv("KURISTO_MPI_LAUNCHER", self._get("runner.mpi_launcher", "mpirun"))
 
         self.batch_backend = self._get("batch.backend", None)
-        self.batch_default_account = self._get("batch.default_account", None)
+        self.batch_default_account = self._get("batch.default-account", None)
         self.batch_partition = self._get("batch.partition", None)
 
         self.console_width = self._get("base.console-width", 100)
