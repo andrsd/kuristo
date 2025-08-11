@@ -8,8 +8,8 @@ from kuristo.utils import get_default_core_limit
 class Config:
 
     def __init__(self, path=None):
-        self._base_dir = find_kuristo_root()
-        self._config_dir = self._base_dir or Path.cwd()
+        base_dir = find_kuristo_root()
+        self._config_dir = base_dir or Path.cwd()
 
         self.path = Path(path or self._config_dir / "config.yaml")
         self._data = self._load()
@@ -46,7 +46,7 @@ class Config:
             val = val.get(part, default)
         return val
 
-    def _resolve_cores(self):
+    def _resolve_cores(self) -> int:
         system_default = get_default_core_limit()
         value = self._get("resources.num_cores", system_default)
 
