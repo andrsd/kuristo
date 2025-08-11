@@ -28,7 +28,7 @@ class Config:
         self.batch_default_account = self._get("batch.default_account", None)
         self.batch_partition = self._get("batch.partition", None)
 
-        self.console_width = 100
+        self.console_width = self._get("base.console-width", 100)
 
     def _load(self):
         try:
