@@ -36,7 +36,7 @@ Arguments
 ``gold`` (float or list of floats, required)
    Reference value(s) to compare against.
 
-``abs_tol`` (float, optional)
+``abs-tol`` (float, optional)
    | Maximum absolute difference allowed.
    | Default is ``0.0``.
 

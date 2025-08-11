@@ -15,7 +15,7 @@ class CSVDiffCheck(Action):
         self._tolerances = kwargs.get("tolerances", {})
 
         self._default_rel = float(kwargs.get("rel-tol", 1e-6))
-        self._default_abs = float(kwargs.get("abs_tol", 1e-12))
+        self._default_abs = float(kwargs.get("abs-tol", 1e-12))
 
     def run(self, context=None):
         gold_data = self._read_csv(self._gold_path)
@@ -31,13 +31,13 @@ class CSVDiffCheck(Action):
                     t_val = float(test_data[row_idx][col])
 
                     rel = float(self._tolerances.get(col, {}).get("rel-tol", self._default_rel))
-                    abs_ = float(self._tolerances.get(col, {}).get("abs_tol", self._default_abs))
+                    abs_ = float(self._tolerances.get(col, {}).get("abs-tol", self._default_abs))
 
                     if not math.isclose(g_val, t_val, rel_tol=rel, abs_tol=abs_):
                         self._stdout = (
                             f"Mismatch at row {row_idx}, column '{col}': "
                             f"gold={g_val}, test={t_val} "
-                            f"(rel_tol={rel}, abs_tol={abs_})"
+                            f"(rel_tol={rel}, abs-tol={abs_})"
                         )
                         self._return_code = -1
                         self._stdout = self._stdout.encode()

@@ -27,7 +27,7 @@ Arguments
 ``test`` (string, required)
    Path to the generated output file.
 
-``abs_tol`` (float, optional)
+``abs-tol`` (float, optional)
    | Allowed absolute difference per value.
    | Default is ``1e-12``.
 

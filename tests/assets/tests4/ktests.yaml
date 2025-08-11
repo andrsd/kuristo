@@ -21,7 +21,7 @@ jobs:
           input: ${{ steps.result.output }}
           pattern: "Value: ([0-9\\.]+)"
           gold: 2.4
-          abs_tol: 1e-10
+          abs-tol: 1e-10
 
       - name: Check user error
         uses: checks/regex-float
@@ -29,4 +29,4 @@ jobs:
           input: ${{ steps.result.output }}
           pattern: "Final: {:float:}"
           gold: 2.4
-          abs_tol: 1e-10
+          abs-tol: 1e-10
