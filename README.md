@@ -159,7 +159,7 @@ You can define a global config at `.kuristo/config.yaml`:
 
 ```yaml
 resources:
-  num_cores: 8
+  num-cores: 8
 
 runner:
   mpi-launcher: mpiexec

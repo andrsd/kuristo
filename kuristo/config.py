@@ -48,14 +48,14 @@ class Config:
 
     def _resolve_cores(self) -> int:
         system_default = get_default_core_limit()
-        value = self._get("resources.num_cores", system_default)
+        value = self._get("resources.num-cores", system_default)
 
         try:
             value = int(value)
             if value <= 0 or value > os.cpu_count():
                 raise ValueError
         except ValueError:
-            print(f"Invalid 'resources.num_cores' value: {value}, falling back to system default ({system_default})")
+            print(f"Invalid 'resources.num-cores' value: {value}, falling back to system default ({system_default})")
             return system_default
 
         return value
