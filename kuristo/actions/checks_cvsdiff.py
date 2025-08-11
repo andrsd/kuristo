@@ -14,7 +14,7 @@ class CSVDiffCheck(Action):
         self._columns = kwargs.get("columns", "all")
         self._tolerances = kwargs.get("tolerances", {})
 
-        self._default_rel = float(kwargs.get("rel_tol", 1e-6))
+        self._default_rel = float(kwargs.get("rel-tol", 1e-6))
         self._default_abs = float(kwargs.get("abs_tol", 1e-12))
 
     def run(self, context=None):
@@ -30,7 +30,7 @@ class CSVDiffCheck(Action):
                     g_val = float(gold_data[row_idx][col])
                     t_val = float(test_data[row_idx][col])
 
-                    rel = float(self._tolerances.get(col, {}).get("rel_tol", self._default_rel))
+                    rel = float(self._tolerances.get(col, {}).get("rel-tol", self._default_rel))
                     abs_ = float(self._tolerances.get(col, {}).get("abs_tol", self._default_abs))
 
                     if not math.isclose(g_val, t_val, rel_tol=rel, abs_tol=abs_):

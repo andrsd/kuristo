@@ -31,7 +31,7 @@ Arguments
    | Allowed absolute difference per value.
    | Default is ``1e-12``.
 
-``rel_tol`` (float, optional)
+``rel-tol`` (float, optional)
    | Allowed relative difference per value.
    | Default is ``1e-6``.
 
