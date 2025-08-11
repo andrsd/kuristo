@@ -16,7 +16,7 @@ class Config:
 
         self.workflow_filename = self._get("base.workflow-filename", "kuristo.yaml")
 
-        self.log_dir = (self._config_dir.parent / self._get("log.dir_name", ".kuristo-out")).resolve()
+        self.log_dir = (self._config_dir.parent / self._get("log.dir-name", ".kuristo-out")).resolve()
         self.log_history = int(self._get("log.history", 5))
         # Options: on_success, always, never
         self.log_cleanup = self._get("log.cleanup", "always")

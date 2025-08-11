@@ -140,7 +140,7 @@ Set logging retention and cleanup in `config.yaml`:
 
 ```yaml
 log:
-  dir_name: .kuristo-out
+  dir-name: .kuristo-out
   history: 5
   cleanup: on_success
 ```

@@ -24,7 +24,7 @@ Logging options
 ``log:``
    Logging settings section.
 
-``log.dir_name``
+``log.dir-name``
    Directory where logs will be stored.
 
 ``log.history``
