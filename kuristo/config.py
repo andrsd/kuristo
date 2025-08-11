@@ -22,7 +22,7 @@ class Config:
         self.log_cleanup = self._get("log.cleanup", "always")
         self.num_cores = self._resolve_cores()
 
-        self.mpi_launcher = os.getenv("KURISTO_MPI_LAUNCHER", self._get("runner.mpi_launcher", "mpirun"))
+        self.mpi_launcher = os.getenv("KURISTO_MPI_LAUNCHER", self._get("runner.mpi-launcher", "mpirun"))
 
         self.batch_backend = self._get("batch.backend", None)
         self.batch_default_account = self._get("batch.default-account", None)

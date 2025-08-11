@@ -42,7 +42,7 @@ Runner
 ``runner:``
    Main runner settings.
 
-``runner.mpi_launcher``
+``runner.mpi-launcher``
    MPI command used to launch jobs.
 
    Default value: ``mpirun``
@@ -79,7 +79,7 @@ And we want to keep 10 previous runs.
       history: 10
 
    runner:
-      mpi_launcher: mpiexec
+      mpi-launcher: mpiexec
 
    batch:
       backend: slurm

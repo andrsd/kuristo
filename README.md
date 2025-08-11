@@ -162,7 +162,7 @@ resources:
   num_cores: 8
 
 runner:
-  mpi_launcher: mpiexec
+  mpi-launcher: mpiexec
 ```
 
 Or override via environment variable:
