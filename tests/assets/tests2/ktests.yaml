@@ -28,7 +28,7 @@ jobs:
       - name: 10k cores
         uses: core/sequential
         with:
-          n_cores: 1000000
+          n-cores: 1000000
 
   test-skipped:
     description: "Disabled test"
