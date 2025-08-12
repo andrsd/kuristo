@@ -107,6 +107,8 @@ def batch_submit(args):
     """
     Submit jobs into HPC queue
     """
+    locations = args.locations or ["."]
+
     cfg = config.get()
     if args.partition is not None:
         cfg.batch_partition = args.partition
@@ -114,7 +116,6 @@ def batch_submit(args):
         cfg.batch_backend = args.backend
 
     backend = get_backend(cfg.batch_backend)
-    locations = args.location or ["."]
     run_id = datetime.now().strftime("%Y%m%d-%H%M%S")
     out_dir = create_run_output_dir(cfg.log_dir, sub_dir=run_id)
     prune_old_runs(cfg.log_dir, cfg.log_history)

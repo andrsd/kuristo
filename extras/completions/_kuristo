@@ -51,9 +51,9 @@ case $state in
           submit)
             _arguments \
               '--help[Show help message and exit]' \
-              '--location[-l Location to scan]:file:_files' \
               '--backend[Batch backend to use]:backend:(slurm)' \
-              '--partition[Partition name to use]:string'
+              '--partition[Partition name to use]:string' \
+              '*:Locations to scan:_files'
             ;;
           status)
             _arguments \
