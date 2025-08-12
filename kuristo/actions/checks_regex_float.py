@@ -9,8 +9,8 @@ class RegexFloatCheck(RegexCheck):
     def __init__(self, name, context, **kwargs):
         super().__init__(name, context, **kwargs)
         self._gold = float(kwargs["gold"])
-        self._rel_tol = float(kwargs.get("rel_tol", 1e-8))
-        self._abs_tol = float(kwargs.get("abs_tol", 0.0))
+        self._rel_tol = float(kwargs.get("rel-tol", 1e-8))
+        self._abs_tol = float(kwargs.get("abs-tol", 0.0))
 
     def run(self, context=None):
         output = self._resolve_output()
@@ -29,7 +29,7 @@ class RegexFloatCheck(RegexCheck):
                 else:
                     self._stdout = (
                         f"Regex float check failed: got {value}, expected {self._gold}, "
-                        f"rel_tol={self._rel_tol}, abs_tol={self._abs_tol}"
+                        f"rel-tol={self._rel_tol}, abs-tol={self._abs_tol}"
                     )
                     self._return_code = -1
             except ValueError:

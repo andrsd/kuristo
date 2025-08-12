@@ -17,7 +17,7 @@ class Action(ABC):
             self._name = name
         self._output = None
         self._context = context
-        self._timeout_minutes = kwargs.get("timeout_minutes", 60)
+        self._timeout_minutes = kwargs.get("timeout-minutes", 60)
 
     @property
     def name(self):

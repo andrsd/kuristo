@@ -140,7 +140,7 @@ Set logging retention and cleanup in `config.yaml`:
 
 ```yaml
 log:
-  dir_name: .kuristo-out
+  dir-name: .kuristo-out
   history: 5
   cleanup: on_success
 ```
@@ -159,10 +159,10 @@ You can define a global config at `.kuristo/config.yaml`:
 
 ```yaml
 resources:
-  num_cores: 8
+  num-cores: 8
 
 runner:
-  mpi_launcher: mpiexec
+  mpi-launcher: mpiexec
 ```
 
 Or override via environment variable:

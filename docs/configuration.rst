@@ -11,7 +11,7 @@ Basic options
 ``base:``
    Logging settings section.
 
-``workflow_filename``
+``workflow-filename``
    Name of files that contain workflow descriptions.
    These files are looked for whne we have kuristo execute workflows from a location.
 
@@ -24,7 +24,7 @@ Logging options
 ``log:``
    Logging settings section.
 
-``log.dir_name``
+``log.dir-name``
    Directory where logs will be stored.
 
 ``log.history``
@@ -42,7 +42,7 @@ Runner
 ``runner:``
    Main runner settings.
 
-``runner.mpi_launcher``
+``runner.mpi-launcher``
    MPI command used to launch jobs.
 
    Default value: ``mpirun``
@@ -57,7 +57,7 @@ Batch
 ``batch.backend``
    Which batch system to use (e.g., slurm).
 
-``batch.default_account``
+``batch.default-account``
    Currently, does nothing.
 
 ``batch.partition``
@@ -79,7 +79,7 @@ And we want to keep 10 previous runs.
       history: 10
 
    runner:
-      mpi_launcher: mpiexec
+      mpi-launcher: mpiexec
 
    batch:
       backend: slurm

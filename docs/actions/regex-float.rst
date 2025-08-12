@@ -21,7 +21,7 @@ Example Usage
          input: ${{ steps.result.output }}
          pattern: "Value: ([0-9\\.]+)"
          gold: 1.23456789
-         rel_tol: 1e-5
+         rel-tol: 1e-5
 
 
 Arguments
@@ -36,11 +36,11 @@ Arguments
 ``gold`` (float or list of floats, required)
    Reference value(s) to compare against.
 
-``abs_tol`` (float, optional)
+``abs-tol`` (float, optional)
    | Maximum absolute difference allowed.
    | Default is ``0.0``.
 
-``rel_tol`` (float, optional)
+``rel-tol`` (float, optional)
    | Maximum relative difference allowed.
    | Default is ``1e-8``.
 
