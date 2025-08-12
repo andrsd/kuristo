@@ -27,11 +27,11 @@ Arguments
 ``test`` (string, required)
    Path to the generated output file.
 
-``abs_tol`` (float, optional)
+``abs-tol`` (float, optional)
    | Allowed absolute difference per value.
    | Default is ``1e-12``.
 
-``rel_tol`` (float, optional)
+``rel-tol`` (float, optional)
    | Allowed relative difference per value.
    | Default is ``1e-6``.
 

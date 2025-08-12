@@ -96,7 +96,7 @@ The available configuration options are listed below.</p>
 <dl>
 <dt><code class="docutils literal notranslate"><span class="pre">base:</span></code></dt><dd><p>Logging settings section.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">workflow_filename</span></code></dt><dd><p>Name of files that contain workflow descriptions.
+<dt><code class="docutils literal notranslate"><span class="pre">workflow-filename</span></code></dt><dd><p>Name of files that contain workflow descriptions.
 These files are looked for whne we have kuristo execute workflows from a location.</p>
 <p>Default value: <code class="docutils literal notranslate"><span class="pre">kuristo.yaml</span></code></p>
 </dd>
@@ -107,7 +107,7 @@ These files are looked for whne we have kuristo execute workflows from a locatio
 <dl>
 <dt><code class="docutils literal notranslate"><span class="pre">log:</span></code></dt><dd><p>Logging settings section.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">log.dir_name</span></code></dt><dd><p>Directory where logs will be stored.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">log.dir-name</span></code></dt><dd><p>Directory where logs will be stored.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">log.history</span></code></dt><dd><p>Number of past log files to keep.</p>
 <p>Default value: <code class="docutils literal notranslate"><span class="pre">5</span></code></p>
@@ -121,7 +121,7 @@ These files are looked for whne we have kuristo execute workflows from a locatio
 <dl>
 <dt><code class="docutils literal notranslate"><span class="pre">runner:</span></code></dt><dd><p>Main runner settings.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">runner.mpi_launcher</span></code></dt><dd><p>MPI command used to launch jobs.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">runner.mpi-launcher</span></code></dt><dd><p>MPI command used to launch jobs.</p>
 <p>Default value: <code class="docutils literal notranslate"><span class="pre">mpirun</span></code></p>
 </dd>
 </dl>
@@ -133,7 +133,7 @@ These files are looked for whne we have kuristo execute workflows from a locatio
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">batch.backend</span></code></dt><dd><p>Which batch system to use (e.g., slurm).</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">batch.default_account</span></code></dt><dd><p>Currently, does nothing.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">batch.default-account</span></code></dt><dd><p>Currently, does nothing.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">batch.partition</span></code></dt><dd><p>Cluster partition or queue to submit jobs to.</p>
 </dd>
@@ -149,7 +149,7 @@ And we want to keep 10 previous runs.</p>
 <span class="w">   </span><span class="nt">history</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10</span>
 
 <span class="nt">runner</span><span class="p">:</span>
-<span class="w">   </span><span class="nt">mpi_launcher</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpiexec</span>
+<span class="w">   </span><span class="nt">mpi-launcher</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpiexec</span>
 
 <span class="nt">batch</span><span class="p">:</span>
 <span class="w">   </span><span class="nt">backend</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">slurm</span>
