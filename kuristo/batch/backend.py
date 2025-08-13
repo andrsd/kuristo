@@ -8,6 +8,8 @@ from typing import Optional
 class ScriptParameters:
     # Kuristo Run ID
     run_id: str
+    # Job number we start numbering from
+    first_job_num: int
     # Workflow file to execute
     workflow_file: Path
     # Job name

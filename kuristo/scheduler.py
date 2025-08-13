@@ -3,6 +3,7 @@ import threading
 import sys
 import time
 from pathlib import Path
+from kuristo.job_spec import JobSpec
 from rich.progress import (Progress, SpinnerColumn, TextColumn, BarColumn, ProgressColumn, TimeElapsedColumn)
 from rich.text import Text
 from rich.style import Style
@@ -135,7 +136,7 @@ class Scheduler:
         self._graph = netx.DiGraph()
         job_map = {}
         for sp in specs:
-            spec_jobs = self._create_jobs(sp)
+            spec_jobs = create_jobs(sp, self._out_dir)
             for job in spec_jobs:
                 job.on_finish = self._job_completed
                 job.on_step_start = self._on_step_start
@@ -245,25 +246,6 @@ class Scheduler:
     def _create_out_dir(self):
         self._out_dir.mkdir(parents=True, exist_ok=True)
 
-    def _create_jobs(self, spec):
-        """
-        Create jobs
-
-        @param spec Job specification
-        @return List of `Job`s
-        """
-        jobs = []
-        if spec.strategy:
-            needs = []
-            for id, variant in spec.build_matrix_values():
-                j = Job(id, spec, self._out_dir, matrix=variant)
-                jobs.append(j)
-                needs.append(id)
-            jobs.append(JobJoiner(spec.id, spec, needs))
-        else:
-            jobs.append(Job(spec.id, spec, self._out_dir))
-        return jobs
-
     def exit_code(self, *, strict=False):
         if self._n_failed > 0:
             return 1
@@ -281,3 +263,23 @@ class Scheduler:
 
         job_task_num = self._tasks[job.num]
         self._progress.update(job_task_num, advance=1)
+
+
+def create_jobs(spec: JobSpec, out_dir: Path):
+    """
+    Create jobs
+
+    @param spec Job specification
+    @return List of `Job`s
+    """
+    jobs = []
+    if spec.strategy:
+        needs = []
+        for id, variant in spec.build_matrix_values():
+            j = Job(id, spec, out_dir, matrix=variant)
+            jobs.append(j)
+            needs.append(id)
+        jobs.append(JobJoiner(spec.id, spec, needs))
+    else:
+        jobs.append(Job(spec.id, spec, out_dir))
+    return jobs

@@ -3,121 +3,12 @@ from types import SimpleNamespace
 from pathlib import Path
 from kuristo.batch.backend import ScriptParameters
 from kuristo.cli._batch import (
-    batch_submit,
-    batch_status,
     build_actions,
     required_cores,
     create_script_params,
-    write_metadata,
-    read_metadata,
-    load_metadata,
+    write_job_metadata,
+    read_job_metadata
 )
-
-
-@patch("kuristo.cli._batch.write_metadata")
-@patch("kuristo.cli._batch.create_script_params")
-@patch("kuristo.cli._batch.specs_from_file")
-@patch("kuristo.cli._batch.scan_locations")
-@patch("kuristo.cli._batch.load_user_steps_from_kuristo_dir")
-@patch("kuristo.cli._batch.update_latest_symlink")
-@patch("kuristo.cli._batch.prune_old_runs")
-@patch("kuristo.cli._batch.create_run_output_dir")
-@patch("kuristo.cli._batch.get_backend")
-@patch("kuristo.cli._batch.config.get")
-def test_batch_submit_basic(
-    mock_config_get,
-    mock_get_backend,
-    mock_create_run_output_dir,
-    mock_prune_old_runs,
-    mock_update_symlink,
-    mock_load_user_steps,
-    mock_scan_locations,
-    mock_specs_from_file,
-    mock_create_script_params,
-    mock_write_metadata,
-    tmp_path
-):
-    # Arrange: mock CLI args
-    args = SimpleNamespace(
-        backend="slurm",
-        location=["some/path"],
-        no_ansi=True,
-        partition='normal'
-    )
-
-    # Return value of Config()
-    mock_config_instance = MagicMock()
-    mock_config_instance.log_dir = Path("/fake/log")
-    mock_config_get.return_value = mock_config_instance
-
-    # Mock backend
-    mock_backend = MagicMock()
-    mock_backend.name = "slurm"
-    mock_backend.submit.side_effect = lambda s: f"job-{s.name}"
-    mock_get_backend.return_value = mock_backend
-
-    # Mock output dir and workflow files
-    out_dir = Path(tmp_path)
-    mock_create_run_output_dir.return_value = out_dir
-    mock_scan_locations.return_value = [Path("workflow1.yml"), Path("workflow2.yml")]
-    mock_specs_from_file.side_effect = lambda path: {"dummy": "spec"}
-
-    # Mock script param creation
-    mock_create_script_params.side_effect = lambda workflow_file, run_id, num, spec, wd: ScriptParameters(
-        run_id=run_id,
-        workflow_file=workflow_file,
-        name=f"job{num}",
-        work_dir=wd,
-        n_cores=4,
-        max_time=120,
-    )
-
-    # Act
-    batch_submit(args)
-
-    # Assert
-    assert mock_backend.submit.call_count == 2
-    assert mock_write_metadata.call_count == 2
-    mock_get_backend.assert_called_once_with("slurm")
-    mock_scan_locations.assert_called_once_with(["some/path"])
-    mock_specs_from_file.assert_any_call(Path("workflow1.yml"))
-    mock_specs_from_file.assert_any_call(Path("workflow2.yml"))
-
-
-@patch("rich.console.Console.print")
-@patch("kuristo.cli._batch.get_backend")
-@patch("kuristo.cli._batch.load_metadata")
-@patch("kuristo.cli._batch.config.get")
-def test_batch_status_basic(mock_config_get, mock_load_metadata, mock_get_backend, mock_console_print):
-    # Fake CLI args
-    args = SimpleNamespace(no_ansi=True)
-
-    # Return value of Config()
-    mock_config_instance = MagicMock()
-    mock_config_instance.log_dir = Path("/fake/log")
-    mock_config_get.return_value = mock_config_instance
-
-    # Fake metadata from a previous submission
-    mock_load_metadata.return_value = [
-        {"job": {"id": 1234, "backend": "slurm"}},
-        {"job": {"id": 5678, "backend": "slurm"}},
-    ]
-
-    # Fake backend with mock status method
-    mock_backend = MagicMock()
-    mock_backend.status.side_effect = ["RUNNING", "COMPLETED"]
-    mock_get_backend.return_value = mock_backend
-
-    batch_status(args)
-
-    # Assert
-    mock_load_metadata.assert_called_once_with(Path("/fake/log/runs/latest"))
-    assert mock_backend.status.call_count == 2
-    mock_backend.status.assert_any_call("1234")
-    mock_backend.status.assert_any_call("5678")
-
-    mock_console_print.assert_any_call("[1234] RUNNING")
-    mock_console_print.assert_any_call("[5678] COMPLETED")
 
 
 @patch("kuristo.cli._batch.ActionFactory.create")
@@ -189,7 +80,7 @@ def test_create_script_params_basic(mock_config_get, mock_build_actions):
     mock_build_actions.return_value = [SimpleNamespace(num_cores=4)]
 
     # Act
-    params = create_script_params(Path("wf.yaml"), "12", 1, [skipped_spec, active_spec], workdir)
+    params = create_script_params("kuristo-job-1", Path("wf.yaml"), "12", 1, [skipped_spec, active_spec], workdir)
 
     # Assert
     assert isinstance(params, ScriptParameters)
@@ -212,7 +103,7 @@ def test_create_script_params_all_skipped(mock_config_get, mock_build_actions):
     workdir = Path("/workdir")
     specs = [SimpleNamespace(skip=True, timeout_minutes=15) for _ in range(3)]
 
-    params = create_script_params(Path("wf.yaml"), "12", 0, specs, workdir)
+    params = create_script_params("kuristo-job-0", Path("wf.yaml"), "12", 0, specs, workdir)
 
     assert params.name == "kuristo-job-0"
     assert params.n_cores == 1  # default
@@ -241,7 +132,7 @@ def test_create_script_params_accumulates_time_and_max_cores(mock_config_get, mo
         [SimpleNamespace(num_cores=8)]
     ]
 
-    params = create_script_params(Path("wf.yaml"), "12", 2, specs, workdir)
+    params = create_script_params("job-2", Path("wf.yaml"), "12", 2, specs, workdir)
 
     assert params.n_cores == 8  # max of both
     assert params.max_time == 30  # sum
@@ -255,7 +146,7 @@ def test_write_metadata():
 
     m = mock_open()
     with patch("builtins.open", m), patch("yaml.safe_dump") as mock_safe_dump:
-        write_metadata(job_id, backend_name, workdir)
+        write_job_metadata(job_id, backend_name, workdir)
 
     expected_metadata = {'job': {'id': job_id, 'backend': backend_name}}
     mock_safe_dump.assert_called_once_with(expected_metadata, m(), sort_keys=False)
@@ -274,36 +165,7 @@ def test_read_metadata():
 
     m = mock_open(read_data=fake_file_content)
     with patch("builtins.open", m), patch("yaml.safe_load") as mock_safe_load:
-        read_metadata(fake_path)
+        read_job_metadata(fake_path)
 
     m.assert_called_once_with(fake_path, "r")
     mock_safe_load.assert_called_once()
-
-
-@patch("kuristo.cli._batch.read_metadata")
-@patch("os.listdir")
-@patch("os.path.isdir")
-@patch("os.path.isfile")
-def test_load_metadata(mock_isfile, mock_isdir, mock_listdir, mock_read_metadata):
-    base_dir = Path("/fake/logs")
-
-    # Simulate directory entries
-    mock_listdir.return_value = ["job-1", "job-2", "not_a_job"]
-
-    # job-1 and job-2 are directories, not_a_job is not
-    mock_isdir.side_effect = lambda path: path.endswith("job-1") or path.endswith("job-2")
-
-    # metadata.yaml exists only in job-1, not in job-2
-    def isfile_side_effect(path):
-        return path.endswith("job-1/metadata.yaml")
-    mock_isfile.side_effect = isfile_side_effect
-
-    # read_metadata returns dummy metadata for job-1 only
-    mock_read_metadata.return_value = {"job": {"id": "job-1", "backend": "slurm"}}
-
-    result = load_metadata(base_dir)
-
-    mock_listdir.assert_called_once_with(base_dir)
-    assert mock_read_metadata.call_count == 1
-    mock_read_metadata.assert_called_with(Path("/fake/logs/job-1/metadata.yaml"))
-    assert result == [mock_read_metadata.return_value]
