@@ -50,6 +50,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#run">run</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#list">list</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#status">status</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#log">log</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#show">show</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#batch">batch</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#doctor">doctor</a></li>
@@ -89,6 +90,12 @@
              
   <section id="user-interface">
 <h1>User Interface<a class="headerlink" href="#user-interface" title="Link to this heading"></a></h1>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">-f|--config</span> <span class="pre">&lt;file&gt;</span></code></dt><dd><p>Supply a config file.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">--no-ansi</span></code></dt><dd><p>Use plain terminal output, i.e. no colors, etc.</p>
+</dd>
+</dl>
 <section id="run">
 <h2>run<a class="headerlink" href="#run" title="Link to this heading"></a></h2>
 <p>Run workflow(s).</p>
@@ -130,6 +137,10 @@ By default, it will show the latest run status.</p>
 </dd>
 </dl>
 </section>
+<section id="log">
+<h2>log<a class="headerlink" href="#log" title="Link to this heading"></a></h2>
+<p>List runs</p>
+</section>
 <section id="show">
 <h2>show<a class="headerlink" href="#show" title="Link to this heading"></a></h2>
 <p>Show the output (log) of a specified job.</p>
@@ -150,7 +161,13 @@ By default, it will show the latest run status.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">--partition</span></code></dt><dd><p>Partition name to submit into.</p>
 </dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&lt;location&gt;</span></code></dt><dd><p>Location to search for tests.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&lt;file&gt;</span></code></dt><dd><p>File to submit into a queue.</p>
+</dd>
 </dl>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">status</span></code></dt><dd><p>Show status of jobs submited into a batch system.</p>
 </dd>
 </dl>
 </section>

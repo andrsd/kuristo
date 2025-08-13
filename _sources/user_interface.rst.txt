@@ -1,6 +1,12 @@
 User Interface
 ==============
 
+``-f|--config <file>``
+   Supply a config file.
+
+``--no-ansi``
+   Use plain terminal output, i.e. no colors, etc.
+
 run
 ---
 
@@ -46,6 +52,12 @@ By default, it will show the latest run status.
 ``--passed``
    Show only successful jobs.
 
+log
+---
+
+List runs
+
+
 show
 ----
 
@@ -70,6 +82,15 @@ Interact with a batch system
 
    ``--partition``
       Partition name to submit into.
+
+   ``<location>``
+      Location to search for tests.
+
+   ``<file>``
+      File to submit into a queue.
+
+``status``
+   Show status of jobs submited into a batch system.
 
 
 doctor
