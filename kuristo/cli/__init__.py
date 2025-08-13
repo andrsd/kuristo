@@ -32,7 +32,6 @@ def build_parser():
     run_parser = subparsers.add_parser("run", help="Run jobs")
     run_parser.add_argument("--verbose", "-v", type=int, default=0, help="Verbose level")
     run_parser.add_argument("--report", type=Path, help="Save report with the runtime information to a CSV file")
-    run_parser.add_argument("--run-id", type=str, help="ID of the run. Do not use directly unless you know what you are doing.")
     run_parser.add_argument("locations", nargs="*", help="Locations to scan for workflow files")
 
     # Doctor command
@@ -46,12 +45,17 @@ def build_parser():
     batch_parser = subparsers.add_parser("batch", help="HPC queueing system commands")
     batch_subparsers = batch_parser.add_subparsers(dest="batch_command")
 
-    submit_parser = batch_subparsers.add_parser("submit", help="Submit jobs to HPC queue")
-    submit_parser.add_argument("--backend", type=str, help="Batch backend to use: ['slurm']")
-    submit_parser.add_argument("--partition", type=str, help="Partition name to use")
-    submit_parser.add_argument("locations", nargs="*", help="Locations to scan for workflow files")
+    batch_submit_parser = batch_subparsers.add_parser("submit", help="Submit jobs to HPC queue")
+    batch_submit_parser.add_argument("--backend", type=str, help="Batch backend to use: ['slurm']")
+    batch_submit_parser.add_argument("--partition", type=str, help="Partition name to use")
+    batch_submit_parser.add_argument("locations", nargs="*", help="Locations to scan for workflow files")
 
     batch_subparsers.add_parser("status", help="Check HPC job status")
+
+    batch_run_parser = batch_subparsers.add_parser("run", help="Run job in a batch system")
+    batch_run_parser.add_argument("run_id", help="ID of the run")
+    batch_run_parser.add_argument("first_job_id", type=int, help="First job ID to start from")
+    batch_run_parser.add_argument("workflow_file", help="Workflow file to run")
 
     status_parser = subparsers.add_parser("status", help="Display status of runs")
     status_parser.add_argument("--run-id", type=str, help="Run ID to display results for")

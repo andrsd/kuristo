@@ -8,4 +8,4 @@
 
 cd {{ job.workdir }}
 
-kuristo run {{ job.workflow_file }} --run-id {{ job.run_id }}
+kuristo --no-ansi batch run {{ job.run_id }} {{ job.first_job_num }} {{ job.workflow_file }}

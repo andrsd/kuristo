@@ -1,6 +1,4 @@
 import yaml
-import fcntl
-import os
 from pathlib import Path
 import kuristo.config as config
 import kuristo.utils as utils
@@ -64,42 +62,12 @@ def write_report_yaml(yaml_path: Path, results, total_runtime):
         }, f, sort_keys=False)
 
 
-def update_report_atomic(yaml_path: Path, new_results: list):
-    """
-    Append new results into a yaml file
-
-    @param yaml_path File we want to update
-    @param new_results Results to add
-    """
-    yaml_path = Path(yaml_path)
-    yaml_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(yaml_path, "a+") as f:
-        fcntl.flock(f, fcntl.LOCK_EX)
-
-        f.seek(0)
-        try:
-            report = yaml.safe_load(f) or {"results": []}
-            results = report['results']
-        except yaml.YAMLError:
-            results = []
-
-        results.extend(new_results)
-
-        tmp_path = yaml_path.with_suffix(".tmp")
-        write_report_yaml(tmp_path, results, 0.)
-
-        os.replace(tmp_path, yaml_path)
-
-
 def run_jobs(args):
     locations = args.locations or ["."]
 
     cfg = config.get()
-    if args.run_id:
-        out_dir = utils.create_run_output_dir(cfg.log_dir, args.run_id)
-    else:
-        out_dir = utils.create_run_output_dir(cfg.log_dir)
-        utils.prune_old_runs(cfg.log_dir, cfg.log_history)
+    out_dir = utils.create_run_output_dir(cfg.log_dir)
+    utils.prune_old_runs(cfg.log_dir, cfg.log_history)
     utils.update_latest_symlink(cfg.log_dir, out_dir)
 
     load_user_steps_from_kuristo_dir()
@@ -113,10 +81,7 @@ def run_jobs(args):
 
     results = create_results(scheduler.jobs)
     yaml_path = out_dir / "report.yaml"
-    if args.run_id:
-        update_report_atomic(yaml_path, results)
-    else:
-        write_report_yaml(yaml_path, results, scheduler.total_runtime)
+    write_report_yaml(yaml_path, results, scheduler.total_runtime)
 
     if args.report:
         write_report_csv(args.report_path, scheduler.jobs)
