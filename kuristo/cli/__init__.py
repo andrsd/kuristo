@@ -57,6 +57,7 @@ def build_parser():
     batch_run_parser.add_argument("first_job_id", type=int, help="First job ID to start from")
     batch_run_parser.add_argument("workflow_file", help="Workflow file to run")
 
+    # Status command
     status_parser = subparsers.add_parser("status", help="Display status of runs")
     status_parser.add_argument("--run-id", type=str, help="Run ID to display results for")
     group = status_parser.add_mutually_exclusive_group()
@@ -64,8 +65,10 @@ def build_parser():
     group.add_argument("--skipped", action="store_true", help="Show only tests that were skipped")
     group.add_argument("--passed", action="store_true", help="Show only tests that passed")
 
+    # Log command
     subparsers.add_parser("log", help="List runs")
 
+    # Show command
     show_parser = subparsers.add_parser("show", help="Show job log")
     show_parser.add_argument("--run-id", type=str, help="Run ID to display results for")
     show_parser.add_argument("--job", required=True, type=int, help="Job ID")

@@ -1,7 +1,7 @@
 from kuristo.actions.action import Action
 from kuristo.context import Context
 from io import StringIO
-import contextlib
+import contextlib as ctxlib
 from abc import abstractmethod
 
 
@@ -19,15 +19,15 @@ class FunctionAction(Action):
         self._params = params
 
     def run(self, context=None):
-        stdout_capture = StringIO()
-        stderr_capture = StringIO()
+        stdout = StringIO()
+        stderr = StringIO()
 
         try:
-            with contextlib.redirect_stdout(stdout_capture), contextlib.redirect_stderr(stderr_capture):
+            with ctxlib.redirect_stdout(stdout), ctxlib.redirect_stderr(stderr):
                 self.execute()
 
-            self._stdout = stdout_capture.getvalue().encode()
-            self._stderr = stderr_capture.getvalue().encode()
+            self._stdout = stdout.getvalue().encode()
+            self._stderr = stderr.getvalue().encode()
             self._return_code = 0
 
         except Exception as e:
