@@ -20,6 +20,7 @@ commands=(
 _arguments -C \
   '--version[Show version and exit]' \
   '--no-ansi[Disable rich output (no colors or progress bars)]' \
+  '(-f --config)'{-f,--config}'[Path to configuration file]:file:_files -g "*.yaml"' \
   '--help[Show help message and exit]' \
   '1:command:->command' \
   '*::arg:->args'

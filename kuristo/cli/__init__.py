@@ -26,6 +26,7 @@ def build_parser():
     parser = argparse.ArgumentParser(prog="kuristo", description="Kuristo automation framework")
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     parser.add_argument("--no-ansi", action="store_true", help="Disable rich output (no colors or progress bars)")
+    parser.add_argument("-f", "--config", type=Path, metavar="FILE", help="Path to configuration file")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     # Run command

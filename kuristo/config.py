@@ -1,22 +1,24 @@
 import yaml
 import os
 from pathlib import Path
-from kuristo.plugin_loader import find_kuristo_root
-from kuristo.utils import get_default_core_limit
+import kuristo.utils as utils
 
 
 class Config:
 
-    def __init__(self, path=None):
-        base_dir = find_kuristo_root()
-        self._config_dir = base_dir or Path.cwd()
+    def __init__(self, no_ansi=True, path=None):
+        self.no_ansi = no_ansi
 
-        self.path = Path(path or self._config_dir / "config.yaml")
+        config_dir = utils.find_kuristo_root() or Path.cwd()
+        if path:
+            self.path = Path(path)
+        else:
+            self.path = Path(config_dir / "config.yaml")
         self._data = self._load()
 
         self.workflow_filename = self._get("base.workflow-filename", "kuristo.yaml")
 
-        self.log_dir = (self._config_dir.parent / self._get("log.dir-name", ".kuristo-out")).resolve()
+        self.log_dir = (config_dir.parent / self._get("log.dir-name", ".kuristo-out")).resolve()
         self.log_history = int(self._get("log.history", 5))
         # Options: on_success, always, never
         self.log_cleanup = self._get("log.cleanup", "always")
@@ -47,7 +49,7 @@ class Config:
         return val
 
     def _resolve_cores(self) -> int:
-        system_default = get_default_core_limit()
+        system_default = utils.get_default_core_limit()
         value = self._get("resources.num-cores", system_default)
 
         try:
@@ -60,15 +62,23 @@ class Config:
 
         return value
 
-    def set_from_args(self, args):
-        """
-        Set configuration parameters from arguments passed via command line
-        """
-        self.no_ansi = args.no_ansi
-
 
 # Global config instance
 _instance = Config()
+
+
+def construct(args):
+    """
+    Construct config
+
+    @param args Command line arguments
+    """
+    global _instance
+
+    _instance = Config(
+        no_ansi=args.no_ansi,
+        path=args.config
+    )
 
 
 def get() -> Config:

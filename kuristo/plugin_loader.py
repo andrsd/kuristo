@@ -1,19 +1,6 @@
 import importlib.util
-import pathlib
 import sys
-
-
-def find_kuristo_root(start_path=None):
-    """
-    Search up from start_path (or cwd) to find the first directory containing `.kuristo/`
-    """
-    current = pathlib.Path(start_path or pathlib.Path.cwd()).resolve()
-
-    for parent in [current] + list(current.parents):
-        if (parent / ".kuristo").is_dir():
-            return parent / ".kuristo"
-
-    return None
+from kuristo.utils import find_kuristo_root
 
 
 def load_user_steps_from_kuristo_dir():

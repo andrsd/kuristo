@@ -12,6 +12,19 @@ from pathlib import Path
 RUN_DIR_PATTERN = re.compile(r"\d{8}-\d{6}")
 
 
+def find_kuristo_root(start_path=None):
+    """
+    Search up from start_path (or cwd) to find the first directory containing `.kuristo/`
+    """
+    current = Path(start_path or Path.cwd()).resolve()
+
+    for parent in [current] + list(current.parents):
+        if (parent / ".kuristo").is_dir():
+            return parent / ".kuristo"
+
+    return None
+
+
 def get_default_core_limit():
     if sys.platform == "darwin":
         try:
