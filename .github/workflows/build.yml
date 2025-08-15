@@ -48,13 +48,19 @@ jobs:
           pip install -e .
 
       - name: Run tests with coverage
-        run: pytest --cov --cov-branch --cov-report=xml
+        run: pytest --cov --cov-branch --cov-report=xml --junitxml=junit.xml -o junit_family=legacy
 
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         with:
           name: coverage-${{ matrix.os }}-${{ matrix.python-version }}
           path: ./coverage.xml
+
+      - name: Upload test results to codecov.io
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   upload-to-codecov:
     needs: [test]
