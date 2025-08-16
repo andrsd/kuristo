@@ -37,12 +37,14 @@ class ExodiffCheck(ProcessAction):
         source_root=None,
         build_root=None,
         fail_on_diff=True,
+        **kwargs
     ):
         super().__init__(
             name=name,
             context=context,
             working_dir=working_dir,
             timeout_minutes=timeout_minutes,
+            **kwargs
         )
         self._source_root = source_root or os.getcwd()
         self._build_root = build_root or os.getcwd()

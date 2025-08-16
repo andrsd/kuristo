@@ -41,10 +41,10 @@ def test_failed():
     )
 
     assert result.returncode == 1
-    assert "Success: 2" in result.stdout
+    assert "Success: 3" in result.stdout
     assert "Failed: 1" in result.stdout
     assert "Skipped: 0" in result.stdout
-    assert "Total: 3" in result.stdout
+    assert "Total: 4" in result.stdout
 
 
 def test_user_defined():

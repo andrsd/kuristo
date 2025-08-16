@@ -10,6 +10,7 @@ class DummyStep:
         id="step1",
         working_directory="/tmp",
         timeout_minutes=5,
+        continue_on_error=False,
         run=None,
         uses=None,
         params=None
@@ -18,6 +19,7 @@ class DummyStep:
         self.id = id
         self.working_directory = working_directory
         self.timeout_minutes = timeout_minutes
+        self.continue_on_error = continue_on_error
         self.run = run
         self.uses = uses
         self.params = params or {}
@@ -39,6 +41,7 @@ def test_create_shell_action_when_uses_is_none(dummy_context):
         id=ts.id,
         working_dir=ts.working_directory,
         timeout_minutes=ts.timeout_minutes,
+        continue_on_error=False,
         commands=ts.run,
     )
     assert result == mock_shell.return_value
@@ -57,6 +60,7 @@ def test_create_registered_action(dummy_context):
         id=ts.id,
         working_dir=ts.working_directory,
         timeout_minutes=ts.timeout_minutes,
+        continue_on_error=False,
         foo="bar",
     )
     assert result == mock_action_cls.return_value

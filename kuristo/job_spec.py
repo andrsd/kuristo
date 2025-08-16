@@ -74,6 +74,8 @@ class Step(BaseModel):
     working_directory: Optional[str] = Field(alias='working-directory', default=None)
     # Timeout in minutes
     timeout_minutes: Optional[int] = Field(alias='timeout-minutes', default=60)
+    # Continue on error
+    continue_on_error: bool = Field(alias="continue-on-error", default=False)
 
     model_config = {
         "populate_by_name": True
