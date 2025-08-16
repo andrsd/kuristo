@@ -17,7 +17,8 @@ class Action(ABC):
             self._name = name
         self._output = None
         self._context = context
-        self._timeout_minutes = kwargs.get("timeout-minutes", 60)
+        self._timeout_minutes = kwargs.get("timeout_minutes", 60)
+        self._continue_on_error = kwargs.get("continue_on_error", False)
 
     @property
     def name(self):
@@ -67,6 +68,10 @@ class Action(ABC):
         Return context
         """
         return self._context
+
+    @property
+    def continue_on_error(self):
+        return self._continue_on_error
 
     @abstractmethod
     def run(self, context=None):

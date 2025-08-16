@@ -24,6 +24,16 @@ jobs:
       - name: Last step
         run: echo "Last"
 
+  test-that-fails-and-continues:
+    description: "Failing test"
+    steps:
+      - name: Failed step
+        continue-on-error: true
+        run: exit 1
+
+      - name: Last step
+        run: echo "Should see this"
+
   test-cwd:
     description: "Test in different working directory"
     steps:

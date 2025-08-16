@@ -273,6 +273,7 @@ class Job:
             self._timeout_timer.cancel()
 
     def _run_process(self):
+        self._return_code = 0
         self._logger.job_start(self.name)
         for step in self._steps:
             with self._step_lock:
@@ -293,11 +294,15 @@ class Job:
             if self._cancelled.is_set():
                 self._logger.log(f'* Job timed out after {self.timeout_minutes} minutes', tag="TASK_END")
                 self._return_code = 124
+                break
             elif step.return_code == 124:
                 self._logger.log(f'* Step timed out after {step.timeout_minutes} minutes', tag="TASK_END")
             else:
                 self._logger.task_end(step.return_code)
-                self._return_code |= step.return_code
+
+            if step.return_code != 0 and not step.continue_on_error:
+                self._return_code = step.return_code
+                break
 
         with self._step_lock:
             self._active_step = None

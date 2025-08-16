@@ -73,6 +73,12 @@ jobs.<id>.steps[*].name
 Step name.
 This is displayed in user interface.
 
+jobs.<id>.steps[*].continue-on-error
+------------------------------------
+
+| Indicates if the workflow execution should continue if this step fails.
+| Default value is ``False``
+
 jobs.<id>.steps[*].description
 ------------------------------
 

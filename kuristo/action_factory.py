@@ -18,6 +18,7 @@ class ActionFactory:
                 id=step.id,
                 working_dir=step.working_directory,
                 timeout_minutes=step.timeout_minutes,
+                continue_on_error=step.continue_on_error,
                 commands=step.run,
             )
         elif get_action(step.uses):
@@ -28,6 +29,7 @@ class ActionFactory:
                 id=step.id,
                 working_dir=step.working_directory,
                 timeout_minutes=step.timeout_minutes,
+                continue_on_error=step.continue_on_error,
                 **step.params
             )
         else:
