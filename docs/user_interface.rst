@@ -105,3 +105,19 @@ This outputs detailed information including:
 - MPI launcher
 - Active plugins, registered actions
 - Logging and cleanup policies
+
+
+report
+------
+
+Generate a report for a given run.
+
+``--run-id``
+   Run ID. If not specified, the latest run is assumed.
+
+``<format>:<file>``
+   File to save the report into with given ``format``.
+
+   Supportted formats:
+
+   - `xml` - junit XML file format

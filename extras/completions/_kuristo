@@ -15,6 +15,7 @@ commands=(
   'status:Display status of runs'
   'log:List runs'
   'show:Show job log'
+  'report:Generate a report for a given run'
 )
 
 _arguments -C \
@@ -87,6 +88,12 @@ case $state in
           '--help[Show help message and exit]' \
           '--run-id[Run ID to display results for]:string' \
           '--job[Job ID]:int'
+        ;;
+      report)
+        _arguments \
+          '--help[Show help message and exit]' \
+          '--run-id[Run ID to display results for]:string' \
+          '*:File name to store the report into\: \<format\>\:\<filename\>:_files'
         ;;
     esac
     ;;
