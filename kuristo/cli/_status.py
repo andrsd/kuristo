@@ -51,7 +51,7 @@ def print_report(report, filters: list):
     stats = summarize(filtered)
     ui.line(cfg.console_width)
     ui.stats(stats)
-    ui.time(report.get("total_runtime", 0.))
+    ui.time(report.get("total-runtime", 0.))
 
 
 def status(args):

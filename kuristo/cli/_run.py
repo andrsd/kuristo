@@ -42,7 +42,7 @@ def write_report_yaml(yaml_path: Path, results, total_runtime):
     with open(yaml_path, "w") as f:
         yaml.safe_dump({
             "results": results,
-            "total_runtime": total_runtime
+            "total-runtime": total_runtime
         }, f, sort_keys=False)
 
 

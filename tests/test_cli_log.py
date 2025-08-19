@@ -30,8 +30,8 @@ def test_log_with_runs(mock_read_report, mock_config_get, mock_console, tmp_path
 
     # Mock read_report() to simulate report content
     mock_read_report.side_effect = [
-        {"results": ["job1", "job2"], "total_runtime": 0.123},
-        {"results": ["job1"], "total_runtime": 0.456},
+        {"results": ["job1", "job2"], "total-runtime": 0.123},
+        {"results": ["job1"], "total-runtime": 0.456},
     ]
 
     # Mock console

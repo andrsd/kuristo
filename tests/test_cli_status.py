@@ -31,7 +31,7 @@ def test_print_report_outputs_correctly(
             {"status": "success", "job-name": "Test A"},
             {"status": "failed", "job-name": "Another"},
         ],
-        "total_runtime": 12.34
+        "total-runtime": 12.34
     }
 
     mock_cfg = MagicMock()
@@ -63,7 +63,7 @@ def test_print_report_outputs_filtered(
             {"status": "success", "job-name": "Test B"},
             {"status": "failed", "job-name": "Another"},
         ],
-        "total_runtime": 12.34
+        "total-runtime": 12.34
     }
 
     mock_cfg = MagicMock()
