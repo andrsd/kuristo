@@ -36,7 +36,7 @@ def parse_sections(lines):
                 "end_time": None
             }
         elif tag == 'TASK_END':
-            rc = int(msg.split("return code")[1].strip())
+            rc = int(msg.split("exit code")[1].strip())
             if current:
                 current["return_code"] = rc
                 current["end_time"] = timestamp
