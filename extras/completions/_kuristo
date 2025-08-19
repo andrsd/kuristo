@@ -36,7 +36,6 @@ case $state in
         _arguments \
           '--help[Show help message and exit]' \
           '--verbose[Verbose level]:int' \
-          '--report[Save report to a CSV file]:file:_files' \
           '*:Locations to scan:_files'
         ;;
       doctor)

@@ -145,14 +145,6 @@ log:
   cleanup: on_success
 ```
 
-## Job Timing Report
-
-To output a CSV of job timings:
-
-```bash
-kuristo run tests --report timing.csv
-```
-
 ## Configuration
 
 You can define a global config at `.kuristo/config.yaml`:
