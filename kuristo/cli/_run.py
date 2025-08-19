@@ -31,7 +31,7 @@ def create_results(jobs):
                 results.append({
                     "id": job.num,
                     "job-name": job.name,
-                    "return code": job.return_code,
+                    "return-code": job.return_code,
                     "status": "success" if job.return_code == 0 else "failed",
                     "duration": round(job.elapsed_time, 3)
                 })

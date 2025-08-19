@@ -45,7 +45,7 @@ def generate_junit(yaml_filename: Path, xml_filename: Path):
             ET.SubElement(
                 testcase,
                 "failure",
-                message=f"Process completed with exit code {r.get('return code')}"
+                message=f"Process completed with exit code {r.get('return-code')}"
             ).text = "Failed"
         elif r.get("status") == "skipped":
             ET.SubElement(
