@@ -8,6 +8,7 @@ from kuristo.cli._batch import batch
 from kuristo.cli._status import status
 from kuristo.cli._log import log
 from kuristo.cli._show import show
+from kuristo.cli._report import report
 
 
 __all__ = [
@@ -18,7 +19,8 @@ __all__ = [
     "batch",
     "status",
     "log",
-    "show"
+    "show",
+    "report"
 ]
 
 
@@ -73,5 +75,10 @@ def build_parser():
     show_parser = subparsers.add_parser("show", help="Show job log")
     show_parser.add_argument("--run-id", type=str, help="Run ID to display results for")
     show_parser.add_argument("--job", required=True, type=int, help="Job ID")
+
+    # Report command
+    report_parser = subparsers.add_parser("report", help="Create report")
+    report_parser.add_argument("--run-id", type=str, help="Run ID to generate report for")
+    report_parser.add_argument("file", help="File name to store the report into: <format>:<filename>")
 
     return parser

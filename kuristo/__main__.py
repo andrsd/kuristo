@@ -25,6 +25,8 @@ def main():
             cli.log(args)
         elif args.command == "show":
             cli.show(args)
+        elif args.command == "report":
+            cli.report(args)
     except Exception as e:
         print(e)
 
