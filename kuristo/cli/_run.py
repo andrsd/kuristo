@@ -10,22 +10,6 @@ from kuristo.job_spec import parse_workflow_files
 from kuristo.scanner import scan_locations
 
 
-def write_report_csv(csv_path: Path, jobs):
-    import csv
-    with open(csv_path, "w", newline="") as f:
-        writer = csv.writer(f)
-        writer.writerow(["id", "job name", "status", "duration [s]", "return code"])
-        for job in jobs:
-            duration = "" if job.is_skipped else round(job.elapsed_time, 3)
-            if job.is_skipped:
-                status = "skipped"
-            elif job.return_code == 0:
-                status = "success"
-            else:
-                status = "failed"
-            writer.writerow([job.num, job.name, status, duration, job.return_code])
-
-
 def create_results(jobs):
     """
     Built results from jobs. Jobs must be finished.
@@ -82,8 +66,5 @@ def run_jobs(args):
     results = create_results(scheduler.jobs)
     yaml_path = out_dir / "report.yaml"
     write_report_yaml(yaml_path, results, scheduler.total_runtime)
-
-    if args.report:
-        write_report_csv(args.report_path, scheduler.jobs)
 
     return scheduler.exit_code()
