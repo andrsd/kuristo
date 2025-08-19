@@ -54,6 +54,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#show">show</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#batch">batch</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#doctor">doctor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#report">report</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="writing_workflows.html">Writing Workflows</a></li>
@@ -183,6 +184,20 @@ This outputs detailed information including:</p>
 <li><p>Active plugins, registered actions</p></li>
 <li><p>Logging and cleanup policies</p></li>
 </ul>
+</section>
+<section id="report">
+<h2>report<a class="headerlink" href="#report" title="Link to this heading"></a></h2>
+<p>Generate a report for a given run.</p>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">--run-id</span></code></dt><dd><p>Run ID. If not specified, the latest run is assumed.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&lt;format&gt;:&lt;file&gt;</span></code></dt><dd><p>File to save the report into with given <code class="docutils literal notranslate"><span class="pre">format</span></code>.</p>
+<p>Supportted formats:</p>
+<ul class="simple">
+<li><p><cite>xml</cite> - junit XML file format</p></li>
+</ul>
+</dd>
+</dl>
 </section>
 </section>
 
