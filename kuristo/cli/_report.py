@@ -37,7 +37,7 @@ def generate_junit(yaml_filename: Path, xml_filename: Path):
             testsuite,
             "testcase",
             classname="jobs",
-            name=r.get("job name", f"id-{r.get('id')}"),
+            name=r.get("job-name", f"id-{r.get('id')}"),
             time=f"{float(r.get('duration', 0)):.3f}"
         )
 

@@ -28,8 +28,8 @@ def test_print_report_outputs_correctly(
 ):
     report = {
         "results": [
-            {"status": "success", "job name": "Test A"},
-            {"status": "failed", "job name": "Another"},
+            {"status": "success", "job-name": "Test A"},
+            {"status": "failed", "job-name": "Another"},
         ],
         "total_runtime": 12.34
     }
@@ -59,9 +59,9 @@ def test_print_report_outputs_filtered(
 ):
     report = {
         "results": [
-            {"status": "success", "job name": "Test A"},
-            {"status": "success", "job name": "Test B"},
-            {"status": "failed", "job name": "Another"},
+            {"status": "success", "job-name": "Test A"},
+            {"status": "success", "job-name": "Test B"},
+            {"status": "failed", "job-name": "Another"},
         ],
         "total_runtime": 12.34
     }
@@ -92,7 +92,7 @@ def test_status_reads_report_and_calls_print(mock_cfg_get, mock_read_report, moc
     mock_cfg.log_dir = tmp_path
     mock_cfg_get.return_value = mock_cfg
 
-    expected_report = {"results": [{"status": "success", "job name": "Job X"}]}
+    expected_report = {"results": [{"status": "success", "job-name": "Job X"}]}
     expected_filters = []
     mock_read_report.return_value = expected_report
 

@@ -44,7 +44,7 @@ def print_report(report, filters: list):
 
     max_label_len = cfg.console_width
     for r in filtered:
-        max_label_len = max(max_label_len, len(r['job name']) + 1)
+        max_label_len = max(max_label_len, len(r['job-name']) + 1)
 
     for entry in filtered:
         ui.status_line(entry, STATUS_LABELS.get(entry["status"], "????"), max_id_width, max_label_len)

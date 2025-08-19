@@ -23,14 +23,14 @@ def create_results(jobs):
             if job.is_skipped:
                 results.append({
                     "id": job.num,
-                    "job name": job.name,
+                    "job-name": job.name,
                     "status": "skipped",
                     "reason": job.skip_reason
                 })
             else:
                 results.append({
                     "id": job.num,
-                    "job name": job.name,
+                    "job-name": job.name,
                     "return code": job.return_code,
                     "status": "success" if job.return_code == 0 else "failed",
                     "duration": round(job.elapsed_time, 3)
