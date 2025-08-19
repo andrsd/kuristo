@@ -55,7 +55,7 @@ class Job:
             self.log(f"* {name}", tag="TASK_START")
 
         def task_end(self, return_code):
-            self.log(f"* Finished with return code {return_code}", tag="TASK_END")
+            self.log(f"* Process completed with exit code {return_code}", tag="TASK_END")
 
         def script_line(self, cmd):
             self.log(f"> {cmd}", tag="SCRIPT")

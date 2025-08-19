@@ -58,8 +58,8 @@ def status_line(job, state, max_id_width, max_label_len):
         elapsed_time = job.elapsed_time
     elif isinstance(job, dict):
         job_id = _padded_job_id(job["id"], max_id_width)
-        job_name_len = len(job["job name"])
-        job_name = job_name_markup(job["job name"])
+        job_name_len = len(job["job-name"])
+        job_name = job_name_markup(job["job-name"])
         if job['status'] == 'skipped':
             skip_reason = job["reason"]
         else:

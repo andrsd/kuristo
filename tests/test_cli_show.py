@@ -49,7 +49,7 @@ def test_single_job_with_task():
         (ts(0), "JOB_START", "Running job A"),
         (ts(1), "TASK_START", "> Doing something"),
         (ts(2), "INFO", "This is a line"),
-        (ts(3), "TASK_END", "return code 0"),
+        (ts(3), "TASK_END", "exit code 0"),
         (ts(4), "JOB_END", "Done"),
     ]
 
@@ -78,7 +78,7 @@ def test_task_with_env_vars_and_misc_lines():
         (ts(1), "INFO", "Some output"),
         (ts(2), "DEBUG", "Debug output"),
         (ts(3), "INFO", "| FOO=BAR"),
-        (ts(4), "TASK_END", "return code 1"),
+        (ts(4), "TASK_END", "exit code 1"),
     ]
 
     sections = parse_sections(lines)
@@ -97,10 +97,10 @@ def test_multiple_tasks():
     lines = [
         (ts(0), "TASK_START", "> First task"),
         (ts(1), "INFO", "Line A"),
-        (ts(2), "TASK_END", "return code 0"),
+        (ts(2), "TASK_END", "exit code 0"),
         (ts(3), "TASK_START", "> Second task"),
         (ts(4), "INFO", "Line B"),
-        (ts(5), "TASK_END", "return code 2"),
+        (ts(5), "TASK_END", "exit code 2"),
     ]
 
     sections = parse_sections(lines)

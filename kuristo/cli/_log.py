@@ -39,7 +39,7 @@ def log(args):
             try:
                 report = utils.read_report(report_file)
                 results = report.get("results", [])
-                duration = report.get("total_runtime", 0)
+                duration = report.get("total-runtime", 0)
                 duration_str = f"{duration:.3f}s"
                 job_count = str(len(results))
             except Exception:
