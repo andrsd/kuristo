@@ -40,7 +40,18 @@ def parse_sections(lines):
             if current:
                 current["return_code"] = rc
                 current["end_time"] = timestamp
-        elif msg.startswith("|"):
+        elif tag == 'ENV':
+            if current:
+                sections.append(current)
+            current = {
+                "type": "section",
+                "title": msg.strip(),
+                "lines": [],
+                "return_code": None,
+                "start_time": timestamp,
+                "end_time": None
+            }
+        elif tag == 'INFO' and msg.startswith("|"):
             if current:
                 current["lines"].append(("ENV_VAR", msg[2:].strip()))
         elif tag == 'JOB_START':
@@ -87,35 +98,32 @@ def render_section(sec, max_label_len):
     title = sec["title"]
 
     rc = sec["return_code"]
-    status = "PASS" if rc == 0 else "FAIL"
-    if status == "SKIP":
-        st = "[yellow]SKIP[/]"
-    elif status == "PASS":
-        st = "[green]PASS[/]"
-    elif status == "FAIL" or status == "TIMEOUT":
-        st = "[red]FAIL[/]"
-    else:
-        st = ""
+    if rc is not None:
+        status = "PASS" if rc == 0 else "FAIL"
+        if status == "SKIP":
+            st = "[yellow]SKIP[/]"
+        elif status == "PASS":
+            st = "[green]PASS[/]"
+        elif status == "FAIL" or status == "TIMEOUT":
+            st = "[red]FAIL[/]"
+        else:
+            st = ""
 
-    delta = 0.
-    if sec["start_time"] and sec["end_time"]:
-        delta = (sec["end_time"] - sec["start_time"]).total_seconds()
-    time_str = utils.human_time(delta)
+        delta = 0.
+        if sec["start_time"] and sec["end_time"]:
+            delta = (sec["end_time"] - sec["start_time"]).total_seconds()
+        time_str = utils.human_time(delta)
 
-    wd = max_label_len - 9 - len(title) - len(time_str)
-    dots = "." * wd
+        wd = max_label_len - 9 - len(title) - len(time_str)
+        dots = "." * wd
 
-    header = f"[white]*[/] {st} {title} [grey23]{dots}[/] [white]{time_str}[/]"
-    console.print(Text.from_markup(header))
+        header = f"[white]*[/] {st} {title} [grey23]{dots}[/] [white]{time_str}[/]"
+        console.print(Text.from_markup(header))
 
     for tag, msg in sec["lines"]:
         if tag == "SCRIPT":
             console.print(Text.from_markup(f"  [grey46]{msg}[/]"))
         elif tag == "OUTPUT":
-            console.print(Text.from_markup(f"  {msg}"))
-        elif "passed" in msg.lower():
-            console.print(Text.from_markup(f"  {msg}"))
-        elif "failed" in msg.lower():
             console.print(Text.from_markup(f"  {msg}"))
         elif tag == "ENV":
             console.print(Text.from_markup(""))
@@ -124,6 +132,10 @@ def render_section(sec, max_label_len):
             console.print(Text.from_markup(f"  [grey63]{msg}[/]"))
         else:
             console.print(Text.from_markup(f"  {msg}"))
+
+    if sec["return_code"] is not None:
+        if sec["return_code"] != 0:
+            console.print(Text.from_markup(f"  Finished with return code {rc}"))
     console.print()
 
 
