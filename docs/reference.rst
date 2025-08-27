@@ -73,6 +73,11 @@ jobs.<id>.steps[*].name
 Step name.
 This is displayed in user interface.
 
+jobs.<id>.steps[*].num-cores
+----------------------------
+
+Number of cores to use.
+
 jobs.<id>.steps[*].continue-on-error
 ------------------------------------
 

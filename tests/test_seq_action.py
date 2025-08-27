@@ -16,7 +16,7 @@ def test_default_num_cores():
 
 def test_custom_num_cores():
     ctx = make_context()
-    action = SeqAction(name="test_seq", context=ctx, **{'n-cores': 4})
+    action = SeqAction(name="test_seq", context=ctx, **{'num-cores': 4})
     assert action.num_cores == 4
 
 

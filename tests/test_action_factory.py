@@ -11,6 +11,7 @@ class DummyStep:
         working_directory="/tmp",
         timeout_minutes=5,
         continue_on_error=False,
+        num_cores=1,
         run=None,
         uses=None,
         params=None
@@ -20,6 +21,7 @@ class DummyStep:
         self.working_directory = working_directory
         self.timeout_minutes = timeout_minutes
         self.continue_on_error = continue_on_error
+        self.num_cores = num_cores
         self.run = run
         self.uses = uses
         self.params = params or {}
@@ -42,6 +44,7 @@ def test_create_shell_action_when_uses_is_none(dummy_context):
         working_dir=ts.working_directory,
         timeout_minutes=ts.timeout_minutes,
         continue_on_error=False,
+        num_cores=1,
         commands=ts.run,
     )
     assert result == mock_shell.return_value

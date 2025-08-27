@@ -5,4 +5,4 @@ jobs:
       - name: 4 cores
         uses: core/sequential
         with:
-          n-cores: 4
+          num-cores: 4
