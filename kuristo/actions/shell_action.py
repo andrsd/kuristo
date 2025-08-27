@@ -11,6 +11,7 @@ class ShellAction(ProcessAction):
     def __init__(self, name, context: Context, commands, **kwargs) -> None:
         super().__init__(name, context, **kwargs)
         self._commands = commands
+        self._n_cores = kwargs.get("num_cores", 1)
 
     def create_command(self):
         assert self.context is not None
@@ -19,3 +20,7 @@ class ShellAction(ProcessAction):
             self.context.vars
         )
         return cmds
+
+    @property
+    def num_cores(self):
+        return self._n_cores

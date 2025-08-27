@@ -76,6 +76,8 @@ class Step(BaseModel):
     timeout_minutes: Optional[int] = Field(alias='timeout-minutes', default=60)
     # Continue on error
     continue_on_error: bool = Field(alias="continue-on-error", default=False)
+    # Number of cores
+    num_cores: int = Field(alias="num-cores", default=1)
 
     model_config = {
         "populate_by_name": True

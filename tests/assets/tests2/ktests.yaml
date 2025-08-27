@@ -12,7 +12,7 @@ jobs:
       - name: MPI-2 (a)
         uses: app-name/mpi
         with:
-          n-procs: 2
+          num-procs: 2
 
   test-C:
     description: "Another test that will use 4 MPI ranks"
@@ -20,7 +20,7 @@ jobs:
       - name: MPI-2 (b)
         uses: app-name/mpi
         with:
-          n-procs: 2
+          num-procs: 2
 
   test-oversized:
     description: "Oversized test that should never be scheduled"
@@ -28,7 +28,7 @@ jobs:
       - name: 10k cores
         uses: core/sequential
         with:
-          n-cores: 1000000
+          num-cores: 1000000
 
   test-skipped:
     description: "Disabled test"

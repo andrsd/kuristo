@@ -15,7 +15,7 @@ class MPIAction(ProcessAction):
             context=context,
             **kwargs,
         )
-        self._n_ranks = kwargs.get("n-procs", 1)
+        self._n_ranks = kwargs.get("num-procs", 1)
 
     @property
     def num_cores(self):

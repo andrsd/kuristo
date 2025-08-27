@@ -15,7 +15,7 @@ class SeqAction(ProcessAction):
             context=context,
             **kwargs
         )
-        self._n_cores = kwargs.get("n-cores", 1)
+        self._n_cores = kwargs.get("num-cores", 1)
 
     @property
     def num_cores(self):
