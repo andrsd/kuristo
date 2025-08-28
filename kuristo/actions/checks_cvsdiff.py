@@ -34,19 +34,18 @@ class CSVDiffCheck(Action):
                     abs_ = float(self._tolerances.get(col, {}).get("abs-tol", self._default_abs))
 
                     if not math.isclose(g_val, t_val, rel_tol=rel, abs_tol=abs_):
-                        self._stdout = (
+                        self.output = (
                             f"Mismatch at row {row_idx}, column '{col}': "
                             f"gold={g_val}, test={t_val} "
                             f"(rel_tol={rel}, abs-tol={abs_})"
                         )
-                        self._stdout = self._stdout.encode()
                         return -1
 
-            self._output = b"CSV files match within tolerance."
+            self.output = "CSV files match within tolerance."
             return 0
 
         except Exception as ex:
-            self._output = f"Comparison failed: {ex}".encode()
+            self.output = f"Comparison failed: {ex}"
             return -1
 
     def _read_csv(self, path):

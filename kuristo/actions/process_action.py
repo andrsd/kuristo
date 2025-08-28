@@ -64,7 +64,7 @@ class ProcessAction(Action):
                 self.context.vars["steps"][self.id] = {
                     "output": self._stdout.decode()
                 }
-            self._output = self._stdout
+            self.output = self._stdout
             return self._process.returncode
 
         except subprocess.TimeoutExpired:
