@@ -279,11 +279,15 @@ class Job:
             with self._step_lock:
                 self._active_step = step
             self._logger.task_start(step.name)
-            if hasattr(step, 'command'):
-                for line in step.command.splitlines():
-                    self._logger.script_line(line)
             self.on_step_start(self, step)
-            exit_code = step.run()
+            try:
+                if hasattr(step, 'command'):
+                    for line in step.command.splitlines():
+                        self._logger.script_line(line)
+                exit_code = step.run()
+            except Exception as e:
+                self._logger.log(str(e))
+                exit_code = -1
             self.on_step_finish(self, step)
             self._load_env()
 

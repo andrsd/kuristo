@@ -14,11 +14,13 @@ class ShellAction(ProcessAction):
         self._n_cores = kwargs.get("num_cores", 1)
 
     def create_command(self):
-        assert self.context is not None
-        cmds = interpolate_str(
-            self._commands,
-            self.context.vars
-        )
+        if self.context is None:
+            cmds = self._commands
+        else:
+            cmds = interpolate_str(
+                self._commands,
+                self.context.vars
+            )
         return cmds
 
     @property
