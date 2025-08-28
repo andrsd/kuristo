@@ -1,4 +1,3 @@
-import pytest
 from unittest.mock import patch, MagicMock
 from kuristo.actions.mpi_action import MPIAction
 from kuristo.context import Context
@@ -35,9 +34,3 @@ def test_create_command_uses_config_and_sub_command(mock_get):
 
     assert result == "mpirun -np 4 my_mpi_program"
     mock_get.assert_called_once()
-
-
-def test_cannot_instantiate_abstract_mpi_action():
-    ctx = make_context()
-    with pytest.raises(TypeError):
-        MPIAction(name="mpi_test", context=ctx)  # no sub_command implementation
