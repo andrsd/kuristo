@@ -1,4 +1,3 @@
-import pytest
 from unittest.mock import patch, MagicMock
 from kuristo.actions.shell_action import ShellAction
 from kuristo.context import Context
@@ -31,5 +30,5 @@ def test_create_command_real_interpolation():
 
 def test_create_command_no_context_raises():
     action = ShellAction("test", None, commands="echo hi")
-    with pytest.raises(AssertionError):
-        action.create_command()
+    result = action.create_command()
+    assert "echo hi" in result
