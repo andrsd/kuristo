@@ -1,7 +1,6 @@
 import re
 from kuristo.registry import action
-from kuristo.actions.action import Action
-from kuristo.utils import interpolate_str
+from kuristo.actions.regex_base import RegexBaseAction
 
 ALIAS_PATTERNS = {
     "float": r"([-+]?(?:\d*\.\d+|\d+)(?:[eE][-+]?\d+)?)",
@@ -12,26 +11,22 @@ ALIAS_RE = re.compile(r"{:(\w+):}")
 
 
 @action("checks/regex")
-class RegexCheck(Action):
+class RegexCheck(RegexBaseAction):
 
     def __init__(self, name, context, **kwargs):
-        super().__init__(name, context, **kwargs)
-        self._target_step = kwargs["input"]
-        self._pattern = self._expand_pattern(kwargs.get("pattern", []))
+        pattern = kwargs.pop("pattern", [])
+        super().__init__(
+            name,
+            context,
+            pattern=self._expand_pattern(pattern),
+            **kwargs)
 
-    def run(self, context=None):
-        output = self._resolve_output()
-        matches = re.search(self._pattern, output)
-        if matches:
-            self._output = "Regex check passed."
-            self._return_code = 0
-        else:
-            self._output = "Regex check failed"
-            self._return_code = -1
-        self._output = self._output.encode()
+    def on_success(self, match) -> int:
+        self.output = "Regex check passed."
+        return 0
 
-    def _resolve_output(self):
-        return interpolate_str(self._target_step, self.context.vars)
+    def on_failure(self):
+        self.output = "Regex check failed"
 
     def _expand_pattern(self, pattern: str) -> str:
         def replacer(match):

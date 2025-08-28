@@ -283,7 +283,7 @@ class Job:
                 for line in step.command.splitlines():
                     self._logger.script_line(line)
             self.on_step_start(self, step)
-            step.run(context=self._context)
+            exit_code = step.run()
             self.on_step_finish(self, step)
             self._load_env()
 
@@ -295,13 +295,13 @@ class Job:
                 self._logger.log(f'* Job timed out after {self.timeout_minutes} minutes', tag="TASK_END")
                 self._return_code = 124
                 break
-            elif step.return_code == 124:
+            elif exit_code == 124:
                 self._logger.log(f'* Step timed out after {step.timeout_minutes} minutes', tag="TASK_END")
             else:
-                self._logger.task_end(step.return_code)
+                self._logger.task_end(exit_code)
 
-            if step.return_code != 0 and not step.continue_on_error:
-                self._return_code = step.return_code
+            if exit_code != 0 and not step.continue_on_error:
+                self._return_code = exit_code
                 break
 
         with self._step_lock:

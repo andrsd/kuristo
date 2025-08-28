@@ -17,7 +17,7 @@ class CSVDiffCheck(Action):
         self._default_rel = float(kwargs.get("rel-tol", 1e-6))
         self._default_abs = float(kwargs.get("abs-tol", 1e-12))
 
-    def run(self, context=None):
+    def run(self) -> int:
         gold_data = self._read_csv(self._gold_path)
         test_data = self._read_csv(self._test_path)
 
@@ -39,16 +39,15 @@ class CSVDiffCheck(Action):
                             f"gold={g_val}, test={t_val} "
                             f"(rel_tol={rel}, abs-tol={abs_})"
                         )
-                        self._return_code = -1
                         self._stdout = self._stdout.encode()
-                        return
+                        return -1
 
             self._output = b"CSV files match within tolerance."
-            self._return_code = 0
+            return 0
 
         except Exception as ex:
             self._output = f"Comparison failed: {ex}".encode()
-            self._return_code = -1
+            return -1
 
     def _read_csv(self, path):
         with open(path, newline="") as f:

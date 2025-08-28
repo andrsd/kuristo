@@ -4,7 +4,7 @@ jobs:
     description: "Default run"
     steps:
       - name: Sequential run
-        uses: core/sequential
+        uses: test/sequential
 
   test-B:
     description: "Default test that will use 4 MPI ranks"
@@ -26,7 +26,7 @@ jobs:
     description: "Oversized test that should never be scheduled"
     steps:
       - name: 10k cores
-        uses: core/sequential
+        uses: test/sequential
         with:
           num-cores: 1000000
 
@@ -35,4 +35,4 @@ jobs:
     skip: "disabled"
     steps:
       - name: Disabled test
-        uses: core/sequential
+        uses: test/sequential

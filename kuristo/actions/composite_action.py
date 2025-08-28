@@ -14,14 +14,13 @@ class CompositeAction(Action):
         """
         pass
 
-    def run(self, context=None):
+    def run(self) -> int:
         output_lines = []
         for step in self._steps:
-            step.run(context)
+            step.run()
             output_lines.append(f"[{step.name}] {step.output.decode(errors='ignore').strip()}")
             if step.return_code != 0:
-                self._return_code = step.return_code
                 self._output = "\n".join(output_lines).encode()
-                return
-        self._return_code = 0
+                return step.return_code
         self._output = "\n".join(output_lines).encode()
+        return 0

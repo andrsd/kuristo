@@ -18,7 +18,7 @@ class FunctionAction(Action):
         )
         self._params = params
 
-    def run(self, context=None):
+    def run(self) -> int:
         stdout = StringIO()
         stderr = StringIO()
 
@@ -28,12 +28,12 @@ class FunctionAction(Action):
 
             self._stdout = stdout.getvalue().encode()
             self._stderr = stderr.getvalue().encode()
-            self._return_code = 0
+            return 0
 
         except Exception as e:
             self._stdout = b""
             self._stderr = str(e).encode()
-            self._return_code = 1
+            return 1
 
     @abstractmethod
     def execute(self) -> None:
