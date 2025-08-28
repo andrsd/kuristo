@@ -1,12 +1,14 @@
+from kuristo.registry import action
 from kuristo.actions.process_action import ProcessAction
 from kuristo.context import Context
+from kuristo.utils import interpolate_str
 import kuristo.config as config
-from abc import abstractmethod
 
 
+@action("core/mpi-run")
 class MPIAction(ProcessAction):
     """
-    Base class for running MPI commands
+    Class for running MPI commands
     """
 
     def __init__(self, name, context: Context, **kwargs) -> None:
@@ -15,19 +17,20 @@ class MPIAction(ProcessAction):
             context=context,
             **kwargs,
         )
+        self._commands = kwargs.get("run", "")
         self._n_ranks = kwargs.get("num-procs", 1)
 
     @property
     def num_cores(self):
         return self._n_ranks
 
-    @abstractmethod
     def create_sub_command(self) -> str:
-        """
-        Subclasses must override this method to return the shell command that will be
-        executed by the MPI launcher
-        """
-        pass
+        assert self.context is not None
+        cmds = interpolate_str(
+            self._commands,
+            self.context.vars
+        )
+        return cmds
 
     def create_command(self):
         cfg = config.get()
