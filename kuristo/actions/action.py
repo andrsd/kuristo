@@ -10,7 +10,6 @@ class Action(ABC):
     def __init__(self, name, context: Context, **kwargs) -> None:
         self._cwd = kwargs.get("working_dir", None)
         self._id = kwargs.get("id", None)
-        self._return_code = -1
         if name is None:
             self._name = ""
         else:
@@ -35,13 +34,6 @@ class Action(ABC):
         return self._id
 
     @property
-    def return_code(self) -> int:
-        """
-        Return code of the action
-        """
-        return self._return_code
-
-    @property
     def num_cores(self) -> int:
         return 1
 
@@ -54,6 +46,10 @@ class Action(ABC):
             return self._output
         else:
             return b''
+
+    @output.setter
+    def output(self, str):
+        self._output = str
 
     @property
     def timeout_minutes(self):
@@ -74,5 +70,5 @@ class Action(ABC):
         return self._continue_on_error
 
     @abstractmethod
-    def run(self, context=None):
+    def run(self) -> int:
         pass

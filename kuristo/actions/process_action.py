@@ -43,11 +43,11 @@ class ProcessAction(Action):
         else:
             return b''
 
-    def run(self, context=None):
+    def run(self) -> int:
         timeout = self.timeout_minutes
         env = os.environ.copy()
-        if context is not None:
-            env.update(context.env)
+        if self.context is not None:
+            env.update(self.context.env)
         self._process = subprocess.Popen(
             self.command,
             shell=True,
@@ -60,21 +60,21 @@ class ProcessAction(Action):
             self._stdout, self._stderr = self._process.communicate(
                 timeout=timeout * 60
             )
-            self._return_code = self._process.returncode
             if self.id is not None:
                 self.context.vars["steps"][self.id] = {
                     "output": self._stdout.decode()
                 }
             self._output = self._stdout
+            return self._process.returncode
 
         except subprocess.TimeoutExpired:
             self.terminate()
             outs, errs = self._process.communicate()
             self._stderr = 'Step timed out'.encode()
-            self._return_code = 124
+            return 124
         except subprocess.SubprocessError:
             self._stderr = b''
-            self._return_code = -1
+            return -1
 
     def terminate(self):
         if self._process is not None:

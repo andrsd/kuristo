@@ -1,6 +1,6 @@
 from kuristo.registry import action
 from kuristo.context import Context
-from kuristo.actions import Action, ProcessAction, MPIAction, CompositeAction, FunctionAction
+from kuristo.actions import Action, ProcessAction, MPIAction, CompositeAction, FunctionAction, RegexBaseAction
 
 try:
     from ._version import __version__
@@ -13,6 +13,7 @@ __all__ = [
     "ProcessAction",
     "MPIAction",
     "FunctionAction",
+    "RegexBaseAction",
     "CompositeAction",
     "Context"
 ]

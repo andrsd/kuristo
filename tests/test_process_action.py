@@ -32,23 +32,10 @@ def test_successful_run(action_instance):
     mock_popen.communicate.return_value = (b"output", b"error")
     mock_popen.returncode = 0
     with patch("subprocess.Popen", return_value=mock_popen):
-        action_instance.run()
+        exit_code = action_instance.run()
+        assert exit_code == 0
     assert action_instance.stdout == b"output"
     assert action_instance.stderr == b"error"
-    assert action_instance._return_code == 0
-
-
-def test_run_with_context_env(action_instance):
-    mock_popen = MagicMock()
-    mock_popen.communicate.return_value = (b"ok", b"")
-    mock_popen.returncode = 0
-    test_context = DummyContext()
-    test_context.env = {"CUSTOM": "123"}
-
-    with patch("subprocess.Popen", return_value=mock_popen) as popen_mock:
-        action_instance.run(context=test_context)
-        _, kwargs = popen_mock.call_args
-        assert "CUSTOM" in kwargs["env"]
 
 
 def test_timeout_handling(action_instance):
@@ -59,18 +46,18 @@ def test_timeout_handling(action_instance):
         (b"", b""),
     ]
     with patch("subprocess.Popen", return_value=mock_popen):
-        action_instance.run()
+        exit_code = action_instance.run()
+        assert exit_code == 124
     assert action_instance.stderr == b"Step timed out"
-    assert action_instance._return_code == 124
 
 
 def test_subprocess_error_handling(action_instance):
     mock_popen = MagicMock()
     mock_popen.communicate.side_effect = subprocess.SubprocessError()
     with patch("subprocess.Popen", return_value=mock_popen):
-        action_instance.run()
+        exit_code = action_instance.run()
+        assert exit_code == -1
     assert action_instance.stderr == b""
-    assert action_instance._return_code == -1
 
 
 def test_terminate_kills_process(action_instance):

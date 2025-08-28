@@ -83,14 +83,16 @@ class ExodiffCheck(ProcessAction):
 
         return shlex.join(cmd)
 
-    def run(self, context=None):
-        super().run(context=context)
+    def run(self) -> int:
+        exit_code = super().run()
 
         # interpret exodiff return code
-        if self._return_code != 0:
+        if exit_code != 0:
             if self._fail_on_diff:
                 # Leave return_code as is, fail the test
-                return
+                return exit_code
             else:
                 # Allow diffs (dev mode), override return code
-                self._return_code = 0
+                return 0
+        else:
+            return -1

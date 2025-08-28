@@ -3,6 +3,6 @@ jobs:
     description: "Run a test that requires 4 cores"
     steps:
       - name: 4 cores
-        uses: core/sequential
+        uses: test/sequential
         with:
           num-cores: 4
