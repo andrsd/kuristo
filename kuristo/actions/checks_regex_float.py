@@ -15,21 +15,21 @@ class RegexFloatCheck(RegexCheck):
         try:
             value = float(match.group(1))
             if math.isclose(value, self._gold, rel_tol=self._rel_tol, abs_tol=self._abs_tol):
-                self._stdout = (
+                self.output = (
                     f"Regex float check passed: got {value}, expected {self._gold}"
                 )
                 return 0
             else:
-                self._stdout = (
+                self.output = (
                     f"Regex float check failed: got {value}, expected {self._gold}, "
                     f"rel-tol={self._rel_tol}, abs-tol={self._abs_tol}"
                 )
                 return -1
         except ValueError:
-            self._stdout = (
+            self.output = (
                 f"Regex matched value '{match.group(1)}' but it is not a float."
             )
             return -1
 
     def on_failure(self):
-        self._stdout = f"Pattern '{self.pattern}' not found in output"
+        self.output = f"Pattern '{self.pattern}' not found in output"

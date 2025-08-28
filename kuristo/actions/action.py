@@ -45,11 +45,16 @@ class Action(ABC):
         if self._output:
             return self._output
         else:
-            return b''
+            return ''
 
     @output.setter
-    def output(self, str):
-        self._output = str
+    def output(self, out):
+        if isinstance(out, str):
+            self._output = out
+        elif isinstance(out, bytes):
+            self._output = out.decode()
+        else:
+            self._output = str(out)
 
     @property
     def timeout_minutes(self):

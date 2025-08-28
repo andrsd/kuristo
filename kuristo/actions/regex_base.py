@@ -10,7 +10,6 @@ class RegexBaseAction(Action):
         super().__init__(name, context, **kwargs)
         self._target_step = kwargs.get("input")
         self._pattern = pattern
-        self._output = ""
 
     def run(self) -> int:
         output = self._resolve_output()
@@ -20,7 +19,6 @@ class RegexBaseAction(Action):
         else:
             self.on_failure()
             exit_code = -1
-        self._output = self._output.encode()
         return exit_code
 
     def _resolve_output(self):

@@ -20,7 +20,7 @@ class CompositeAction(Action):
             step.run()
             output_lines.append(f"[{step.name}] {step.output.decode(errors='ignore').strip()}")
             if step.return_code != 0:
-                self._output = "\n".join(output_lines).encode()
+                self.output = "\n".join(output_lines)
                 return step.return_code
-        self._output = "\n".join(output_lines).encode()
+        self.output = "\n".join(output_lines)
         return 0

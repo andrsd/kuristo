@@ -287,7 +287,7 @@ class Job:
             self.on_step_finish(self, step)
             self._load_env()
 
-            log_data = step.output.decode()
+            log_data = step.output
             for line in log_data.splitlines():
                 self._logger.log(line)
 
