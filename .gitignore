@@ -9,3 +9,6 @@ kuristo/_version.py
 docs/_build/
 dist/
 htmlcov/
+.idea
+.zed
+.vscode
