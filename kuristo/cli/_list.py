@@ -23,7 +23,7 @@ def list_jobs(args):
             txt = Text("• ")
             txt.append(Text.from_markup(jnm, style="bold cyan"))
             txt.append(": ")
-            txt.append(Text.from_markup(sp.description, style="dim"))
+            txt.append(Text.from_markup(sp.name, style="gray46"))
             console.print(txt)
     console.print()
     console.print(Text.from_markup(f"Found jobs: [green]{n_jobs}[/]"))
