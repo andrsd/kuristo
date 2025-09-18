@@ -20,10 +20,14 @@ def list_jobs(args):
         n_jobs += len(job_names)
         for name, _ in job_names:
             jnm = ui.job_name_markup(name)
-            txt = Text("• ")
-            txt.append(Text.from_markup(jnm, style="bold cyan"))
-            txt.append(": ")
-            txt.append(Text.from_markup(sp.name, style="gray46"))
+            txt = Text("")
+            if sp.skip:
+                txt.append(Text.from_markup(f"• {jnm}: {sp.name}", style="grey35"))
+            else:
+                txt.append(Text.from_markup("• "))
+                txt.append(Text.from_markup(jnm, style="bold cyan"))
+                txt.append(": ")
+                txt.append(Text.from_markup(sp.name, style="grey70"))
             console.print(txt)
     console.print()
     console.print(Text.from_markup(f"Found jobs: [green]{n_jobs}[/]"))
