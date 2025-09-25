@@ -10,6 +10,7 @@ def dummy_context():
     ctx.env = {}
     return ctx
 
+
 def test_create_command_with_abs_tol(dummy_context):
     check = H5DiffCheck(
         name="test",
@@ -22,6 +23,7 @@ def test_create_command_with_abs_tol(dummy_context):
     assert "--delta=0.001" in cmd
     assert "gold.h5" in cmd
     assert "test.h5" in cmd
+
 
 def test_create_command_with_rel_tol(dummy_context):
     check = H5DiffCheck(
@@ -36,6 +38,7 @@ def test_create_command_with_rel_tol(dummy_context):
     assert "gold.h5" in cmd
     assert "test.h5" in cmd
 
+
 def test_missing_tolerances_raises(dummy_context):
     with pytest.raises(RuntimeError, match="Must provide either `rel-tol` or `abs-tol`"):
         H5DiffCheck(
@@ -44,6 +47,7 @@ def test_missing_tolerances_raises(dummy_context):
             gold="gold.h5",
             test="test.h5"
         )
+
 
 def test_run_returns_exit_code_on_diff(dummy_context):
     check = H5DiffCheck(
@@ -59,6 +63,7 @@ def test_run_returns_exit_code_on_diff(dummy_context):
     check.run_command = MagicMock(return_value=2)
     assert check.run() == 2
 
+
 def test_run_allows_diff_when_flag_false(dummy_context):
     check = H5DiffCheck(
         name="test",
@@ -72,6 +77,7 @@ def test_run_allows_diff_when_flag_false(dummy_context):
     )
     check.run_command = MagicMock(return_value=2)
     assert check.run() == 0
+
 
 def test_run_success(dummy_context):
     check = H5DiffCheck(
