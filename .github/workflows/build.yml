@@ -36,7 +36,8 @@ jobs:
           sudo apt update
           sudo apt install -y \
             libopenmpi-dev \
-            openmpi-bin
+            openmpi-bin \
+            hdf5-tools
           python -m pip install --upgrade pip
           pip install \
             pytest \
