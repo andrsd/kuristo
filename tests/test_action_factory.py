@@ -25,6 +25,7 @@ class DummyStep:
         self.run = run
         self.uses = uses
         self.params = params or {}
+        self.env = {}
 
 
 @pytest.fixture
@@ -46,6 +47,7 @@ def test_create_shell_action_when_uses_is_none(dummy_context):
         continue_on_error=False,
         num_cores=1,
         commands=ts.run,
+        env={}
     )
     assert result == mock_shell.return_value
 

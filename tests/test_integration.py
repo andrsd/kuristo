@@ -101,10 +101,10 @@ def test_env():
     )
 
     assert result.returncode == 0
-    assert "Success: 2" in result.stdout
+    assert "Success: 3" in result.stdout
     assert "Failed: 0" in result.stdout
     assert "Skipped: 0" in result.stdout
-    assert "Total: 2" in result.stdout
+    assert "Total: 3" in result.stdout
 
 
 def test_matrix():

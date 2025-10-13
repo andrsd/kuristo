@@ -78,6 +78,8 @@ class Step(BaseModel):
     continue_on_error: bool = Field(alias="continue-on-error", default=False)
     # Number of cores
     num_cores: int = Field(alias="num-cores", default=1)
+    # Environment for this step
+    env: Optional[dict] = Field(default={})
 
     model_config = {
         "populate_by_name": True

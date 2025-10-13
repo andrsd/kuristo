@@ -21,3 +21,11 @@ jobs:
       - name: Add PATH
         run: |
           echo "$PWD" >> $KURISTO_PATH
+
+  step-with-env:
+    steps:
+      - name: Run with env vars
+        env:
+          ENV_VAR1: 42
+        run: |
+          echo $ENV_VAR1
