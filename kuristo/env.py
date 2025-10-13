@@ -28,6 +28,9 @@ class Env:
                 k, v = line.split("=", 1)
                 self.set(k.strip(), v.strip())
 
+    def update(self, vals: dict):
+        self._vars.update(vals)
+
     def as_dict(self):
         return dict(self._vars)
 

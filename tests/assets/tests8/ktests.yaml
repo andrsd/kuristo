@@ -23,9 +23,16 @@ jobs:
           echo "$PWD" >> $KURISTO_PATH
 
   step-with-env:
+    env:
+      ENV_VAR_JOB: "Job env var"
     steps:
       - name: Run with env vars
         env:
           ENV_VAR1: 42
         run: |
           echo $ENV_VAR1
+
+      - name: Show job env var
+        id: job_env_var
+        run: |
+          echo $ENV_VAR_JOB

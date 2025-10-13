@@ -121,6 +121,8 @@ class JobSpec(BaseModel):
     _name: str = PrivateAttr()
     # File name where the job specification was defined
     _file_name: str = PrivateAttr()
+    # Environment for this job
+    env: Optional[dict] = Field(default={})
 
     @property
     def id(self):

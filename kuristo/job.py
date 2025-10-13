@@ -102,6 +102,7 @@ class Job:
             base_env=self._get_base_env(),
             matrix=matrix
         )
+        self._context.env.update((var, str(val)) for var, val in job_spec.env.items())
         self._steps = self._build_steps(job_spec)
         if job_spec.skip:
             self.skip(job_spec.skip_reason)
