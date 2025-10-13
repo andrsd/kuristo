@@ -27,12 +27,25 @@ jobs:
       ENV_VAR_JOB: "Job env var"
     steps:
       - name: Run with env vars
+        id: step_env_var
         env:
           ENV_VAR1: 42
         run: |
           echo $ENV_VAR1
 
+      - name: Check-1
+        uses: checks/regex
+        with:
+          input: ${{ steps.step_env_var.output }}
+          pattern: "42"
+
       - name: Show job env var
         id: job_env_var
         run: |
           echo $ENV_VAR_JOB
+
+      - name: Check-2
+        uses: checks/regex
+        with:
+          input: ${{ steps.job_env_var.output }}
+          pattern: "Job env var"
