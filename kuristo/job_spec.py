@@ -235,17 +235,18 @@ def specs_from_file(file_path) -> list[JobSpec]:
     specs = []
     with open(file_path, 'r') as file:
         data = yaml.safe_load(file)
-        jobs = data.get('jobs', {})
-        for id, params in jobs.items():
-            try:
-                jspec = JobSpec.from_dict(file_path, id, params)
-                specs.append(jspec)
-            except ValidationError as exp:
-                msgs = []
-                n = len(exp.errors())
-                msgs.append(f"{n} syntax error found in {location}:")
-                for error in exp.errors():
-                    loc_str = ".".join(str(p) for p in error['loc'])
-                    msgs.append(f"- {loc_str}: {error['msg']}")
-                raise RuntimeError("\n".join(msgs))
+        if data is not None:
+            jobs = data.get('jobs', {})
+            for id, params in jobs.items():
+                try:
+                    jspec = JobSpec.from_dict(file_path, id, params)
+                    specs.append(jspec)
+                except ValidationError as exp:
+                    msgs = []
+                    n = len(exp.errors())
+                    msgs.append(f"{n} syntax error found in {location}:")
+                    for error in exp.errors():
+                        loc_str = ".".join(str(p) for p in error['loc'])
+                        msgs.append(f"- {loc_str}: {error['msg']}")
+                    raise RuntimeError("\n".join(msgs))
     return specs
