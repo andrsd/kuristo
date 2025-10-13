@@ -15,6 +15,7 @@ class ProcessAction(Action):
         self._process = None
         self._stdout = None
         self._stderr = None
+        self._env = kwargs.get('env', {})
 
     @property
     def command(self) -> str:
@@ -48,6 +49,7 @@ class ProcessAction(Action):
         env = os.environ.copy()
         if self.context is not None:
             env.update(self.context.env)
+        env.update((var, str(val)) for var, val in self._env.items())
         self._process = subprocess.Popen(
             self.command,
             shell=True,
