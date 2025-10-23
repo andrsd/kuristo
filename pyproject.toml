@@ -25,4 +25,4 @@ output = "coverage.xml"
 include = ["kuristo*"]
 
 [tool.setuptools.package-data]
-"kuristo" = ["templates/*.j2"]
+"kuristo" = ["templates/*.j2", "_version.py"]
