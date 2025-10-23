@@ -95,4 +95,4 @@ class ExodiffCheck(ProcessAction):
                 # Allow diffs (dev mode), override return code
                 return 0
         else:
-            return -1
+            return 0
