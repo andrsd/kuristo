@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>checks/exodiff &mdash; kuristo 0.7.0 documentation</title>
+  <title>checks/h5diff &mdash; kuristo 0.7.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -21,8 +21,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="checks/h5diff" href="h5diff.html" />
-    <link rel="prev" title="checks/csv-diff" href="csv-diff.html" /> 
+    <link rel="next" title="checks/regex" href="regex.html" />
+    <link rel="prev" title="checks/exodiff" href="exodiff.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -50,12 +50,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../writing_workflows.html">Writing Workflows</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Built-in Actions</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="csv-diff.html">checks/csv-diff</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">checks/exodiff</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="exodiff.html">checks/exodiff</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">checks/h5diff</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#example-usage">Example Usage</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#arguments">Arguments</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="h5diff.html">checks/h5diff</a></li>
 <li class="toctree-l2"><a class="reference internal" href="regex.html">checks/regex</a></li>
 <li class="toctree-l2"><a class="reference internal" href="regex-float.html">checks/regex-float</a></li>
 </ul>
@@ -81,9 +81,9 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">Built-in Actions</a></li>
-      <li class="breadcrumb-item active">checks/exodiff</li>
+      <li class="breadcrumb-item active">checks/h5diff</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/actions/exodiff.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/actions/h5diff.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -91,46 +91,45 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="checks-exodiff">
-<h1>checks/exodiff<a class="headerlink" href="#checks-exodiff" title="Link to this heading"></a></h1>
-<p>The <code class="docutils literal notranslate"><span class="pre">exodiff</span></code> action compares two Exodus files (<cite>.exo</cite>) to verify that simulation results match a known reference.</p>
-<p>It is typically used to perform regression tests on output files produced by finite element solvers that write Exodus format.</p>
+  <section id="checks-h5diff">
+<h1>checks/h5diff<a class="headerlink" href="#checks-h5diff" title="Link to this heading"></a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">h5diff</span></code> action compares two HDF5 files (<cite>.h5</cite>) to verify that simulation results
+match a known reference.</p>
 <section id="example-usage">
 <h2>Example Usage<a class="headerlink" href="#example-usage" title="Link to this heading"></a></h2>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">steps</span><span class="p">:</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">checks/exodiff</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">checks/h5diff</span>
 <span class="w">    </span><span class="nt">with</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">gold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ref.exo</span>
-<span class="w">      </span><span class="nt">test</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result.exo</span>
-<span class="w">      </span><span class="nt">atol</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1e-8</span>
-<span class="w">      </span><span class="nt">rtol</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1e-6</span>
+<span class="w">      </span><span class="nt">gold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ref.h5</span>
+<span class="w">      </span><span class="nt">test</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result.h5</span>
+<span class="w">      </span><span class="nt">rel-tol</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1e-6</span>
 </pre></div>
 </div>
 </section>
 <section id="arguments">
 <h2>Arguments<a class="headerlink" href="#arguments" title="Link to this heading"></a></h2>
 <dl class="simple">
-<dt><code class="docutils literal notranslate"><span class="pre">gold</span></code> (string, required)</dt><dd><p>Path to the reference Exodus file.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">gold</span></code> (string, required)</dt><dd><p>Path to the reference HDF5 file.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">test</span></code> (string, required)</dt><dd><p>Path to the simulation output file to compare.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">test</span></code> (string, required)</dt><dd><p>Path to the output HDF5 file to compare.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">atol</span></code> (float, optional)</dt><dd><p>Absolute difference threshold.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">abs-tol</span></code> (float, optional)</dt><dd><p>Absolute difference threshold.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">rtol</span></code> (float, optional)</dt><dd><p>Relative difference threshold.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">rel-tol</span></code> (float, optional)</dt><dd><p>Relative difference threshold.</p>
 </dd>
 </dl>
 <div class="admonition-notes admonition">
 <p class="admonition-title">Notes</p>
 <ul class="simple">
-<li><p>This action assumes the input files use compatible mesh topologies and metadata.</p></li>
-<li><p>Uses <code class="docutils literal notranslate"><span class="pre">exodiff</span></code> from SEACAS. Make sure it is on your PATH when running kuristo.</p></li>
+<li><p>Either <code class="docutils literal notranslate"><span class="pre">abs-tol</span></code> or <code class="docutils literal notranslate"><span class="pre">rel-tol</span></code> must be provided</p></li>
+<li><p>Uses <code class="docutils literal notranslate"><span class="pre">h5diff</span></code> from HDF5 distribution. Make sure it is on your PATH when running kuristo.</p></li>
 </ul>
 </div>
 <div class="admonition seealso">
 <p class="admonition-title">See also</p>
 <ul class="simple">
+<li><p><a class="reference internal" href="exodiff.html"><span class="doc">checks/exodiff</span></a></p></li>
 <li><p><a class="reference internal" href="csv-diff.html"><span class="doc">checks/csv-diff</span></a></p></li>
-<li><p><a class="reference internal" href="h5diff.html"><span class="doc">checks/h5diff</span></a></p></li>
 </ul>
 </div>
 </section>
@@ -140,8 +139,8 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="csv-diff.html" class="btn btn-neutral float-left" title="checks/csv-diff" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="h5diff.html" class="btn btn-neutral float-right" title="checks/h5diff" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="exodiff.html" class="btn btn-neutral float-left" title="checks/exodiff" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="regex.html" class="btn btn-neutral float-right" title="checks/regex" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

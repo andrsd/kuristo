@@ -39,3 +39,4 @@ Arguments
 .. seealso::
 
    - :doc:`exodiff`
+   - :doc:`h5diff`

@@ -46,3 +46,4 @@ Arguments
 .. seealso::
 
    - :doc:`csv-diff`
+   - :doc:`h5diff`

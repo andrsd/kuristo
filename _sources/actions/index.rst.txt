@@ -10,5 +10,6 @@ Each action is used inside a job step to perform a specific task — such as val
 
    csv-diff
    exodiff
+   h5diff
    regex
    regex-float
