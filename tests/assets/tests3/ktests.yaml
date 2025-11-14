@@ -40,3 +40,14 @@ jobs:
       - name: Step 1
         working-directory: /tmp
         run: "echo $PWD"
+
+  test-job-cwd:
+    defaults:
+      run:
+        shell: bash
+        working-directory: /tmp
+    steps:
+      - name: print step
+        run: |
+          echo $PWD
+          echo $SHELL

@@ -11,12 +11,20 @@ class ActionFactory:
 
     @staticmethod
     def create(step, context):
+        working_directory = None
+        if context.defaults:
+            if context.defaults.run:
+                if context.defaults.run.working_directory:
+                    working_directory = context.defaults.run.working_directory
+        if step.working_directory:
+            working_directory = step.working_directory
+
         if step.uses is None:
             return ShellAction(
                 step.name,
                 context,
                 id=step.id,
-                working_dir=step.working_directory,
+                working_dir=working_directory,
                 timeout_minutes=step.timeout_minutes,
                 continue_on_error=step.continue_on_error,
                 commands=step.run,
@@ -29,7 +37,7 @@ class ActionFactory:
                 step.name,
                 context,
                 id=step.id,
-                working_dir=step.working_directory,
+                working_dir=working_directory,
                 timeout_minutes=step.timeout_minutes,
                 continue_on_error=step.continue_on_error,
                 **step.params

@@ -51,6 +51,15 @@ class Strategy(BaseModel):
     matrix: StrategyMatrix
 
 
+class JobDefaultsRun(BaseModel):
+    # Working directory
+    working_directory: Optional[str] = Field(alias='working-directory', default=None)
+
+
+class JobDefaults(BaseModel):
+    run: JobDefaultsRun
+
+
 class Step(BaseModel):
     """
     Data class with description of a job step
@@ -123,6 +132,8 @@ class JobSpec(BaseModel):
     _file_name: str = PrivateAttr()
     # Environment for this job
     env: Optional[dict] = Field(default={})
+    # Defaults
+    defaults: Optional[JobDefaults] = None
 
     @property
     def id(self):

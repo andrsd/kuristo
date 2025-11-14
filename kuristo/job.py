@@ -100,6 +100,7 @@ class Job:
         self._skipped = False
         self._context = Context(
             base_env=self._get_base_env(),
+            defaults=job_spec.defaults,
             matrix=matrix
         )
         self._context.env.update((var, str(val)) for var, val in job_spec.env.items())

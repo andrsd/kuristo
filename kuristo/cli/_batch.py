@@ -62,7 +62,10 @@ def create_script_params(
         if sp.skip:
             pass
         else:
-            context = Context(base_env=None)
+            context = Context(
+                base_env=None,
+                defaults=sp.defaults
+            )
             actions = build_actions(sp, context)
             n_cores = max(n_cores, required_cores(actions))
             max_time += sp.timeout_minutes
