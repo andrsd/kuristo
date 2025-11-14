@@ -64,6 +64,7 @@ def create_script_params(
         else:
             context = Context(
                 base_env=None,
+                working_directory=sp.working_directory,
                 defaults=sp.defaults
             )
             actions = build_actions(sp, context)

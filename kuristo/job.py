@@ -100,6 +100,7 @@ class Job:
         self._skipped = False
         self._context = Context(
             base_env=self._get_base_env(),
+            working_directory=job_spec.working_directory,
             defaults=job_spec.defaults,
             matrix=matrix
         )
