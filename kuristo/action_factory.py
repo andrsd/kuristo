@@ -11,7 +11,7 @@ class ActionFactory:
 
     @staticmethod
     def create(step, context):
-        working_directory = None
+        working_directory = context.working_directory
         if context.defaults:
             if context.defaults.run:
                 if context.defaults.run.working_directory:

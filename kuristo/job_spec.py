@@ -179,6 +179,13 @@ class JobSpec(BaseModel):
         """
         return self._file_name
 
+    @property
+    def working_directory(self):
+        """
+        Return file name where this job specification was
+        """
+        return self._work_dir
+
     def set_id(self, id):
         self._id = id
 
@@ -187,6 +194,9 @@ class JobSpec(BaseModel):
 
     def set_file_name(self, file_name):
         self._file_name = file_name
+
+    def set_working_directory(self, work_dir: str):
+        self._work_dir = work_dir
 
     def build_matrix_values(self):
         """
@@ -228,6 +238,7 @@ class JobSpec(BaseModel):
         if isinstance(data, dict):
             ts = JobSpec(**data)
             ts.set_file_name(file_name)
+            ts.set_working_directory(os.path.dirname(os.path.abspath(file_name)))
             ts.set_id(id)
             ts.set_name(data.get("name", id))
             return ts

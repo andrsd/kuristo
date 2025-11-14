@@ -73,8 +73,8 @@ def test_create_script_params_basic(mock_config_get, mock_build_actions):
     mock_config_get.return_value = mock_config_instance
 
     # 2 specs: one skipped, one active
-    skipped_spec = SimpleNamespace(skip=True, timeout_minutes=0, defaults=None)
-    active_spec = SimpleNamespace(skip=False, timeout_minutes=30, defaults=None)
+    skipped_spec = SimpleNamespace(skip=True, timeout_minutes=0, defaults=None, working_directory=None)
+    active_spec = SimpleNamespace(skip=False, timeout_minutes=30, defaults=None, working_directory=None)
 
     # build_actions returns actions with num_cores
     mock_build_actions.return_value = [SimpleNamespace(num_cores=4)]
@@ -123,8 +123,8 @@ def test_create_script_params_accumulates_time_and_max_cores(mock_config_get, mo
 
     workdir = Path("/data")
     specs = [
-        SimpleNamespace(skip=False, timeout_minutes=10, defaults=None),
-        SimpleNamespace(skip=False, timeout_minutes=20, defaults=None),
+        SimpleNamespace(skip=False, timeout_minutes=10, defaults=None, working_directory=None),
+        SimpleNamespace(skip=False, timeout_minutes=20, defaults=None, working_directory=None),
     ]
     # First spec -> 2 cores, second -> 8 cores
     mock_build_actions.side_effect = [
