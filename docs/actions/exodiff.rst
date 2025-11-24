@@ -17,7 +17,7 @@ Example Usage
          gold: ref.exo
          test: result.exo
          abs-tol: 1e-8
-         rtol: 1e-6
+         rel-tol: 1e-6
 
 
 Arguments
@@ -32,7 +32,7 @@ Arguments
 ``abs-tol`` (float, optional)
    Absolute difference threshold.
 
-``rtol`` (float, optional)
+``rel-tol`` (float, optional)
    Relative difference threshold.
 
 

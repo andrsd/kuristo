@@ -15,7 +15,7 @@ class ExodiffCheck(ProcessAction):
     Parameters:
         reference (str): Path to gold/reference file (can be prefixed with source: or build:)
         test (str): Path to test output file (same rules apply)
-        rtol (float): Relative tolerance
+        rel-tol (float): Relative tolerance
         abs-tol (float): Absolute tolerance
         floor (float): Floor tolerance
         extra_args (list[str]): Raw args passed to exodiff
@@ -31,7 +31,6 @@ class ExodiffCheck(ProcessAction):
         timeout_minutes,
         reference=None,
         test=None,
-        rtol=None,
         floor=None,
         extra_args=None,
         source_root=None,
@@ -58,7 +57,7 @@ class ExodiffCheck(ProcessAction):
             path_str=test, build_root=self._build_root, source_root=self._source_root
         )
         self._abs_tol = kwargs.get("abs-tol", None)
-        self._rtol = rtol
+        self._rel_tol = kwargs.get("rel-tol", None)
         self._floor = floor
         self._extra_args = extra_args or []
         self._fail_on_diff = fail_on_diff
@@ -69,8 +68,8 @@ class ExodiffCheck(ProcessAction):
         if self._abs_tol is not None:
             cmd += ["-tolerance", str(self._abs_tol)]
             cmd += ["-absolute"]
-        if self._rtol is not None:
-            cmd += ["-tolerance", str(self._rtol)]
+        if self._rel_tol is not None:
+            cmd += ["-tolerance", str(self._rel_tol)]
             cmd += ["-absolute"]
 
         if self._floor is not None:
