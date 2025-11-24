@@ -11,5 +11,5 @@ jobs:
         with:
           reference: source:input_file.inp
           test: build:result.out
-          atol: 1e-17
+          abs-tol: 1e-17
           fail_on_diff: false
