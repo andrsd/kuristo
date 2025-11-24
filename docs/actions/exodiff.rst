@@ -16,7 +16,7 @@ Example Usage
        with:
          gold: ref.exo
          test: result.exo
-         atol: 1e-8
+         abs-tol: 1e-8
          rtol: 1e-6
 
 
@@ -29,7 +29,7 @@ Arguments
 ``test`` (string, required)
    Path to the simulation output file to compare.
 
-``atol`` (float, optional)
+``abs-tol`` (float, optional)
    Absolute difference threshold.
 
 ``rtol`` (float, optional)
