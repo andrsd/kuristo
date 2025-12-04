@@ -13,8 +13,6 @@ class ProcessAction(Action):
     def __init__(self, name, context: Context, **kwargs) -> None:
         super().__init__(name, context, **kwargs)
         self._process = None
-        self._stdout = None
-        self._stderr = None
         self._env = kwargs.get('env', {})
 
     @property
@@ -23,26 +21,6 @@ class ProcessAction(Action):
         Return command
         """
         return self.create_command()
-
-    @property
-    def stdout(self):
-        """
-        Return stdout of the jobs
-        """
-        if self._stdout:
-            return self._stdout
-        else:
-            return b''
-
-    @property
-    def stderr(self):
-        """
-        Return stderr of the jobs
-        """
-        if self._stderr:
-            return self._stderr
-        else:
-            return b''
 
     def run(self) -> int:
         timeout = self.timeout_minutes
@@ -56,26 +34,28 @@ class ProcessAction(Action):
             cwd=self._cwd,
             env=env,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
+            stderr=subprocess.STDOUT
         )
         try:
-            self._stdout, self._stderr = self._process.communicate(
+            stdout, _ = self._process.communicate(
                 timeout=timeout * 60
             )
             if self.id is not None:
                 self.context.vars["steps"][self.id] = {
-                    "output": self._stdout.decode()
+                    "output": stdout.decode()
                 }
-            self.output = self._stdout
+            self.output = stdout
             return self._process.returncode
 
         except subprocess.TimeoutExpired:
             self.terminate()
-            outs, errs = self._process.communicate()
-            self._stderr = 'Step timed out'.encode()
+            outs, _ = self._process.communicate()
+            outs += b'\n'
+            outs += 'Step timed out'.encode()
+            self.output = outs
             return 124
         except subprocess.SubprocessError:
-            self._stderr = b''
+            self.output = b''
             return -1
 
     def terminate(self):
