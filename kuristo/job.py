@@ -87,8 +87,6 @@ class Job:
         self._path_file = log_dir / f"job-{self._num}.path"
         self._thread = None
         self._process = None
-        self._stdout = None
-        self._stderr = None
         self._logger = self.Logger(
             self._num,
             log_dir / f'job-{self._num}.log'

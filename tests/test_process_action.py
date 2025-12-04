@@ -22,20 +22,14 @@ def action_instance():
     return TrivialProcessAction("test", DummyContext())
 
 
-def test_stdout_and_stderr_defaults(action_instance):
-    assert action_instance.stdout == b""
-    assert action_instance.stderr == b""
-
-
 def test_successful_run(action_instance):
     mock_popen = MagicMock()
-    mock_popen.communicate.return_value = (b"output", b"error")
+    mock_popen.communicate.return_value = (b"output", None)
     mock_popen.returncode = 0
     with patch("subprocess.Popen", return_value=mock_popen):
         exit_code = action_instance.run()
         assert exit_code == 0
-    assert action_instance.stdout == b"output"
-    assert action_instance.stderr == b"error"
+    assert action_instance.output == "output"
 
 
 def test_timeout_handling(action_instance):
@@ -48,7 +42,7 @@ def test_timeout_handling(action_instance):
     with patch("subprocess.Popen", return_value=mock_popen):
         exit_code = action_instance.run()
         assert exit_code == 124
-    assert action_instance.stderr == b"Step timed out"
+    assert action_instance.output.endswith("Step timed out")
 
 
 def test_subprocess_error_handling(action_instance):
@@ -57,7 +51,7 @@ def test_subprocess_error_handling(action_instance):
     with patch("subprocess.Popen", return_value=mock_popen):
         exit_code = action_instance.run()
         assert exit_code == -1
-    assert action_instance.stderr == b""
+    assert action_instance.output == ""
 
 
 def test_terminate_kills_process(action_instance):
