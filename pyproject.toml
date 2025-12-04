@@ -8,7 +8,7 @@ dynamic = ["version"]
 description = "A simple automation framework"
 authors = [{ name = "David Andrs", email = "andrsd@gmail.com" }]
 dependencies = ["pyyaml", "rich", "networkx", "jinja2", "pydantic"]
-license = { text = "MIT" }
+license = "MIT"
 readme = "README.md"
 requires-python = ">=3.10"
 
