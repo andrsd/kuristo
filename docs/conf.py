@@ -3,7 +3,7 @@
 project = 'kuristo'
 copyright = '2025, David Andrs'
 author = 'David Andrs'
-release = '0.7.1'
+release = '0.7.2'
 
 # General configuration
 
