@@ -1,22 +1,19 @@
 import kuristo.config as config
 import kuristo.utils as utils
+import kuristo.cli._show as show
+import kuristo.ui as ui
 from pathlib import Path
 import xml.etree.ElementTree as ET
 from datetime import datetime
 
 
-def generate_junit(yaml_filename: Path, xml_filename: Path):
-    report = utils.read_report(yaml_filename)
-
-    results = report.get("results", [])
-
+def generate_junit(results, xml_filename: Path, stat):
     tests = len(results)
     failures = sum(1 for r in results if r.get("status") == "failed")
     errors = sum(1 for r in results if r.get("status") == "error")
     skipped = sum(1 for r in results if r.get("status") == "skipped")
     time = sum(float(r.get("duration", 0)) for r in results)
 
-    stat = yaml_filename.stat()
     created = datetime.fromtimestamp(stat.st_ctime).isoformat()
 
     testsuites = ET.Element("testsuites")
@@ -61,18 +58,39 @@ def generate_junit(yaml_filename: Path, xml_filename: Path):
 def report(args):
     cfg = config.get()
 
-    try:
-        format, filename = args.file.split(':')
-    except ValueError:
-        raise RuntimeError("Expected format of the file parameter is <format>:<filename>")
-
     run_name = args.run_id or "latest"
     runs_dir = cfg.log_dir / "runs" / run_name
-    yaml_report = Path(runs_dir / "report.yaml")
-    if not yaml_report.exists():
+    report_path = Path(runs_dir / "report.yaml")
+    if not report_path.exists():
         raise RuntimeError("No report found. Did you run any jobs yet?")
 
-    if format == "xml":
-        generate_junit(yaml_report, Path(filename))
+    report = utils.read_report(report_path)
+    filters = utils.build_filters(args)
+
+    results = report.get("results", [])
+    if len(filters) == 0:
+        filtered = results
     else:
-        raise RuntimeError(f"Requested unknown file format '{format}'")
+        filtered = [r for r in results if r["status"] in filters]
+
+    if args.output:
+        try:
+            format, filename = args.output.split(':')
+        except ValueError:
+            raise RuntimeError("Expected format of the file parameter is <format>:<filename>")
+
+        if format == "xml":
+            stat = report_path.stat()
+            generate_junit(filtered, Path(filename), stat)
+        else:
+            raise RuntimeError(f"Requested unknown file format '{format}'")
+    else:
+        # write to terminal
+        for entry in filtered:
+            log_path = Path(runs_dir / f"job-{entry['id']}.log")
+            if len(filters) == 0:
+                ui.job_header_line(entry['id'], cfg.console_width)
+                show.display_job_log(log_path)
+            elif entry['status'] in filters:
+                ui.job_header_line(entry['id'], cfg.console_width)
+                show.display_job_log(log_path, filters)

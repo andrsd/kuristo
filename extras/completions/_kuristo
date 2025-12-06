@@ -92,7 +92,10 @@ case $state in
         _arguments \
           '--help[Show help message and exit]' \
           '--run-id[Run ID to display results for]:string' \
-          '*:File name to store the report into\: \<format\>\:\<filename\>:_files'
+          '--failed[Show only tests that failed]' \
+          '--skipped[Show only tests that were skipped]' \
+          '--passed[Show only tests that passed]' \
+          '--output[File name to store the report into\: \<format\>\:\<filename\>]:string'
         ;;
     esac
     ;;

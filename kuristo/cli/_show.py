@@ -36,10 +36,22 @@ def parse_sections(lines):
                 "end_time": None
             }
         elif tag == 'TASK_END':
-            rc = int(msg.split("exit code")[1].strip())
-            if current:
-                current["return_code"] = rc
-                current["end_time"] = timestamp
+            s = msg.split("exit code")
+            if len(s) > 1:
+                rc = int(s[1].strip())
+                if current:
+                    current["return_code"] = rc
+                    current["end_time"] = timestamp
+            else:
+                current = {
+                    "type": "section",
+                    "title": "",
+                    "return_code": None,
+                    "lines": [
+                        ('OUTPUT', msg.strip())
+                    ]
+                }
+
         elif tag == 'ENV':
             if current:
                 sections.append(current)
@@ -139,25 +151,33 @@ def render_section(sec, max_label_len):
     console.print()
 
 
-def render_sections(sections):
+def render_sections(sections, filters=None):
     cfg = config.get()
     max_label_len = cfg.console_width
     for sec in sections:
         if sec["type"] == "title":
             render_title(sec, max_label_len)
         else:
-            render_section(sec, max_label_len)
+            if filters is None:
+                render_section(sec, max_label_len)
+            elif sec["return_code"] is not None:
+                if sec["return_code"] == 0:
+                    status = "success"
+                else:
+                    status = "failed"
+                if status in filters:
+                    render_section(sec, max_label_len)
 
 
-def display_job_log(log_path: Path):
+def display_job_log(log_path: Path, filters=None):
     if not log_path.exists():
         raise RuntimeError(f"Log file not found: {log_path}")
 
     with open(log_path) as f:
         lines = [parse_log_line(line) for line in f if parse_log_line(line)]
-
     sections = parse_sections(lines)
-    render_sections(sections)
+
+    render_sections(sections, filters)
 
 
 def show(args):
