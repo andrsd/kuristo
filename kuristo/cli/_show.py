@@ -119,6 +119,7 @@ def render_section(sec, max_label_len):
 
         header = f"[white]*[/] {st} {title} [grey23]{dots}[/] [white]{time_str}[/]"
         console.print(Text.from_markup(header))
+        console.print()
 
     for tag, msg in sec["lines"]:
         if tag == "SCRIPT":
@@ -134,6 +135,7 @@ def render_section(sec, max_label_len):
             console.print(Text.from_markup(f"  {msg}"))
 
     if sec["return_code"] is not None:
+        console.print()
         console.print(Text.from_markup(f"  Finished with return code {rc}"))
     console.print()
 
