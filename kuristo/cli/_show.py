@@ -134,8 +134,7 @@ def render_section(sec, max_label_len):
             console.print(Text.from_markup(f"  {msg}"))
 
     if sec["return_code"] is not None:
-        if sec["return_code"] != 0:
-            console.print(Text.from_markup(f"  Finished with return code {rc}"))
+        console.print(Text.from_markup(f"  Finished with return code {rc}"))
     console.print()
 
 
