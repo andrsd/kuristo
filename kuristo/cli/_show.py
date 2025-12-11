@@ -15,7 +15,7 @@ def parse_log_line(line):
         timestamp = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S,%f")
     except ValueError:
         return None
-    return timestamp, tag.strip(), msg.strip()
+    return timestamp, tag.strip(), msg
 
 
 def parse_sections(lines):
