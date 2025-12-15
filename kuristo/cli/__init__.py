@@ -78,6 +78,11 @@ def build_parser():
     # Report command
     report_parser = subparsers.add_parser("report", help="Create report")
     report_parser.add_argument("--run-id", type=str, help="Run ID to generate report for")
-    report_parser.add_argument("file", help="File name to store the report into: <format>:<filename>")
+    group = report_parser.add_mutually_exclusive_group()
+    group.add_argument("--failed", action="store_true", help="Show only tests that failed")
+    group.add_argument("--skipped", action="store_true", help="Show only tests that were skipped")
+    group.add_argument("--passed", action="store_true", help="Show only tests that passed")
+
+    report_parser.add_argument("--output", help="File name to store the report into: <format>:<filename>")
 
     return parser

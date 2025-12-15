@@ -149,3 +149,14 @@ def human_time(seconds: float) -> str:
 def read_report(path):
     with open(path, "r") as f:
         return yaml.safe_load(f)
+
+
+def build_filters(args):
+    filters = []
+    if args.failed:
+        filters.append("failed")
+    if args.skipped:
+        filters.append("skipped")
+    if args.passed:
+        filters.append("success")
+    return filters

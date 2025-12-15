@@ -315,7 +315,9 @@ class Job:
             self._logger.dump(self._context.env)
 
     def skip_process(self):
-        self._logger.log(f'* {self.name} was skipped: {self.skip_reason}', tag="TASK_END")
+        self._logger.job_start(self.name)
+        self._logger.log(f'* Skipped: {self.skip_reason}', tag="TASK_END")
+        self._logger.job_end()
         self._status = Job.FINISHED
         self._elapsed_time = 0.
 

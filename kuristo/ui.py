@@ -128,3 +128,17 @@ def time(elapsed_time: float):
 
     markup = f"[grey46]Took:[/] {human_time(elapsed_time)}"
     consol.print(Text.from_markup(markup))
+
+
+def job_header_line(job_id, width: int):
+    consol = console()
+
+    hdr = f"== [ Job {job_id} ] "
+    width -= len(hdr)
+    line = hdr + "=" * width
+    consol.print(
+        Text.from_markup(f"[grey42]{line}[/]")
+    )
+    consol.print(
+        Text.from_markup("")
+    )
