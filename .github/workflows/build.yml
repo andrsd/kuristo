@@ -45,7 +45,9 @@ jobs:
             pyyaml \
             rich \
             networkx \
-            jinja2
+            jinja2 \
+            h5py \
+            numpy
           pip install -e .
 
       - name: Run tests with coverage

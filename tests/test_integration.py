@@ -1,7 +1,6 @@
 import subprocess
 from pathlib import Path
 
-
 ASSETS_DIR = Path(__file__).parent / "assets"
 
 
@@ -133,5 +132,20 @@ def test_float_check_str():
     assert result.returncode == 1
     assert "Success: 0" in result.stdout
     assert "Failed: 1" in result.stdout
+    assert "Skipped: 0" in result.stdout
+    assert "Total: 1" in result.stdout
+
+
+def test_convergence():
+    test_dir = ASSETS_DIR / "tests12"
+    result = subprocess.run(
+        ["kuristo", "--no-ansi", "run", str(test_dir)],
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 0
+    assert "Success: 1" in result.stdout
+    assert "Failed: 0" in result.stdout
     assert "Skipped: 0" in result.stdout
     assert "Total: 1" in result.stdout

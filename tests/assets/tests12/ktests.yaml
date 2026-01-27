@@ -1,0 +1,13 @@
+jobs:
+  convergence-rate:
+    name: "Convergence rate"
+    description: "Check convergence rate from HDF5 file"
+    steps:
+      - name: Convergence rate
+        uses: checks/convergence-rate
+        with:
+          input: tests/assets/files/convergence-data.h5
+          x-axis: "/dof"
+          y-axis: "/err"
+          expected-order: 2.
+          rel-tol: 1e-3
