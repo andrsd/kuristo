@@ -31,7 +31,7 @@ jobs:
           - animal: dog
             color: brown
     steps:
-      - name: Run test
+      - name: "Run test with: color=${{ matrix.color }}, animal=${{ matrix.animal }}"
         run: |
           echo ${{ matrix.color }} ${{matrix.animal }}
 

@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from kuristo.context import Context
+from kuristo.utils import interpolate_str
 
 
 class Action(ABC):
@@ -7,13 +8,16 @@ class Action(ABC):
     Base class for job action
     """
 
-    def __init__(self, name, context: Context, **kwargs) -> None:
+    def __init__(self, name, context: Context | None, **kwargs) -> None:
         self._cwd = kwargs.get("working_dir", None)
         self._id = kwargs.get("id", None)
         if name is None:
             self._name = ""
         else:
-            self._name = name
+            if context is None:
+                self._name = name
+            else:
+                self._name = interpolate_str(name, context.vars)
         self._output = None
         self._context = context
         self._timeout_minutes = kwargs.get("timeout_minutes", 60)
