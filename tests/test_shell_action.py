@@ -1,4 +1,5 @@
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
 from kuristo.actions.shell_action import ShellAction
 from kuristo.context import Context
 
@@ -11,7 +12,9 @@ def make_context(vars_dict=None):
 
 def test_create_command_calls_interpolate_str():
     ctx = make_context({"name": "world"})
-    with patch("kuristo.actions.shell_action.interpolate_str", return_value="echo world") as mock_interp:
+    with patch(
+        "kuristo.actions.shell_action.interpolate_str", return_value="echo world"
+    ) as mock_interp:
         action = ShellAction("test", ctx, commands="echo {name}")
         result = action.create_command()
         mock_interp.assert_called_once_with("echo {name}", ctx.vars)

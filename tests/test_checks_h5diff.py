@@ -8,6 +8,7 @@ from kuristo.actions import H5DiffCheck
 def dummy_context():
     ctx = MagicMock(spec=Context)
     ctx.env = {}
+    ctx.vars = {}
     return ctx
 
 

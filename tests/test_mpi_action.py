@@ -9,7 +9,9 @@ class DummyMPIAction(MPIAction):
 
 
 def make_context():
-    return MagicMock(spec=Context)
+    ctx = MagicMock(spec=Context)
+    ctx.vars = {}
+    return ctx
 
 
 def test_default_num_cores():
