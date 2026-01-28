@@ -10,4 +10,16 @@ jobs:
           x-axis: "/dof"
           y-axis: "/err"
           expected-order: 2.
-          rel-tol: 1e-3
+          abs-tol: 1e-3
+
+  convergence-rate-components:
+    name: "Convergence rate on multiple components"
+    steps:
+      - name: Convergence rate
+        uses: checks/convergence-rate
+        with:
+          input: tests/assets/files/convergence-data-multicomps.h5
+          x-axis: "/dof"
+          y-axis: "/err"
+          expected-order: [2., 0.5]
+          abs-tol: 1e-3

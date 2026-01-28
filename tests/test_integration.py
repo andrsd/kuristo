@@ -145,7 +145,7 @@ def test_convergence():
     )
 
     assert result.returncode == 0
-    assert "Success: 1" in result.stdout
+    assert "Success: 2" in result.stdout
     assert "Failed: 0" in result.stdout
     assert "Skipped: 0" in result.stdout
-    assert "Total: 1" in result.stdout
+    assert "Total: 2" in result.stdout

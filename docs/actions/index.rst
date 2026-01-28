@@ -8,6 +8,7 @@ Each action is used inside a job step to perform a specific task — such as val
 .. toctree::
    :maxdepth: 1
 
+   convergence-rate
    csv-diff
    exodiff
    h5diff
