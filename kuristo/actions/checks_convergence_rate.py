@@ -5,19 +5,7 @@ import numpy as np
 
 from kuristo.actions.action import Action
 from kuristo.registry import action
-
-
-def scalar_or_list(kwargs: dict, name: str):
-    """
-    Look at kwargs for "parameter" `name` and return it either as a float or
-    a list of floats.
-    """
-    if kwargs[name] is None:
-        raise ValueError(f"{name} is required")
-    if isinstance(kwargs[name], (list, tuple)):
-        return [float(x) for x in kwargs[name]]
-    else:
-        return float(kwargs[name])
+from kuristo.utils import scalar_or_list
 
 
 def to_array(data, n_comps, name: str):

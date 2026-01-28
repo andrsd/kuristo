@@ -1,13 +1,13 @@
-import sys
-import subprocess
 import os
-import shutil
 import re
-import yaml
-from jinja2 import Template
+import shutil
+import subprocess
+import sys
 from datetime import datetime
 from pathlib import Path
 
+import yaml
+from jinja2 import Template
 
 RUN_DIR_PATTERN = re.compile(r"\d{8}-\d{6}")
 
@@ -30,8 +30,7 @@ def get_default_core_limit():
         try:
             # Apple Silicon: performance cores
             output = subprocess.check_output(
-                ["sysctl", "-n", "hw.perflevel0.physicalcpu"],
-                text=True
+                ["sysctl", "-n", "hw.perflevel0.physicalcpu"], text=True
             )
             perf_cores = int(output.strip())
             return max(perf_cores, 1)
@@ -89,7 +88,9 @@ def create_run_output_dir(base_log_dir: Path, sub_dir=None) -> Path:
 
 def prune_old_runs(log_dir: Path, keep_last_n: int):
     runs_dir = log_dir / "runs"
-    run_dirs = [d for d in runs_dir.iterdir() if d.is_dir() and RUN_DIR_PATTERN.match(d.name)]
+    run_dirs = [
+        d for d in runs_dir.iterdir() if d.is_dir() and RUN_DIR_PATTERN.match(d.name)
+    ]
     run_dirs.sort(key=lambda d: d.stat().st_mtime, reverse=True)
     for old_run in run_dirs[keep_last_n:]:
         shutil.rmtree(old_run)
@@ -160,3 +161,16 @@ def build_filters(args):
     if args.passed:
         filters.append("success")
     return filters
+
+
+def scalar_or_list(kwargs: dict, name: str):
+    """
+    Look at kwargs for "parameter" `name` and return it either as a `float` or
+    a list of `float`s.
+    """
+    if kwargs[name] is None:
+        raise ValueError(f"{name} is required")
+    if isinstance(kwargs[name], (list, tuple)):
+        return [float(x) for x in kwargs[name]]
+    else:
+        return float(kwargs[name])
