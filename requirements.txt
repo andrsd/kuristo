@@ -3,3 +3,4 @@ rich
 networkx>=3.4
 jinja2
 pydantic>=2.11
+h5py
