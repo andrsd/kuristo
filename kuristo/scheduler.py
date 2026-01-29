@@ -116,8 +116,8 @@ class Scheduler:
         self._create_out_dir()
         start_time = time.perf_counter()
         with self._progress:
-            self._schedule_next_job()
             while any(not job.is_processed for job in self._graph.nodes):
+                self._schedule_next_job()
                 threading.Event().wait(0.5)
         end_time = time.perf_counter()
         self._total_runtime = end_time - start_time
