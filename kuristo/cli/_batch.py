@@ -2,6 +2,7 @@ import yaml
 import os
 import fcntl
 import re
+import threading
 from datetime import datetime
 from pathlib import Path
 import kuristo.config as config
@@ -149,6 +150,7 @@ def batch_submit(args):
     utils.update_latest_symlink(cfg.log_dir, out_dir)
     load_user_steps_from_kuristo_dir()
 
+    cond = threading.Event()
     n_jobs = 0
     job_num = 0
     workflow_files = scan_locations(locations)
@@ -165,7 +167,7 @@ def batch_submit(args):
         write_job_metadata(batch_job_id, backend.name, workdir)
 
         for sp in specs:
-            jobs = create_jobs(sp, out_dir)
+            jobs = create_jobs(sp, out_dir, cond)
             job_num += len(jobs)
 
     ui.console().print(f'Submitted {n_jobs} jobs')

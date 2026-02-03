@@ -68,9 +68,10 @@ class Scheduler:
         self._max_label_len = cfg.console_width
         self._max_id_width = 1
         self._out_dir = Path(out_dir)
-        self._create_graph(specs)
         self._active_jobs = set()
         self._lock = threading.Lock()
+        self._event = threading.Event()
+        self._create_graph(specs)
         self._resources = rcs
         if cfg.no_ansi:
             self._progress = NullProgress()
@@ -118,7 +119,8 @@ class Scheduler:
         with self._progress:
             while any(not job.is_processed for job in self._graph.nodes):
                 self._schedule_next_job()
-                threading.Event().wait(0.5)
+                self._event.wait()
+                self._event.clear()
         end_time = time.perf_counter()
         self._total_runtime = end_time - start_time
         if cfg.no_ansi:
@@ -136,7 +138,7 @@ class Scheduler:
         self._graph = netx.DiGraph()
         job_map = {}
         for sp in specs:
-            spec_jobs = create_jobs(sp, self._out_dir)
+            spec_jobs = create_jobs(sp, self._out_dir, self._event)
             for job in spec_jobs:
                 job.on_finish = self._job_completed
                 job.on_step_start = self._on_step_start
@@ -207,7 +209,6 @@ class Scheduler:
             del self._tasks[job.num]
             self._active_jobs.remove(job)
             self._resources.free_cores(job.required_cores)
-        self._schedule_next_job()
 
     def _check_for_cycles(self):
         """
@@ -265,21 +266,22 @@ class Scheduler:
         self._progress.update(job_task_num, advance=1)
 
 
-def create_jobs(spec: JobSpec, out_dir: Path):
+def create_jobs(spec: JobSpec, out_dir: Path, event: threading.Event):
     """
     Create jobs
 
     @param spec Job specification
+    @param event Event for signaling that job status changed
     @return List of `Job`s
     """
     jobs = []
     if spec.strategy:
         needs = []
         for id, variant in spec.build_matrix_values():
-            j = Job(id, spec, out_dir, matrix=variant)
+            j = Job(id, event, spec, out_dir, matrix=variant)
             jobs.append(j)
             needs.append(id)
-        jobs.append(JobJoiner(spec.id, spec, needs))
+        jobs.append(JobJoiner(spec.id, event, spec, needs))
     else:
-        jobs.append(Job(spec.id, spec, out_dir))
+        jobs.append(Job(spec.id, event, spec, out_dir))
     return jobs
