@@ -76,12 +76,14 @@ class Job:
             for key, value in env.items():
                 self.env(key, value)
 
-    def __init__(self, id, job_spec: JobSpec, log_dir: Path, matrix=None) -> None:
+    def __init__(self, id, event: threading.Event, job_spec: JobSpec, log_dir: Path, matrix=None) -> None:
         """
+        @param event Signalling event when job status changes
         @param job_spec Job specification
         """
         Job.ID = Job.ID + 1
         self._num = Job.ID
+        self._event = event
         self._spec = job_spec
         self._env_file = log_dir / f"job-{self._num}.env"
         self._path_file = log_dir / f"job-{self._num}.path"
@@ -320,11 +322,13 @@ class Job:
         self._logger.job_end()
         self._status = Job.FINISHED
         self._elapsed_time = 0.
+        self._event.set()
 
     def _finish_process(self):
         self._status = Job.FINISHED
         self.on_finish(self)
         self._logger.job_end()
+        self._event.set()
 
     def _on_timeout(self):
         """
@@ -334,6 +338,7 @@ class Job:
             if self._active_step is not None:
                 self._cancelled.set()
                 self._active_step.terminate()
+        self._event.set()
 
     def _build_steps(self, spec):
         steps = []
@@ -420,11 +425,13 @@ class JobJoiner:
     The `multiple-job` in the middle is represented by this class.
     """
 
-    def __init__(self, id, spec: JobSpec, needs: list) -> None:
+    def __init__(self, id, event: threading.Event, spec: JobSpec, needs: list) -> None:
         """
+        @param event Signalling event when job status changes
         @param job_spec Job specification
         """
         Job.ID = Job.ID + 1
+        self._event = event
         self._num = Job.ID
         self._id = id
         self._name = id
@@ -515,3 +522,4 @@ class JobJoiner:
 
     def start(self):
         self._status = Job.FINISHED
+        self._event.set()
