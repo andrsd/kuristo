@@ -96,6 +96,56 @@ Use the ``needs`` field to create dependencies between jobs. This controls execu
 
 Jobs without dependencies may run in parallel, depending on available system resources.
 
+Strategy Matrix
+---------------
+
+Use ``jobs.<id>.strategy.matrix`` to create multiple job variations automatically. Each combination runs as a separate job.
+This is useful for running the same test or simulation with different parameters, configurations, or mesh sizes.
+
+.. rubric:: Cartesian Product
+
+Create jobs from all combinations of matrix variables:
+
+.. code-block:: yaml
+
+   jobs:
+     convergence-study:
+       strategy:
+         matrix:
+           mesh_size: [coarse, medium, fine]
+           solver: [direct, iterative]
+       steps:
+         - run: ./simulate --mesh ${{ matrix.mesh_size }} --solver ${{ matrix.solver }}
+         - uses: checks/exodiff
+           with:
+             input: results.e
+             gold: gold/results_${{ matrix.mesh_size }}_${{ matrix.solver }}.e
+
+This creates 6 job variations (3 mesh sizes × 2 solvers), each running independently.
+
+.. rubric:: Explicit Combinations
+
+Use ``include`` to specify exact combinations when not all are valid or needed:
+
+.. code-block:: yaml
+
+   jobs:
+     verification:
+       strategy:
+         matrix:
+           include:
+             - model: steady_state
+               preconditioner: ilu
+             - model: transient
+               preconditioner: ml
+             - model: transient
+               preconditioner: ilu
+               slow: true
+       steps:
+         - run: ./verify --model ${{ matrix.model }} --prec ${{ matrix.preconditioner }}
+
+This creates only the specified 3 combinations rather than all possible pairs.
+
 Job Labels
 ----------
 
