@@ -1,12 +1,12 @@
 Configuration
-====
+=============
 
 Kuristo’s behavior can be customized using a configuration file named ``config.yaml``.
 Kuristo searches for this file in a ``.kuristo`` directory, starting from the current working directory and moving up through parent directories until it finds the first match.
 The available configuration options are listed below.
 
 Basic options
-----
+-------------
 
 ``base:``
    General settings section.
@@ -24,7 +24,7 @@ Basic options
 
 
 Logging options
-----
+---------------
 
 ``log:``
    Logging settings section.
@@ -42,7 +42,7 @@ Logging options
 
 
 Resources
-----
+---------
 
 ``resources:``
    Resource allocation settings.
@@ -55,7 +55,7 @@ Resources
 
 
 Runner
-----
+------
 
 ``runner:``
    Main runner settings.
@@ -73,7 +73,7 @@ Runner
 
 
 Batch
-----
+-----
 
 ``batch:``
    Batch submission settings.
@@ -89,7 +89,7 @@ Batch
 
 
 Example
-----
+-------
 
 This example shows how to setup kuristo for a slurm queue, submitting into
 a ``default`` partition.
