@@ -1,0 +1,23 @@
+jobs:
+  smoke-test-1:
+    description: Quick smoke test
+    labels: [smoke, quick]
+    steps:
+      - run: echo "Smoke test 1"
+
+  smoke-test-2:
+    description: Another smoke test
+    labels: [smoke]
+    steps:
+      - run: echo "Smoke test 2"
+
+  integration-test:
+    description: Integration test
+    labels: [integration, slow]
+    steps:
+      - run: echo "Integration test"
+
+  no-label-test:
+    description: Test without labels
+    steps:
+      - run: echo "No labels"

@@ -30,6 +30,14 @@ jobs.<id>.needs
 Job dependecies.
 These are job IDs that must finish before this job starts.
 
+jobs.<id>.labels
+----------------
+
+| List of labels for filtering jobs during execution.
+| Allows selective execution of job subsets using the ``--label`` CLI option.
+| Optional field with no default value.
+| Example: ``labels: [smoke, quick]``
+
 jobs.<id>.skip
 --------------
 

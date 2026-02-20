@@ -134,6 +134,8 @@ class JobSpec(BaseModel):
     env: Optional[dict] = Field(default={})
     # Defaults
     defaults: Optional[JobDefaults] = None
+    # Labels for filtering jobs
+    labels: Optional[List[str]] = None
 
     @property
     def id(self):

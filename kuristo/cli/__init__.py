@@ -34,6 +34,7 @@ def build_parser():
     # Run command
     run_parser = subparsers.add_parser("run", help="Run jobs")
     run_parser.add_argument("--verbose", "-v", type=int, default=0, help="Verbose level")
+    run_parser.add_argument("--label", action="append", dest="labels", metavar="LABEL", help="Filter jobs by label (can be specified multiple times)")
     run_parser.add_argument("locations", nargs="*", help="Locations to scan for workflow files")
 
     # Doctor command
@@ -41,6 +42,7 @@ def build_parser():
 
     # List command
     list_parser = subparsers.add_parser("list", help="List available jobs")
+    list_parser.add_argument("--label", action="append", dest="labels", metavar="LABEL", help="Filter jobs by label (can be specified multiple times)")
     list_parser.add_argument("locations", nargs="*", help="Locations to scan for workflow files")
 
     # Batch command
