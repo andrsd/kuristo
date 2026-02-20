@@ -9,13 +9,18 @@ Basic options
 ----
 
 ``base:``
-   Logging settings section.
+   General settings section.
 
-``workflow-filename``
+``base.workflow-filename``
    Name of files that contain workflow descriptions.
-   These files are looked for whne we have kuristo execute workflows from a location.
+   These files are looked for when Kuristo executes workflows from a location.
 
    Default value: ``kuristo.yaml``
+
+``base.console-width``
+   Maximum width for console output, in characters.
+
+   Default value: ``100``
 
 
 Logging options
@@ -36,6 +41,19 @@ Logging options
    Currently, does nothing.
 
 
+Resources
+----
+
+``resources:``
+   Resource allocation settings.
+
+``resources.num-cores``
+   Maximum number of CPU cores available for parallel job execution.
+   Kuristo will not attempt to run more than this many cores in parallel.
+
+   Default value: System CPU count (determined automatically)
+
+
 Runner
 ----
 
@@ -46,6 +64,12 @@ Runner
    MPI command used to launch jobs.
 
    Default value: ``mpirun``
+
+   Can be overridden with the ``KURISTO_MPI_LAUNCHER`` environment variable:
+
+   .. code:: bash
+
+      KURISTO_MPI_LAUNCHER=mpiexec kuristo run tests/
 
 
 Batch
