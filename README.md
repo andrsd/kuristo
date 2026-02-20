@@ -17,6 +17,7 @@ It supports sequential and parallel job execution, workflow definition via YAML,
 - YAML-based workflows (GitHub Actions style)
 - Custom steps and actions via Python plugins
 - Job dependency graph with parallel execution
+- Job labels for selective execution
 - Resource-aware scheduling with core-aware limits
 - Step & job timeouts
 - ANSI-rich output or plain mode for CI
@@ -74,6 +75,7 @@ kuristo run tests --no-ansi
 ```yaml
 jobs:
   test-matrix:
+    labels: [simulation, slow]
     strategy:
       matrix:
         include:
