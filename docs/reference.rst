@@ -44,8 +44,49 @@ Example:
 jobs.<id>.needs
 ---------------
 
-Job dependecies.
-These are job IDs that must finish before this job starts.
+| Job dependencies - other jobs that must finish before this job starts.
+| Optional field; can be a single job ID (string) or multiple job IDs (list).
+| Dependent jobs run in parallel only if all their dependencies are satisfied.
+
+Example with single dependency:
+
+.. code:: yaml
+
+   jobs:
+     prepare:
+       description: "Generate mesh"
+       steps:
+         - run: ./generate_mesh.sh
+
+     simulate:
+       name: "Run Simulation"
+       needs: prepare
+       steps:
+         - run: ./simulate
+
+Example with multiple dependencies:
+
+.. code:: yaml
+
+   jobs:
+     build:
+       steps:
+         - run: make
+
+     test-unit:
+       needs: build
+       steps:
+         - run: pytest unit_tests/
+
+     test-integration:
+       needs: build
+       steps:
+         - run: pytest integration_tests/
+
+     report:
+       needs: [test-unit, test-integration]
+       steps:
+         - run: ./generate_report.py
 
 jobs.<id>.labels
 ----------------
