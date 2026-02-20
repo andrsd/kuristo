@@ -57,6 +57,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#jobs-id-name">jobs.&lt;id&gt;.name</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#jobs-id-description">jobs.&lt;id&gt;.description</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#jobs-id-needs">jobs.&lt;id&gt;.needs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#jobs-id-labels">jobs.&lt;id&gt;.labels</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#jobs-id-skip">jobs.&lt;id&gt;.skip</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#jobs-id-timeout-minutes">jobs.&lt;id&gt;.timeout-minutes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#jobs-id-strategy">jobs.&lt;id&gt;.strategy</a></li>
@@ -126,6 +127,15 @@ If you are new to YAML, you can <a class="reference external" href="https://lear
 <h2>jobs.&lt;id&gt;.needs<a class="headerlink" href="#jobs-id-needs" title="Link to this heading"></a></h2>
 <p>Job dependecies.
 These are job IDs that must finish before this job starts.</p>
+</section>
+<section id="jobs-id-labels">
+<h2>jobs.&lt;id&gt;.labels<a class="headerlink" href="#jobs-id-labels" title="Link to this heading"></a></h2>
+<div class="line-block">
+<div class="line">List of labels for filtering jobs during execution.</div>
+<div class="line">Allows selective execution of job subsets using the <code class="docutils literal notranslate"><span class="pre">--label</span></code> CLI option.</div>
+<div class="line">Optional field with no default value.</div>
+<div class="line">Example: <code class="docutils literal notranslate"><span class="pre">labels:</span> <span class="pre">[smoke,</span> <span class="pre">quick]</span></code></div>
+</div>
 </section>
 <section id="jobs-id-skip">
 <h2>jobs.&lt;id&gt;.skip<a class="headerlink" href="#jobs-id-skip" title="Link to this heading"></a></h2>

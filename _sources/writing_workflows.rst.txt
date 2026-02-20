@@ -95,3 +95,34 @@ Use the ``needs`` field to create dependencies between jobs. This controls execu
    Name of the job that must finish before this job starts
 
 Jobs without dependencies may run in parallel, depending on available system resources.
+
+Job Labels
+----------
+
+Use the ``labels`` field to tag jobs for selective execution. This allows you to run subsets of jobs without creating separate workflow files.
+
+.. rubric:: Example of using labels
+
+.. code-block:: yaml
+
+   jobs:
+     smoke-test:
+       name: Smoke Test
+       labels: [smoke, quick]
+       steps:
+         - run: ./test_smoke.sh
+
+     integration-test:
+       name: Integration Test
+       labels: [integration, slow]
+       steps:
+         - run: ./test_integration.sh
+
+     unit-test:
+       name: Unit Tests
+       steps:
+         - run: ./test_unit.sh
+
+``jobs.<id>.labels`` (list of strings, optional)
+   Tags for filtering jobs during execution. Jobs can have multiple labels.
+   See the User Interface documentation for information on filtering jobs with the ``--label`` option.

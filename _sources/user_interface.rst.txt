@@ -28,11 +28,20 @@ Run workflow(s).
    - `2`: default
    - `3`: detailed output for each step
 
+``--label <label>``
+   Filter jobs by label. Can be specified multiple times to match jobs with any of the requested labels (OR logic).
+   Only jobs with matching labels will be executed. Jobs without labels are skipped when a filter is active.
+   If no jobs match the filter, the command exits successfully.
+
 list
 ----
 
 ``<location>``
    Find tests in the location that would be executed.
+
+``--label <label>``
+   Filter jobs by label. Can be specified multiple times to match jobs with any of the requested labels (OR logic).
+   Only jobs with matching labels will be displayed. Jobs without labels are skipped when a filter is active.
 
 status
 ------

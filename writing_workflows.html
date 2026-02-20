@@ -51,6 +51,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#basic-structure">Basic Structure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#step-fields">Step Fields</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#job-dependencies">Job Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#job-labels">Job Labels</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="actions/index.html">Built-in Actions</a></li>
@@ -167,6 +168,35 @@ Jobs contain one or more <strong>steps</strong> to execute.</p>
 </dd>
 </dl>
 <p>Jobs without dependencies may run in parallel, depending on available system resources.</p>
+</section>
+<section id="job-labels">
+<h2>Job Labels<a class="headerlink" href="#job-labels" title="Link to this heading"></a></h2>
+<p>Use the <code class="docutils literal notranslate"><span class="pre">labels</span></code> field to tag jobs for selective execution. This allows you to run subsets of jobs without creating separate workflow files.</p>
+<p class="rubric">Example of using labels</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">smoke-test</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Smoke Test</span>
+<span class="w">    </span><span class="nt">labels</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">smoke</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">quick</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./test_smoke.sh</span>
+
+<span class="w">  </span><span class="nt">integration-test</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Integration Test</span>
+<span class="w">    </span><span class="nt">labels</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">integration</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">slow</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./test_integration.sh</span>
+
+<span class="w">  </span><span class="nt">unit-test</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Unit Tests</span>
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./test_unit.sh</span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">jobs.&lt;id&gt;.labels</span></code> (list of strings, optional)</dt><dd><p>Tags for filtering jobs during execution. Jobs can have multiple labels.
+See the User Interface documentation for information on filtering jobs with the <code class="docutils literal notranslate"><span class="pre">--label</span></code> option.</p>
+</dd>
+</dl>
 </section>
 </section>
 
