@@ -2,6 +2,7 @@ from rich.text import Text
 import kuristo.ui as ui
 from kuristo.job_spec import parse_workflow_files
 from kuristo.scanner import scan_locations
+from kuristo.utils import filter_specs_by_labels
 
 
 def list_jobs(args):
@@ -10,6 +11,12 @@ def list_jobs(args):
 
     workflow_files = scan_locations(locations)
     specs = parse_workflow_files(workflow_files)
+
+    # Filter by labels if specified
+    requested_labels = getattr(args, 'labels', None)
+    if requested_labels:
+        specs, total_jobs, filtered_jobs = filter_specs_by_labels(specs, requested_labels)
+        console.print(f"[cyan]Showing {filtered_jobs} of {total_jobs} jobs matching labels:[/] [magenta]{', '.join(requested_labels)}[/]")
 
     n_jobs = 0
     for sp in specs:
@@ -28,6 +35,8 @@ def list_jobs(args):
                 txt.append(Text.from_markup(jnm, style="bold cyan"))
                 txt.append(": ")
                 txt.append(Text.from_markup(sp.name, style="grey70"))
+                if sp.labels:
+                    txt.append(Text.from_markup(f" ({', '.join(sp.labels)})", style="magenta"))
             console.print(txt)
     console.print()
     console.print(Text.from_markup(f"Found jobs: [green]{n_jobs}[/]"))

@@ -36,6 +36,7 @@ case $state in
         _arguments \
           '--help[Show help message and exit]' \
           '--verbose[Verbose level]:int' \
+          '*--label[Filter jobs by label \(can be specified multiple times\)]:label' \
           '*:Locations to scan:_files'
         ;;
       doctor)
@@ -45,6 +46,7 @@ case $state in
       list)
         _arguments \
           '--help[Show help message and exit]' \
+          '*--label[Filter jobs by label \(can be specified multiple times\)]:label' \
           '*:Locations to scan:_files'
         ;;
       batch)

@@ -174,3 +174,25 @@ def scalar_or_list(kwargs: dict, name: str):
         return [float(x) for x in kwargs[name]]
     else:
         return float(kwargs[name])
+
+
+def filter_specs_by_labels(specs, requested_labels):
+    """
+    Filter job specs by labels using OR logic.
+
+    Args:
+        specs: List of JobSpec objects
+        requested_labels: List of label strings to filter by
+
+    Returns:
+        Tuple of (filtered_specs, total_count, filtered_count)
+    """
+    if not requested_labels:
+        return specs, len(specs), len(specs)
+
+    filtered = []
+    for spec in specs:
+        if spec.labels and any(label in spec.labels for label in requested_labels):
+            filtered.append(spec)
+
+    return filtered, len(specs), len(filtered)
