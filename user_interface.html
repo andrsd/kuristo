@@ -56,6 +56,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#batch">batch</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#doctor">doctor</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#report">report</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tag">tag</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="writing_workflows.html">Writing Workflows</a></li>
@@ -219,6 +220,22 @@ This outputs detailed information including:</p>
 </ul>
 </dd>
 </dl>
+</section>
+<section id="tag">
+<h2>tag<a class="headerlink" href="#tag" title="Link to this heading"></a></h2>
+<p>Manage run tags to protect important results from automatic cleanup.</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">&lt;name&gt;</span></code></dt><dd><p>Tag the latest run with the given name.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&lt;name&gt;</span> <span class="pre">--run-id</span> <span class="pre">&lt;id&gt;</span></code></dt><dd><p>Tag a specific run.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">-D|--delete</span> <span class="pre">&lt;name&gt;</span></code></dt><dd><p>Delete a tag (the run itself is preserved).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">-l|--list</span></code></dt><dd><p>List all tags and their associated runs.</p>
+</dd>
+</dl>
+<p>Tag names can contain letters, numbers, dots, hyphens, and underscores (e.g., <code class="docutils literal notranslate"><span class="pre">v1.0</span></code>, <code class="docutils literal notranslate"><span class="pre">baseline</span></code>, <code class="docutils literal notranslate"><span class="pre">release-1-2-3</span></code>).</p>
+<p>Tagged runs are protected from deletion by the automatic cleanup process and will not be deleted even when they exceed the <code class="docutils literal notranslate"><span class="pre">log.history</span></code> limit.</p>
 </section>
 </section>
 

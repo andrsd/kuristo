@@ -145,3 +145,25 @@ Generate a report for a given run.
    Supportted formats:
 
    - `xml` - junit XML file format
+
+
+tag
+---
+
+Manage run tags to protect important results from automatic cleanup.
+
+``<name>``
+   Tag the latest run with the given name.
+
+``<name> --run-id <id>``
+   Tag a specific run.
+
+``-D|--delete <name>``
+   Delete a tag (the run itself is preserved).
+
+``-l|--list``
+   List all tags and their associated runs.
+
+Tag names can contain letters, numbers, dots, hyphens, and underscores (e.g., ``v1.0``, ``baseline``, ``release-1-2-3``).
+
+Tagged runs are protected from deletion by the automatic cleanup process and will not be deleted even when they exceed the ``log.history`` limit.

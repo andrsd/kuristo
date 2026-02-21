@@ -33,7 +33,9 @@ Logging options
    Directory where logs will be stored.
 
 ``log.history``
-   Number of past log files to keep.
+   Number of recent runs to keep. Older runs are automatically deleted when this limit is exceeded.
+   Tagged runs are protected from deletion and do not count toward this limit.
+   Use the ``tag`` command to protect important results (e.g., versions, baselines).
 
    Default value: ``5``
 
