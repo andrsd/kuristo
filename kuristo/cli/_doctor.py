@@ -52,9 +52,7 @@ def print_diag(args):
     console.print(Text.from_markup("[bold]Resources[/]"))
     try:
         output = (
-            subprocess.check_output(
-                ["sysctl", "-n", "hw.perflevel0.physicalcpu"], text=True
-            )
+            subprocess.check_output(["sysctl", "-n", "hw.perflevel0.physicalcpu"], text=True)
             if sys.platform == "darwin"
             else None
         )
@@ -63,9 +61,7 @@ def print_diag(args):
         perf_cores = None
 
     resource_table = Table(show_header=False, show_edge=False)
-    resource_table.add_row(
-        "Cores (max used)", Text.from_markup(f"[cyan]{cfg.num_cores}[/]")
-    )
+    resource_table.add_row("Cores (max used)", Text.from_markup(f"[cyan]{cfg.num_cores}[/]"))
     resource_table.add_row("System cores", str(os.cpu_count()))
     if perf_cores is not None:
         resource_table.add_row("Perf cores (macOS)", str(perf_cores))

@@ -23,9 +23,7 @@ from kuristo.resources import Resources
 class StepCountColumn(ProgressColumn):
     def render(self, task) -> Text:
         if task.total is not None:
-            return Text(
-                f"{int(task.completed)}/{int(task.total)}", style=Style(color="green")
-            )
+            return Text(f"{int(task.completed)}/{int(task.total)}", style=Style(color="green"))
         else:
             return Text("")
 
@@ -88,9 +86,7 @@ class Scheduler:
             self._progress = Progress(
                 SpinnerColumn(),
                 TextColumn("[progress.description]{task.description}"),
-                BarColumn(
-                    style=Style(color="grey23"), pulse_style=Style(color="grey46")
-                ),
+                BarColumn(style=Style(color="grey23"), pulse_style=Style(color="grey46")),
                 StepCountColumn(),
                 TimeElapsedColumn(),
                 transient=True,
@@ -206,9 +202,7 @@ class Scheduler:
                         self._tasks[job.num] = task_id
                         job.create_step_tasks(self._progress)
                         job.start()
-                        ui.status_line(
-                            job, "STARTING", self._max_id_width, self._max_label_len
-                        )
+                        ui.status_line(job, "STARTING", self._max_id_width, self._max_label_len)
 
     def _job_completed(self, job):
         with self._lock:
@@ -244,9 +238,7 @@ class Scheduler:
         """
         Mark jobs that are too big for the available resources as skipped
         """
-        sources = [
-            node for node in self._graph.nodes if self._graph.in_degree(node) == 0
-        ]
+        sources = [node for node in self._graph.nodes if self._graph.in_degree(node) == 0]
         for source in sources:
             for job in netx.dfs_tree(self._graph, source=source):
                 if job.required_cores > self._resources.total_cores:
@@ -256,9 +248,7 @@ class Scheduler:
         """
         If a job have skipped dependency, we would not be able to run it, so mark it as skipped as well
         """
-        sources = [
-            node for node in self._graph.nodes if self._graph.in_degree(node) == 0
-        ]
+        sources = [node for node in self._graph.nodes if self._graph.in_degree(node) == 0]
         for source in sources:
             for job in netx.dfs_tree(self._graph, source=source):
                 predecessors = list(self._graph.predecessors(job))

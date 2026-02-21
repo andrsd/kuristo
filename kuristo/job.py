@@ -26,9 +26,7 @@ class Job:
         def format(self, record):
             if not hasattr(record, "tag"):
                 record.tag = "INFO"  # fallback if not tagged
-            return (
-                f"{self.formatTime(record)} - {record.tag:<12} - {record.getMessage()}"
-            )
+            return f"{self.formatTime(record)} - {record.tag:<12} - {record.getMessage()}"
 
     class Logger:
         """
@@ -57,9 +55,7 @@ class Job:
             self.log(f"* {name}", tag="TASK_START")
 
         def task_end(self, return_code):
-            self.log(
-                f"* Process completed with exit code {return_code}", tag="TASK_END"
-            )
+            self.log(f"* Process completed with exit code {return_code}", tag="TASK_END")
 
         def script_line(self, cmd):
             self.log(f"> {cmd}", tag="SCRIPT")
@@ -128,9 +124,7 @@ class Job:
         self._status = Job.RUNNING
         self._thread = threading.Thread(target=self._target)
         self._thread.start()
-        self._timeout_timer = threading.Timer(
-            self.timeout_minutes * 60, self._on_timeout
-        )
+        self._timeout_timer = threading.Timer(self.timeout_minutes * 60, self._on_timeout)
         self._timeout_timer.start()
 
     def wait(self):
@@ -369,9 +363,7 @@ class Job:
             try:
                 additional_paths = self._path_file.read_text().splitlines()
             except (FileNotFoundError, PermissionError, UnicodeDecodeError) as e:
-                self._logger.log(
-                    f"Error reading path file {self._path_file}: {e}", tag="ERROR"
-                )
+                self._logger.log(f"Error reading path file {self._path_file}: {e}", tag="ERROR")
                 additional_paths = []
             for p in reversed(additional_paths):
                 sanitized_path = p.strip()
@@ -404,9 +396,7 @@ class Job:
 
     def create_step_tasks(self, progress):
         self._step_task_ids = {
-            step.name: progress.add_task(
-                f"  ↳ [magenta]{step.name}", total=None, visible=False
-            )
+            step.name: progress.add_task(f"  ↳ [magenta]{step.name}", total=None, visible=False)
             for step in self._steps
         }
 

@@ -27,12 +27,8 @@ __all__ = [
 
 
 def build_parser():
-    parser = argparse.ArgumentParser(
-        prog="kuristo", description="Kuristo automation framework"
-    )
-    parser.add_argument(
-        "--version", action="version", version=f"%(prog)s {__version__}"
-    )
+    parser = argparse.ArgumentParser(prog="kuristo", description="Kuristo automation framework")
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     parser.add_argument(
         "--no-ansi",
         action="store_true",
@@ -45,9 +41,7 @@ def build_parser():
 
     # Run command
     run_parser = subparsers.add_parser("run", help="Run jobs")
-    run_parser.add_argument(
-        "--verbose", "-v", type=int, default=0, help="Verbose level"
-    )
+    run_parser.add_argument("--verbose", "-v", type=int, default=0, help="Verbose level")
     run_parser.add_argument(
         "--label",
         action="append",
@@ -55,9 +49,7 @@ def build_parser():
         metavar="LABEL",
         help="Filter jobs by label (can be specified multiple times)",
     )
-    run_parser.add_argument(
-        "locations", nargs="*", help="Locations to scan for workflow files"
-    )
+    run_parser.add_argument("locations", nargs="*", help="Locations to scan for workflow files")
 
     # Doctor command
     subparsers.add_parser("doctor", help="Show diagnostic info")
@@ -71,53 +63,33 @@ def build_parser():
         metavar="LABEL",
         help="Filter jobs by label (can be specified multiple times)",
     )
-    list_parser.add_argument(
-        "locations", nargs="*", help="Locations to scan for workflow files"
-    )
+    list_parser.add_argument("locations", nargs="*", help="Locations to scan for workflow files")
 
     # Batch command
     batch_parser = subparsers.add_parser("batch", help="HPC queueing system commands")
     batch_subparsers = batch_parser.add_subparsers(dest="batch_command")
 
-    batch_submit_parser = batch_subparsers.add_parser(
-        "submit", help="Submit jobs to HPC queue"
-    )
-    batch_submit_parser.add_argument(
-        "--backend", type=str, help="Batch backend to use: ['slurm']"
-    )
-    batch_submit_parser.add_argument(
-        "--partition", type=str, help="Partition name to use"
-    )
+    batch_submit_parser = batch_subparsers.add_parser("submit", help="Submit jobs to HPC queue")
+    batch_submit_parser.add_argument("--backend", type=str, help="Batch backend to use: ['slurm']")
+    batch_submit_parser.add_argument("--partition", type=str, help="Partition name to use")
     batch_submit_parser.add_argument(
         "locations", nargs="*", help="Locations to scan for workflow files"
     )
 
     batch_subparsers.add_parser("status", help="Check HPC job status")
 
-    batch_run_parser = batch_subparsers.add_parser(
-        "run", help="Run job in a batch system"
-    )
+    batch_run_parser = batch_subparsers.add_parser("run", help="Run job in a batch system")
     batch_run_parser.add_argument("run_id", help="ID of the run")
-    batch_run_parser.add_argument(
-        "first_job_id", type=int, help="First job ID to start from"
-    )
+    batch_run_parser.add_argument("first_job_id", type=int, help="First job ID to start from")
     batch_run_parser.add_argument("workflow_file", help="Workflow file to run")
 
     # Status command
     status_parser = subparsers.add_parser("status", help="Display status of runs")
-    status_parser.add_argument(
-        "--run-id", type=str, help="Run ID to display results for"
-    )
+    status_parser.add_argument("--run-id", type=str, help="Run ID to display results for")
     group = status_parser.add_mutually_exclusive_group()
-    group.add_argument(
-        "--failed", action="store_true", help="Show only tests that failed"
-    )
-    group.add_argument(
-        "--skipped", action="store_true", help="Show only tests that were skipped"
-    )
-    group.add_argument(
-        "--passed", action="store_true", help="Show only tests that passed"
-    )
+    group.add_argument("--failed", action="store_true", help="Show only tests that failed")
+    group.add_argument("--skipped", action="store_true", help="Show only tests that were skipped")
+    group.add_argument("--passed", action="store_true", help="Show only tests that passed")
 
     # Log command
     subparsers.add_parser("log", help="List runs")
@@ -129,19 +101,11 @@ def build_parser():
 
     # Report command
     report_parser = subparsers.add_parser("report", help="Create report")
-    report_parser.add_argument(
-        "--run-id", type=str, help="Run ID to generate report for"
-    )
+    report_parser.add_argument("--run-id", type=str, help="Run ID to generate report for")
     group = report_parser.add_mutually_exclusive_group()
-    group.add_argument(
-        "--failed", action="store_true", help="Show only tests that failed"
-    )
-    group.add_argument(
-        "--skipped", action="store_true", help="Show only tests that were skipped"
-    )
-    group.add_argument(
-        "--passed", action="store_true", help="Show only tests that passed"
-    )
+    group.add_argument("--failed", action="store_true", help="Show only tests that failed")
+    group.add_argument("--skipped", action="store_true", help="Show only tests that were skipped")
+    group.add_argument("--passed", action="store_true", help="Show only tests that passed")
 
     report_parser.add_argument(
         "--output", help="File name to store the report into: <format>:<filename>"
@@ -150,9 +114,7 @@ def build_parser():
     # Tag command
     tag_parser = subparsers.add_parser("tag", help="Manage run tags")
     tag_parser.add_argument("name", nargs="?", help="Tag name")
-    tag_parser.add_argument(
-        "--run-id", type=str, help="Run ID to tag (default: latest)"
-    )
+    tag_parser.add_argument("--run-id", type=str, help="Run ID to tag (default: latest)")
     tag_group = tag_parser.add_mutually_exclusive_group()
     tag_group.add_argument(
         "-D",

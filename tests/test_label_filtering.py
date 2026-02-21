@@ -21,15 +21,11 @@ class TestLabelFiltering:
         self.spec_with_integration.set_id("integration-test")
         self.spec_with_integration.set_file_name("test.yaml")
 
-        self.spec_without_labels = JobSpec(
-            description="No labels", steps=[], labels=None
-        )
+        self.spec_without_labels = JobSpec(description="No labels", steps=[], labels=None)
         self.spec_without_labels.set_id("no-label-test")
         self.spec_without_labels.set_file_name("test.yaml")
 
-        self.spec_with_empty_labels = JobSpec(
-            description="Empty labels", steps=[], labels=[]
-        )
+        self.spec_with_empty_labels = JobSpec(description="Empty labels", steps=[], labels=[])
         self.spec_with_empty_labels.set_id("empty-label-test")
         self.spec_with_empty_labels.set_file_name("test.yaml")
 
@@ -136,9 +132,7 @@ class TestLabelFiltering:
             assert count == 2
 
             # Filter by smoke or integration
-            filtered, total, count = filter_specs_by_labels(
-                specs, ["smoke", "integration"]
-            )
+            filtered, total, count = filter_specs_by_labels(specs, ["smoke", "integration"])
             assert count == 3
 
             # Filter by nonexistent

@@ -88,9 +88,7 @@ def create_run_output_dir(base_log_dir: Path, sub_dir=None) -> Path:
 
 def prune_old_runs(log_dir: Path, keep_last_n: int):
     runs_dir = log_dir / "runs"
-    run_dirs = [
-        d for d in runs_dir.iterdir() if d.is_dir() and RUN_DIR_PATTERN.match(d.name)
-    ]
+    run_dirs = [d for d in runs_dir.iterdir() if d.is_dir() and RUN_DIR_PATTERN.match(d.name)]
     run_dirs.sort(key=lambda d: d.stat().st_mtime, reverse=True)
     for old_run in run_dirs[keep_last_n:]:
         # Skip deletion if run is tagged

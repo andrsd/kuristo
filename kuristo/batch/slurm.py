@@ -17,9 +17,7 @@ class SlurmBackend(BatchBackend):
         script_path = Path(params.work_dir) / "slurm_job.sh"
         script_path.write_text(script)
 
-        result = subprocess.run(
-            ["sbatch", str(script_path)], capture_output=True, text=True
-        )
+        result = subprocess.run(["sbatch", str(script_path)], capture_output=True, text=True)
         if result.returncode != 0:
             raise RuntimeError(f"sbatch failed: {result.stderr.strip()}")
 

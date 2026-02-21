@@ -44,9 +44,7 @@ def test_create_command_with_rel_tol(dummy_context):
 
 
 def test_missing_tolerances_raises(dummy_context):
-    with pytest.raises(
-        RuntimeError, match="Must provide either `rel-tol` or `abs-tol`"
-    ):
+    with pytest.raises(RuntimeError, match="Must provide either `rel-tol` or `abs-tol`"):
         H5DiffCheck(name="test", context=dummy_context, gold="gold.h5", test="test.h5")
 
 
@@ -105,9 +103,7 @@ def test_datasets_requires_path(dummy_context):
 
 def test_datasets_requires_tolerance(dummy_context):
     """Each dataset must have rel-tol or abs-tol"""
-    with pytest.raises(
-        RuntimeError, match="must provide either `rel-tol` or `abs-tol`"
-    ):
+    with pytest.raises(RuntimeError, match="must provide either `rel-tol` or `abs-tol`"):
         H5DiffCheck(
             name="test",
             context=dummy_context,

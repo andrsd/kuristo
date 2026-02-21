@@ -73,9 +73,7 @@ def report(args):
         try:
             format, filename = args.output.split(":")
         except ValueError:
-            raise RuntimeError(
-                "Expected format of the file parameter is <format>:<filename>"
-            )
+            raise RuntimeError("Expected format of the file parameter is <format>:<filename>")
 
         if format == "xml":
             stat = report_path.stat()

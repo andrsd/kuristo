@@ -20,9 +20,7 @@ class TestSlurmBackend(unittest.TestCase):
 
     @patch("subprocess.run")
     def test_submit_success(self, mock_run):
-        mock_run.return_value = MagicMock(
-            returncode=0, stdout="Submitted batch job 123456"
-        )
+        mock_run.return_value = MagicMock(returncode=0, stdout="Submitted batch job 123456")
 
         job_id = self.backend.submit(self.params)
         self.assertEqual(job_id, "123456")

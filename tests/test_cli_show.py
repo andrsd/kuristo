@@ -203,9 +203,7 @@ def test_render_section_pass(mock_human_time, mock_console, capsys):
     console = MagicMock()
     mock_console.return_value = console
 
-    sec = make_section(
-        rc=0, lines=[("OUTPUT", "Success output"), ("SCRIPT", "echo run")]
-    )
+    sec = make_section(rc=0, lines=[("OUTPUT", "Success output"), ("SCRIPT", "echo run")])
     render_section(sec, max_label_len=50)
 
     texts = []
@@ -275,9 +273,7 @@ def test_render_section_handles_dot_padding(mock_human_time, mock_console):
     render_section(sec, max_label_len=10)
 
     header = str(console.print.call_args_list[0][0][0])
-    assert "...." not in header or isinstance(
-        header, Text
-    )  # Dots suppressed if negative width
+    assert "...." not in header or isinstance(header, Text)  # Dots suppressed if negative width
 
 
 @patch("kuristo.cli._show.render_title")
@@ -303,9 +299,7 @@ def test_render_sections_calls_correct_renderers(
 
 @patch("kuristo.cli._show.render_sections")
 @patch("kuristo.cli._show.parse_log_line")
-def test_display_job_log_parses_and_renders(
-    mock_parse_log_line, mock_render_sections, tmp_path
-):
+def test_display_job_log_parses_and_renders(mock_parse_log_line, mock_render_sections, tmp_path):
     log_file = tmp_path / "job-1.log"
     log_file.write_text("")
 

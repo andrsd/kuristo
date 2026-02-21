@@ -46,9 +46,7 @@ def create_results(jobs):
 
 def write_report_yaml(yaml_path: Path, results, total_runtime):
     with open(yaml_path, "w") as f:
-        yaml.safe_dump(
-            {"results": results, "total-runtime": total_runtime}, f, sort_keys=False
-        )
+        yaml.safe_dump({"results": results, "total-runtime": total_runtime}, f, sort_keys=False)
 
 
 def run_jobs(args):
@@ -67,9 +65,7 @@ def run_jobs(args):
     # Filter by labels if specified
     requested_labels = getattr(args, "labels", None)
     if requested_labels:
-        specs, total_jobs, filtered_jobs = filter_specs_by_labels(
-            specs, requested_labels
-        )
+        specs, total_jobs, filtered_jobs = filter_specs_by_labels(specs, requested_labels)
         if filtered_jobs == 0:
             ui.console().print(
                 f"[yellow]Warning: No jobs found matching labels: {', '.join(requested_labels)}[/]"

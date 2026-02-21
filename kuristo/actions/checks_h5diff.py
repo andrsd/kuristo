@@ -144,9 +144,7 @@ class H5DiffCheck(ProcessAction):
 
                 stdout, _ = process.communicate(timeout=timeout * 60)
                 output = stdout.decode()
-                outputs.append(
-                    f"Dataset {dataset_path}: exit code {process.returncode}\n{output}"
-                )
+                outputs.append(f"Dataset {dataset_path}: exit code {process.returncode}\n{output}")
 
                 if process.returncode != 0:
                     all_passed = False

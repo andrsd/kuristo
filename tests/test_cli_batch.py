@@ -109,9 +109,7 @@ def test_create_script_params_all_skipped(mock_config_get, mock_build_actions):
     workdir = Path("/workdir")
     specs = [SimpleNamespace(skip=True, timeout_minutes=15) for _ in range(3)]
 
-    params = create_script_params(
-        "kuristo-job-0", Path("wf.yaml"), "12", 0, specs, workdir
-    )
+    params = create_script_params("kuristo-job-0", Path("wf.yaml"), "12", 0, specs, workdir)
 
     assert params.name == "kuristo-job-0"
     assert params.n_cores == 1  # default
@@ -123,9 +121,7 @@ def test_create_script_params_all_skipped(mock_config_get, mock_build_actions):
 
 @patch("kuristo.cli._batch.build_actions")
 @patch("kuristo.cli._batch.config.get")
-def test_create_script_params_accumulates_time_and_max_cores(
-    mock_config_get, mock_build_actions
-):
+def test_create_script_params_accumulates_time_and_max_cores(mock_config_get, mock_build_actions):
     # Return value of Config()
     mock_config_instance = MagicMock()
     mock_config_instance.batch_partition = "normal"
@@ -133,12 +129,8 @@ def test_create_script_params_accumulates_time_and_max_cores(
 
     workdir = Path("/data")
     specs = [
-        SimpleNamespace(
-            skip=False, timeout_minutes=10, defaults=None, working_directory=None
-        ),
-        SimpleNamespace(
-            skip=False, timeout_minutes=20, defaults=None, working_directory=None
-        ),
+        SimpleNamespace(skip=False, timeout_minutes=10, defaults=None, working_directory=None),
+        SimpleNamespace(skip=False, timeout_minutes=20, defaults=None, working_directory=None),
     ]
     # First spec -> 2 cores, second -> 8 cores
     mock_build_actions.side_effect = [
