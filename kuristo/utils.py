@@ -93,6 +93,9 @@ def prune_old_runs(log_dir: Path, keep_last_n: int):
     ]
     run_dirs.sort(key=lambda d: d.stat().st_mtime, reverse=True)
     for old_run in run_dirs[keep_last_n:]:
+        # Skip deletion if run is tagged
+        if is_run_tagged(log_dir, old_run.name):
+            continue
         shutil.rmtree(old_run)
 
 
@@ -106,6 +109,82 @@ def update_latest_symlink(log_dir: Path, latest_run_dir: Path):
         latest_link.unlink()
     relative_target = latest_run_dir.relative_to(runs_dir)
     latest_link.symlink_to(relative_target, target_is_directory=True)
+
+
+TAG_NAME_PATTERN = re.compile(r"^[a-zA-Z0-9._-]+$")
+
+
+def validate_tag_name(tag_name: str) -> bool:
+    """Validate tag name against allowed pattern"""
+    return TAG_NAME_PATTERN.match(tag_name) is not None
+
+
+def create_tag(log_dir: Path, tag_name: str, run_id: str):
+    """Create a tag (symlink) pointing to a run directory"""
+    if not validate_tag_name(tag_name):
+        raise RuntimeError(
+            f"Invalid tag name '{tag_name}'. Must contain only letters, numbers, dots, hyphens, and underscores."
+        )
+
+    runs_dir = log_dir / "runs"
+    tags_dir = log_dir / "tags"
+    tags_dir.mkdir(exist_ok=True)
+
+    # Verify run exists
+    run_dir = runs_dir / run_id
+    if not run_dir.exists():
+        raise RuntimeError(f"Run '{run_id}' does not exist")
+
+    # Create or update tag
+    tag_path = tags_dir / tag_name
+    if tag_path.exists() or tag_path.is_symlink():
+        tag_path.unlink()
+
+    relative_target = Path("..") / "runs" / run_id
+    tag_path.symlink_to(relative_target, target_is_directory=True)
+
+
+def delete_tag(log_dir: Path, tag_name: str):
+    """Delete a tag (symlink only, not the run)"""
+    tags_dir = log_dir / "tags"
+    tag_path = tags_dir / tag_name
+
+    if not tag_path.exists() and not tag_path.is_symlink():
+        raise RuntimeError(f"Tag '{tag_name}' does not exist")
+
+    tag_path.unlink()
+
+
+def list_tags(log_dir: Path) -> list:
+    """List all tags and their target run IDs. Returns [(tag_name, run_id), ...]"""
+    tags_dir = log_dir / "tags"
+    if not tags_dir.exists():
+        return []
+
+    tags = []
+    for tag_path in tags_dir.iterdir():
+        if tag_path.is_symlink():
+            try:
+                target = tag_path.resolve()
+                run_id = target.name
+                tags.append((tag_path.name, run_id))
+            except Exception:
+                # Broken symlink, skip
+                pass
+
+    tags.sort(key=lambda x: x[0])  # Sort by tag name
+    return tags
+
+
+def get_tags_for_run(log_dir: Path, run_id: str) -> list:
+    """Get all tag names pointing to a specific run"""
+    all_tags = list_tags(log_dir)
+    return [tag_name for tag_name, target_run_id in all_tags if target_run_id == run_id]
+
+
+def is_run_tagged(log_dir: Path, run_id: str) -> bool:
+    """Check if a run has any tags"""
+    return len(get_tags_for_run(log_dir, run_id)) > 0
 
 
 def interpolate_str(text: str, variables: dict) -> str:

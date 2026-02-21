@@ -49,7 +49,10 @@ def log(args):
             duration_str = "error"
             job_count = "?"
 
-        tag = "latest" if run_dir.name == latest_target else ""
+        tags_list = utils.get_tags_for_run(cfg.log_dir, run_dir.name)
+        if run_dir.name == latest_target:
+            tags_list.append("latest")
+        tag = ", ".join(tags_list) if tags_list else ""
         table.add_row(run_dir.name, duration_str, job_count, tag)
 
     console.print(table)

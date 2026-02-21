@@ -9,6 +9,7 @@ from kuristo.cli._status import status
 from kuristo.cli._log import log
 from kuristo.cli._show import show
 from kuristo.cli._report import report
+from kuristo.cli._tag import tag
 
 
 __all__ = [
@@ -20,7 +21,8 @@ __all__ = [
     "status",
     "log",
     "show",
-    "report"
+    "report",
+    "tag"
 ]
 
 
@@ -86,5 +88,13 @@ def build_parser():
     group.add_argument("--passed", action="store_true", help="Show only tests that passed")
 
     report_parser.add_argument("--output", help="File name to store the report into: <format>:<filename>")
+
+    # Tag command
+    tag_parser = subparsers.add_parser("tag", help="Manage run tags")
+    tag_parser.add_argument("name", nargs="?", help="Tag name")
+    tag_parser.add_argument("--run-id", type=str, help="Run ID to tag (default: latest)")
+    tag_group = tag_parser.add_mutually_exclusive_group()
+    tag_group.add_argument("-D", "--delete", action="store_true", help="Delete tag (does not delete the run)")
+    tag_group.add_argument("-l", "--list", dest="list_tags", action="store_true", help="List all tags")
 
     return parser

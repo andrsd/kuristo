@@ -16,6 +16,7 @@ commands=(
   'log:List runs'
   'show:Show job log'
   'report:Generate a report for a given run'
+  'tag:Manage run tags'
 )
 
 _arguments -C \
@@ -98,6 +99,14 @@ case $state in
           '--skipped[Show only tests that were skipped]' \
           '--passed[Show only tests that passed]' \
           '--output[File name to store the report into\: \<format\>\:\<filename\>]:string'
+        ;;
+      tag)
+        _arguments \
+          '--help[Show help message and exit]' \
+          '(-D --delete -l --list)'{-D,--delete}'[Delete tag \(does not delete the run\)]' \
+          '(-D --delete -l --list)'{-l,--list}'[List all tags]' \
+          '--run-id[Run ID to tag \(default\: latest\)]:string' \
+          ':tag name'
         ;;
     esac
     ;;

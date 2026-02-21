@@ -25,6 +25,7 @@ It supports sequential and parallel job execution, workflow definition via YAML,
 - Output validation (regex, float comparisons, CSV diffing)
 - Composite steps for reusable action pipelines
 - Built-in log directory and run tracking
+- Run tagging system to protect important results from cleanup
 - Test coverage with `pytest`
 - MPI support via configurable launcher (`mpirun`, `mpiexec`, etc.)
 
