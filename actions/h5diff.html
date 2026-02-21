@@ -53,8 +53,11 @@
 <li class="toctree-l2"><a class="reference internal" href="csv-diff.html">checks/csv-diff</a></li>
 <li class="toctree-l2"><a class="reference internal" href="exodiff.html">checks/exodiff</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">checks/h5diff</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#example-usage">Example Usage</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#arguments">Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-usage-compare-entire-files">Example Usage - Compare Entire Files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#example-usage-compare-multiple-datasets">Example Usage - Compare Multiple Datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arguments-file-comparison">Arguments - File Comparison</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#arguments-dataset-comparison">Arguments - Dataset Comparison</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#optional-arguments">Optional Arguments</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="regex.html">checks/regex</a></li>
@@ -94,10 +97,10 @@
              
   <section id="checks-h5diff">
 <h1>checks/h5diff<a class="headerlink" href="#checks-h5diff" title="Link to this heading"></a></h1>
-<p>The <code class="docutils literal notranslate"><span class="pre">h5diff</span></code> action compares two HDF5 files (<cite>.h5</cite>) to verify that simulation results
-match a known reference.</p>
-<section id="example-usage">
-<h2>Example Usage<a class="headerlink" href="#example-usage" title="Link to this heading"></a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">h5diff</span></code> action compares HDF5 files (<cite>.h5</cite>) to verify that simulation results
+match a known reference. You can compare entire files or specific datasets within files.</p>
+<section id="example-usage-compare-entire-files">
+<h2>Example Usage - Compare Entire Files<a class="headerlink" href="#example-usage-compare-entire-files" title="Link to this heading"></a></h2>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">steps</span><span class="p">:</span>
 <span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">checks/h5diff</span>
 <span class="w">    </span><span class="nt">with</span><span class="p">:</span>
@@ -107,23 +110,67 @@ match a known reference.</p>
 </pre></div>
 </div>
 </section>
-<section id="arguments">
-<h2>Arguments<a class="headerlink" href="#arguments" title="Link to this heading"></a></h2>
+<section id="example-usage-compare-multiple-datasets">
+<h2>Example Usage - Compare Multiple Datasets<a class="headerlink" href="#example-usage-compare-multiple-datasets" title="Link to this heading"></a></h2>
+<p>Compare specific datasets within the HDF5 files, each with its own tolerance:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">checks/h5diff</span>
+<span class="w">    </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">gold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ref.h5</span>
+<span class="w">      </span><span class="nt">test</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result.h5</span>
+<span class="w">      </span><span class="nt">datasets</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/pressure</span>
+<span class="w">          </span><span class="nt">rel-tol</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1e-6</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/velocity</span>
+<span class="w">          </span><span class="nt">abs-tol</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.001</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/temperature</span>
+<span class="w">          </span><span class="nt">rel-tol</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1e-5</span>
+</pre></div>
+</div>
+</section>
+<section id="arguments-file-comparison">
+<h2>Arguments - File Comparison<a class="headerlink" href="#arguments-file-comparison" title="Link to this heading"></a></h2>
 <dl class="simple">
 <dt><code class="docutils literal notranslate"><span class="pre">gold</span></code> (string, required)</dt><dd><p>Path to the reference HDF5 file.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">test</span></code> (string, required)</dt><dd><p>Path to the output HDF5 file to compare.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">abs-tol</span></code> (float, optional)</dt><dd><p>Absolute difference threshold.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">abs-tol</span></code> (float, optional)</dt><dd><p>Absolute difference threshold. Used when comparing entire files.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">rel-tol</span></code> (float, optional)</dt><dd><p>Relative difference threshold.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">rel-tol</span></code> (float, optional)</dt><dd><p>Relative difference threshold. Used when comparing entire files.</p>
+</dd>
+</dl>
+</section>
+<section id="arguments-dataset-comparison">
+<h2>Arguments - Dataset Comparison<a class="headerlink" href="#arguments-dataset-comparison" title="Link to this heading"></a></h2>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">gold</span></code> (string, required)</dt><dd><p>Path to the reference HDF5 file.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">test</span></code> (string, required)</dt><dd><p>Path to the output HDF5 file to compare.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">datasets</span></code> (list, optional)</dt><dd><p>List of datasets to compare. Each dataset is a dictionary with:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">path</span></code> (string, required): Path to the dataset (e.g., <code class="docutils literal notranslate"><span class="pre">/pressure</span></code>, <code class="docutils literal notranslate"><span class="pre">/data/velocity</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rel-tol</span></code> (float, optional): Relative tolerance for this dataset</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">abs-tol</span></code> (float, optional): Absolute tolerance for this dataset</p></li>
+</ul>
+<p>Either <code class="docutils literal notranslate"><span class="pre">rel-tol</span></code> or <code class="docutils literal notranslate"><span class="pre">abs-tol</span></code> must be provided for each dataset.</p>
+</dd>
+</dl>
+</section>
+<section id="optional-arguments">
+<h2>Optional Arguments<a class="headerlink" href="#optional-arguments" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">fail-on-diff</span></code> (boolean, optional, default: true)</dt><dd><p>If <code class="docutils literal notranslate"><span class="pre">false</span></code>, differences found by h5diff will not cause the step to fail.
+Useful for development and debugging.</p>
 </dd>
 </dl>
 <div class="admonition-notes admonition">
 <p class="admonition-title">Notes</p>
 <ul class="simple">
-<li><p>Either <code class="docutils literal notranslate"><span class="pre">abs-tol</span></code> or <code class="docutils literal notranslate"><span class="pre">rel-tol</span></code> must be provided</p></li>
+<li><p>Either <code class="docutils literal notranslate"><span class="pre">abs-tol</span></code> or <code class="docutils literal notranslate"><span class="pre">rel-tol</span></code> must be provided (for entire file comparison) or for each dataset</p></li>
 <li><p>Uses <code class="docutils literal notranslate"><span class="pre">h5diff</span></code> from HDF5 distribution. Make sure it is on your PATH when running kuristo.</p></li>
+<li><p>When comparing multiple datasets, the step fails if any dataset comparison fails (unless <code class="docutils literal notranslate"><span class="pre">fail-on-diff</span></code> is false)</p></li>
 </ul>
 </div>
 <div class="admonition seealso">
