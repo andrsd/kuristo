@@ -27,6 +27,8 @@ def main():
             cli.show(args)
         elif args.command == "report":
             cli.report(args)
+        elif args.command == "tag":
+            cli.tag(args)
     except Exception as e:
         print(e)
         sys.exit(1)
