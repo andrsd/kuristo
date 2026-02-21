@@ -102,11 +102,11 @@ And we want to keep 10 previous runs.
 .. code:: yaml
 
    log:
-      history: 10
+     history: 10
 
    runner:
-      mpi-launcher: mpiexec
+     mpi-launcher: mpiexec
 
    batch:
-      backend: slurm
-      partition: default
+     backend: slurm
+     partition: default
