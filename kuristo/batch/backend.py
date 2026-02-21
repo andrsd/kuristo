@@ -25,7 +25,6 @@ class ScriptParameters:
 
 
 class BatchBackend(ABC):
-
     def __init__(self, name):
         self._name = name
 

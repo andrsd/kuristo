@@ -29,7 +29,7 @@ class ActionFactory:
                 continue_on_error=step.continue_on_error,
                 commands=step.run,
                 num_cores=step.num_cores,
-                env=step.env
+                env=step.env,
             )
         elif get_action(step.uses):
             cls = get_action(step.uses)
@@ -40,7 +40,7 @@ class ActionFactory:
                 working_dir=working_directory,
                 timeout_minutes=step.timeout_minutes,
                 continue_on_error=step.continue_on_error,
-                **step.params
+                **step.params,
             )
         else:
             raise RuntimeError(f"Requested unknown action: {step.uses}")

@@ -31,7 +31,7 @@ def test_print_report_outputs_correctly(
             {"status": "success", "job-name": "Test A"},
             {"status": "failed", "job-name": "Another"},
         ],
-        "total-runtime": 12.34
+        "total-runtime": 12.34,
     }
 
     mock_cfg = MagicMock()
@@ -63,7 +63,7 @@ def test_print_report_outputs_filtered(
             {"status": "success", "job-name": "Test B"},
             {"status": "failed", "job-name": "Another"},
         ],
-        "total-runtime": 12.34
+        "total-runtime": 12.34,
     }
 
     mock_cfg = MagicMock()
@@ -83,7 +83,9 @@ def test_print_report_outputs_filtered(
 @patch("kuristo.cli._status.print_report")
 @patch("kuristo.cli._status.utils.read_report")
 @patch("kuristo.cli._status.config.get")
-def test_status_reads_report_and_calls_print(mock_cfg_get, mock_read_report, mock_print_report, tmp_path):
+def test_status_reads_report_and_calls_print(
+    mock_cfg_get, mock_read_report, mock_print_report, tmp_path
+):
     report_path = tmp_path / "runs" / "latest" / "report.yaml"
     report_path.parent.mkdir(parents=True)
     report_path.write_text("fake: data")

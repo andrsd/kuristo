@@ -30,8 +30,12 @@ class CSVDiffCheck(Action):
                     g_val = float(gold_data[row_idx][col])
                     t_val = float(test_data[row_idx][col])
 
-                    rel = float(self._tolerances.get(col, {}).get("rel-tol", self._default_rel))
-                    abs_ = float(self._tolerances.get(col, {}).get("abs-tol", self._default_abs))
+                    rel = float(
+                        self._tolerances.get(col, {}).get("rel-tol", self._default_rel)
+                    )
+                    abs_ = float(
+                        self._tolerances.get(col, {}).get("abs-tol", self._default_abs)
+                    )
 
                     if not math.isclose(g_val, t_val, rel_tol=rel, abs_tol=abs_):
                         self.output = (

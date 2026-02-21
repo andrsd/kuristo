@@ -60,7 +60,7 @@ def status_line(job, state, max_id_width, max_label_len):
         job_id = _padded_job_id(job["id"], max_id_width)
         job_name_len = len(job["job-name"])
         job_name = job_name_markup(job["job-name"])
-        if job['status'] == 'skipped':
+        if job["status"] == "skipped":
             skip_reason = job["reason"]
         else:
             skip_reason = ""
@@ -103,9 +103,7 @@ def line(width: int):
     consol = console()
 
     line = "-" * width
-    consol.print(
-        Text.from_markup(f"[grey23]{line}[/]")
-    )
+    consol.print(Text.from_markup(f"[grey23]{line}[/]"))
 
 
 def stats(stats: RunStats):
@@ -136,9 +134,5 @@ def job_header_line(job_id, width: int):
     hdr = f"== [ Job {job_id} ] "
     width -= len(hdr)
     line = hdr + "=" * width
-    consol.print(
-        Text.from_markup(f"[grey42]{line}[/]")
-    )
-    consol.print(
-        Text.from_markup("")
-    )
+    consol.print(Text.from_markup(f"[grey42]{line}[/]"))
+    consol.print(Text.from_markup(""))

@@ -31,7 +31,10 @@ def print_diag(args):
     table.add_row("Python", f"{platform.python_version()} @ {sys.executable}")
     table.add_row("Config location", f"{cfg.path}")
     table.add_row("Log directory", f"{runs_dir}")
-    table.add_row("Latest run", Text.from_markup(str(latest.resolve() if latest.exists() else "[dim]none[/]")))
+    table.add_row(
+        "Latest run",
+        Text.from_markup(str(latest.resolve() if latest.exists() else "[dim]none[/]")),
+    )
     table.add_row("MPI launcher", Text.from_markup(f"[green]{cfg.mpi_launcher}[/]"))
 
     console.print(table)
@@ -48,16 +51,21 @@ def print_diag(args):
     # Resources
     console.print(Text.from_markup("[bold]Resources[/]"))
     try:
-        output = subprocess.check_output(
-            ["sysctl", "-n", "hw.perflevel0.physicalcpu"],
-            text=True
-        ) if sys.platform == "darwin" else None
+        output = (
+            subprocess.check_output(
+                ["sysctl", "-n", "hw.perflevel0.physicalcpu"], text=True
+            )
+            if sys.platform == "darwin"
+            else None
+        )
         perf_cores = int(output.strip()) if output else None
     except Exception:
         perf_cores = None
 
     resource_table = Table(show_header=False, show_edge=False)
-    resource_table.add_row("Cores (max used)", Text.from_markup(f"[cyan]{cfg.num_cores}[/]"))
+    resource_table.add_row(
+        "Cores (max used)", Text.from_markup(f"[cyan]{cfg.num_cores}[/]")
+    )
     resource_table.add_row("System cores", str(os.cpu_count()))
     if perf_cores is not None:
         resource_table.add_row("Perf cores (macOS)", str(perf_cores))

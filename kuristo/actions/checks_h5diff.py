@@ -46,13 +46,17 @@ class H5DiffCheck(ProcessAction):
         """Validate that each dataset has required tolerance"""
         for i, dataset in enumerate(self._datasets):
             if not isinstance(dataset, dict):
-                raise RuntimeError(f"h5diff: dataset[{i}] must be a dictionary with 'path' and tolerance")
+                raise RuntimeError(
+                    f"h5diff: dataset[{i}] must be a dictionary with 'path' and tolerance"
+                )
             if "path" not in dataset:
                 raise RuntimeError(f"h5diff: dataset[{i}] must have a 'path' field")
             rel_tol = dataset.get("rel-tol", None)
             abs_tol = dataset.get("abs-tol", None)
             if rel_tol is None and abs_tol is None:
-                raise RuntimeError(f"h5diff: dataset[{i}] ({dataset['path']}) must provide either `rel-tol` or `abs-tol`")
+                raise RuntimeError(
+                    f"h5diff: dataset[{i}] ({dataset['path']}) must provide either `rel-tol` or `abs-tol`"
+                )
 
     def _create_command_for_dataset(self, dataset: dict) -> str:
         """Create h5diff command for a single dataset"""
@@ -135,12 +139,14 @@ class H5DiffCheck(ProcessAction):
                     cwd=self._cwd,
                     env=env,
                     stdout=subprocess.PIPE,
-                    stderr=subprocess.STDOUT
+                    stderr=subprocess.STDOUT,
                 )
 
                 stdout, _ = process.communicate(timeout=timeout * 60)
                 output = stdout.decode()
-                outputs.append(f"Dataset {dataset_path}: exit code {process.returncode}\n{output}")
+                outputs.append(
+                    f"Dataset {dataset_path}: exit code {process.returncode}\n{output}"
+                )
 
                 if process.returncode != 0:
                     all_passed = False
@@ -153,9 +159,7 @@ class H5DiffCheck(ProcessAction):
         # Store combined output
         if self.id is not None:
             combined_output = "\n".join(outputs)
-            self.context.vars["steps"][self.id] = {
-                "output": combined_output
-            }
+            self.context.vars["steps"][self.id] = {"output": combined_output}
 
         self.output = "\n".join(outputs).encode()
 

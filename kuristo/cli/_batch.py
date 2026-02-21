@@ -43,7 +43,7 @@ def create_script_params(
     run_id: str,
     first_job_num: int,
     specs: list[JobSpec],
-    workdir: Path
+    workdir: Path,
 ) -> ScriptParameters:
     """
     Create a specification for job submission into a queue
@@ -66,7 +66,7 @@ def create_script_params(
             context = Context(
                 base_env=None,
                 working_directory=sp.working_directory,
-                defaults=sp.defaults
+                defaults=sp.defaults,
             )
             actions = build_actions(sp, context)
             n_cores = max(n_cores, required_cores(actions))
@@ -81,7 +81,7 @@ def create_script_params(
         partition=cfg.batch_partition,
         run_id=run_id,
         first_job_num=first_job_num,
-        workflow_file=workflow_file
+        workflow_file=workflow_file,
     )
 
 
@@ -100,28 +100,25 @@ def update_report_atomic(yaml_path: Path, new_results: list):
         f.seek(0)
         try:
             report = yaml.safe_load(f) or {"results": []}
-            results = report['results']
+            results = report["results"]
         except yaml.YAMLError:
             results = []
 
         results.extend(new_results)
 
         tmp_path = yaml_path.with_suffix(".tmp")
-        cli_run.write_report_yaml(tmp_path, results, 0.)
+        cli_run.write_report_yaml(tmp_path, results, 0.0)
 
         os.replace(tmp_path, yaml_path)
 
 
 def write_job_metadata(batch_job_id, backend_name, workdir):
     # metadata for the job in the queue
-    metadata = {
-        'id': batch_job_id,
-        'backend': backend_name
-    }
+    metadata = {"id": batch_job_id, "backend": backend_name}
 
     metadata_path = Path(workdir) / "metadata.yaml"
     with open(metadata_path, "w") as f:
-        yaml.safe_dump({'job': metadata}, f, sort_keys=False)
+        yaml.safe_dump({"job": metadata}, f, sort_keys=False)
 
 
 def read_job_metadata(path: Path):
@@ -170,7 +167,7 @@ def batch_submit(args):
             jobs = create_jobs(sp, out_dir, cond)
             job_num += len(jobs)
 
-    ui.console().print(f'Submitted {n_jobs} jobs')
+    ui.console().print(f"Submitted {n_jobs} jobs")
 
 
 def batch_status(args):
@@ -193,7 +190,7 @@ def batch_status(args):
         batch_job_id = str(m["job"]["id"])
         backend = get_backend(m["job"]["backend"])
         status = backend.status(batch_job_id)
-        ui.console().print(f'[{batch_job_id}] {status}')
+        ui.console().print(f"[{batch_job_id}] {status}")
 
 
 def batch_run(args):

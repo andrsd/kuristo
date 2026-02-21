@@ -17,7 +17,7 @@ def summarize(results):
         status = r["status"]
         counts[status] += 1
 
-    return ui.RunStats(counts['success'], counts['failed'], counts['skipped'])
+    return ui.RunStats(counts["success"], counts["failed"], counts["skipped"])
 
 
 def build_filters(args):
@@ -44,14 +44,19 @@ def print_report(report, filters: list):
 
     max_label_len = cfg.console_width
     for r in filtered:
-        max_label_len = max(max_label_len, len(r['job-name']) + 1)
+        max_label_len = max(max_label_len, len(r["job-name"]) + 1)
 
     for entry in filtered:
-        ui.status_line(entry, STATUS_LABELS.get(entry["status"], "????"), max_id_width, max_label_len)
+        ui.status_line(
+            entry,
+            STATUS_LABELS.get(entry["status"], "????"),
+            max_id_width,
+            max_label_len,
+        )
     stats = summarize(filtered)
     ui.line(cfg.console_width)
     ui.stats(stats)
-    ui.time(report.get("total-runtime", 0.))
+    ui.time(report.get("total-runtime", 0.0))
 
 
 def status(args):

@@ -20,10 +20,7 @@ def log(args):
         except Exception:
             pass
 
-    run_dirs = [
-        d for d in runs_dir.iterdir()
-        if d.is_dir() and d.name != "latest"
-    ]
+    run_dirs = [d for d in runs_dir.iterdir() if d.is_dir() and d.name != "latest"]
     run_dirs.sort(key=lambda d: d.name, reverse=False)
 
     table = Table(show_lines=False, box=None)

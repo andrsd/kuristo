@@ -1,4 +1,5 @@
 import sys
+
 import kuristo.cli as cli
 import kuristo.config as config
 

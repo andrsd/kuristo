@@ -24,7 +24,7 @@ def parse_sections(lines):
     current = None
 
     for timestamp, tag, msg in lines:
-        if tag == 'TASK_START':
+        if tag == "TASK_START":
             if current:
                 sections.append(current)
             current = {
@@ -33,9 +33,9 @@ def parse_sections(lines):
                 "lines": [],
                 "return_code": None,
                 "start_time": timestamp,
-                "end_time": None
+                "end_time": None,
             }
-        elif tag == 'TASK_END':
+        elif tag == "TASK_END":
             s = msg.split("exit code")
             if len(s) > 1:
                 rc = int(s[1].strip())
@@ -47,12 +47,10 @@ def parse_sections(lines):
                     "type": "section",
                     "title": "",
                     "return_code": None,
-                    "lines": [
-                        ('OUTPUT', msg.strip())
-                    ]
+                    "lines": [("OUTPUT", msg.strip())],
                 }
 
-        elif tag == 'ENV':
+        elif tag == "ENV":
             if current:
                 sections.append(current)
             current = {
@@ -61,20 +59,20 @@ def parse_sections(lines):
                 "lines": [],
                 "return_code": None,
                 "start_time": timestamp,
-                "end_time": None
+                "end_time": None,
             }
-        elif tag == 'INFO' and msg.startswith("|"):
+        elif tag == "INFO" and msg.startswith("|"):
             if current:
                 current["lines"].append(("ENV_VAR", msg[2:].strip()))
-        elif tag == 'JOB_START':
+        elif tag == "JOB_START":
             title = {
                 "type": "title",
                 "title": msg,
                 "start_time": timestamp,
-                "end_time": None
+                "end_time": None,
             }
             sections.append(title)
-        elif tag == 'JOB_END':
+        elif tag == "JOB_END":
             if title:
                 title["end_time"] = timestamp
         else:
@@ -91,7 +89,7 @@ def render_title(sec, max_label_len):
     console = ui.console()
     title = sec["title"]
 
-    tm = 0.
+    tm = 0.0
     if sec["start_time"] and sec["end_time"]:
         tm = (sec["end_time"] - sec["start_time"]).total_seconds()
     time_str = utils.human_time(tm)
@@ -121,7 +119,7 @@ def render_section(sec, max_label_len):
         else:
             st = ""
 
-        delta = 0.
+        delta = 0.0
         if sec["start_time"] and sec["end_time"]:
             delta = (sec["end_time"] - sec["start_time"]).total_seconds()
         time_str = utils.human_time(delta)

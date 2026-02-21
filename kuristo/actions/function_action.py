@@ -11,11 +11,7 @@ class FunctionAction(Action):
     """
 
     def __init__(self, name, context: Context, **params):
-        super().__init__(
-            name,
-            context,
-            **params
-        )
+        super().__init__(name, context, **params)
         self._params = params
 
     def run(self) -> int:

@@ -13,7 +13,7 @@ class ProcessAction(Action):
     def __init__(self, name, context: Context, **kwargs) -> None:
         super().__init__(name, context, **kwargs)
         self._process = None
-        self._env = kwargs.get('env', {})
+        self._env = kwargs.get("env", {})
 
     @property
     def command(self) -> str:
@@ -34,28 +34,24 @@ class ProcessAction(Action):
             cwd=self._cwd,
             env=env,
             stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT
+            stderr=subprocess.STDOUT,
         )
         try:
-            stdout, _ = self._process.communicate(
-                timeout=timeout * 60
-            )
+            stdout, _ = self._process.communicate(timeout=timeout * 60)
             if self.id is not None:
-                self.context.vars["steps"][self.id] = {
-                    "output": stdout.decode()
-                }
+                self.context.vars["steps"][self.id] = {"output": stdout.decode()}
             self.output = stdout
             return self._process.returncode
 
         except subprocess.TimeoutExpired:
             self.terminate()
             outs, _ = self._process.communicate()
-            outs += b'\n'
-            outs += 'Step timed out'.encode()
+            outs += b"\n"
+            outs += "Step timed out".encode()
             self.output = outs
             return 124
         except subprocess.SubprocessError:
-            self.output = b''
+            self.output = b""
             return -1
 
     def terminate(self):

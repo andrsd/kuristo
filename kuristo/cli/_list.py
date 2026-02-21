@@ -13,10 +13,14 @@ def list_jobs(args):
     specs = parse_workflow_files(workflow_files)
 
     # Filter by labels if specified
-    requested_labels = getattr(args, 'labels', None)
+    requested_labels = getattr(args, "labels", None)
     if requested_labels:
-        specs, total_jobs, filtered_jobs = filter_specs_by_labels(specs, requested_labels)
-        console.print(f"[cyan]Showing {filtered_jobs} of {total_jobs} jobs matching labels:[/] [magenta]{', '.join(requested_labels)}[/]")
+        specs, total_jobs, filtered_jobs = filter_specs_by_labels(
+            specs, requested_labels
+        )
+        console.print(
+            f"[cyan]Showing {filtered_jobs} of {total_jobs} jobs matching labels:[/] [magenta]{', '.join(requested_labels)}[/]"
+        )
 
     n_jobs = 0
     for sp in specs:
@@ -36,7 +40,9 @@ def list_jobs(args):
                 txt.append(": ")
                 txt.append(Text.from_markup(sp.name, style="grey70"))
                 if sp.labels:
-                    txt.append(Text.from_markup(f" ({', '.join(sp.labels)})", style="magenta"))
+                    txt.append(
+                        Text.from_markup(f" ({', '.join(sp.labels)})", style="magenta")
+                    )
             console.print(txt)
     console.print()
     console.print(Text.from_markup(f"Found jobs: [green]{n_jobs}[/]"))

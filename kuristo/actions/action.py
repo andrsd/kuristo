@@ -49,7 +49,7 @@ class Action(ABC):
         if self._output:
             return self._output
         else:
-            return ''
+            return ""
 
     @output.setter
     def output(self, out):

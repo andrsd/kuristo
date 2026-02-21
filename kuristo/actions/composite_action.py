@@ -18,7 +18,9 @@ class CompositeAction(Action):
         output_lines = []
         for step in self._steps:
             step.run()
-            output_lines.append(f"[{step.name}] {step.output.decode(errors='ignore').strip()}")
+            output_lines.append(
+                f"[{step.name}] {step.output.decode(errors='ignore').strip()}"
+            )
             if step.return_code != 0:
                 self.output = "\n".join(output_lines)
                 return step.return_code

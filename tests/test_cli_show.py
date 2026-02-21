@@ -9,7 +9,7 @@ from kuristo.cli._show import (
     render_section,
     render_sections,
     display_job_log,
-    show
+    show,
 )
 from rich.text import Text
 
@@ -26,16 +26,20 @@ def test_parse_log_line_valid():
     assert msg == "something happened"
 
 
-@pytest.mark.parametrize("line", [
-    "invalid line",
-    "2025-07-26 13:00:00 - INFO - missing milliseconds",
-    "2025-07-26 13:00:00,123 - only two parts",
-    "2025-07-26 13:00:00,123 - INFO",  # missing msg
-    "2025-07-26 13:00:00,123",         # no dashes
-    "2025-07-26T13:00:00,123 - INFO - ISO format timestamp",  # bad timestamp format
-])
+@pytest.mark.parametrize(
+    "line",
+    [
+        "invalid line",
+        "2025-07-26 13:00:00 - INFO - missing milliseconds",
+        "2025-07-26 13:00:00,123 - only two parts",
+        "2025-07-26 13:00:00,123 - INFO",  # missing msg
+        "2025-07-26 13:00:00,123",  # no dashes
+        "2025-07-26T13:00:00,123 - INFO - ISO format timestamp",  # bad timestamp format
+    ],
+)
 def test_parse_log_line_invalid(line):
     assert parse_log_line(line) is None
+
 
 # ---
 
@@ -125,6 +129,7 @@ def test_unclosed_task():
     assert task["end_time"] is None
     assert task["lines"] == [("INFO", "Still going")]
 
+
 # ---
 
 
@@ -187,6 +192,7 @@ def test_render_title_long_title(mock_human_time, mock_console):
     # No crash, still prints
     mock_console_instance.print.assert_called()
 
+
 # ---
 
 
@@ -197,7 +203,9 @@ def test_render_section_pass(mock_human_time, mock_console, capsys):
     console = MagicMock()
     mock_console.return_value = console
 
-    sec = make_section(rc=0, lines=[("OUTPUT", "Success output"), ("SCRIPT", "echo run")])
+    sec = make_section(
+        rc=0, lines=[("OUTPUT", "Success output"), ("SCRIPT", "echo run")]
+    )
     render_section(sec, max_label_len=50)
 
     texts = []
@@ -267,20 +275,24 @@ def test_render_section_handles_dot_padding(mock_human_time, mock_console):
     render_section(sec, max_label_len=10)
 
     header = str(console.print.call_args_list[0][0][0])
-    assert "...." not in header or isinstance(header, Text)  # Dots suppressed if negative width
+    assert "...." not in header or isinstance(
+        header, Text
+    )  # Dots suppressed if negative width
 
 
 @patch("kuristo.cli._show.render_title")
 @patch("kuristo.cli._show.render_section")
 @patch("kuristo.cli._show.config.get")
-def test_render_sections_calls_correct_renderers(mock_cfg_get, mock_render_section, mock_render_title):
+def test_render_sections_calls_correct_renderers(
+    mock_cfg_get, mock_render_section, mock_render_title
+):
     mock_cfg = MagicMock()
     mock_cfg.console_width = 80
     mock_cfg_get.return_value = mock_cfg
 
     sections = [
         {"type": "title", "title": "Header", "start_time": None, "end_time": None},
-        make_section()
+        make_section(),
     ]
 
     render_sections(sections)
@@ -291,7 +303,9 @@ def test_render_sections_calls_correct_renderers(mock_cfg_get, mock_render_secti
 
 @patch("kuristo.cli._show.render_sections")
 @patch("kuristo.cli._show.parse_log_line")
-def test_display_job_log_parses_and_renders(mock_parse_log_line, mock_render_sections, tmp_path):
+def test_display_job_log_parses_and_renders(
+    mock_parse_log_line, mock_render_sections, tmp_path
+):
     log_file = tmp_path / "job-1.log"
     log_file.write_text("")
 

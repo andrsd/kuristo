@@ -14,7 +14,9 @@ class RegexFloatCheck(RegexCheck):
     def on_success(self, match) -> int:
         try:
             value = float(match.group(1))
-            if math.isclose(value, self._gold, rel_tol=self._rel_tol, abs_tol=self._abs_tol):
+            if math.isclose(
+                value, self._gold, rel_tol=self._rel_tol, abs_tol=self._abs_tol
+            ):
                 self.output = (
                     f"Regex float check passed: got {value}, expected {self._gold}"
                 )
