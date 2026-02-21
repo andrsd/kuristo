@@ -1,7 +1,8 @@
 import unittest
-from unittest.mock import patch, MagicMock
 from pathlib import Path
-from kuristo.batch.slurm import SlurmBackend, ScriptParameters
+from unittest.mock import MagicMock, patch
+
+from kuristo.batch.slurm import ScriptParameters, SlurmBackend
 
 
 class TestSlurmBackend(unittest.TestCase):

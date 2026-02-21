@@ -1,15 +1,17 @@
-from pathlib import Path
 import os
 import platform
-import sys
 import subprocess
+import sys
+from pathlib import Path
+
 from rich.table import Table
 from rich.text import Text
+
 import kuristo.config as config
 import kuristo.ui as ui
+from kuristo._version import __version__
 from kuristo.plugin_loader import find_kuristo_root, load_user_steps_from_kuristo_dir
 from kuristo.registry import _ACTION_REGISTRY
-from kuristo._version import __version__
 
 
 def print_diag(args):

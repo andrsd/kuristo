@@ -1,6 +1,8 @@
 import subprocess
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
+
 from kuristo.actions.process_action import ProcessAction
 
 

@@ -1,14 +1,16 @@
-import yaml
 from pathlib import Path
+
+import yaml
+
 import kuristo.config as config
-import kuristo.utils as utils
 import kuristo.ui as ui
-from kuristo.scheduler import Scheduler
-from kuristo.resources import Resources
+import kuristo.utils as utils
 from kuristo.job import Job
-from kuristo.plugin_loader import load_user_steps_from_kuristo_dir
 from kuristo.job_spec import parse_workflow_files
+from kuristo.plugin_loader import load_user_steps_from_kuristo_dir
+from kuristo.resources import Resources
 from kuristo.scanner import scan_locations
+from kuristo.scheduler import Scheduler
 from kuristo.utils import filter_specs_by_labels
 
 

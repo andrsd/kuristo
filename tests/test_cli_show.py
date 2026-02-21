@@ -1,17 +1,19 @@
-from unittest.mock import patch, MagicMock
-import pytest
-from pathlib import Path
 from datetime import datetime, timedelta
+from pathlib import Path
+from unittest.mock import MagicMock, patch
+
+import pytest
+from rich.text import Text
+
 from kuristo.cli._show import (
+    display_job_log,
     parse_log_line,
     parse_sections,
-    render_title,
     render_section,
     render_sections,
-    display_job_log,
+    render_title,
     show,
 )
-from rich.text import Text
 
 
 def test_parse_log_line_valid():

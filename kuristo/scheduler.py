@@ -1,22 +1,24 @@
-import networkx as netx
-import threading
 import sys
+import threading
 import time
 from pathlib import Path
-from kuristo.job_spec import JobSpec
+
+import networkx as netx
 from rich.progress import (
+    BarColumn,
     Progress,
+    ProgressColumn,
     SpinnerColumn,
     TextColumn,
-    BarColumn,
-    ProgressColumn,
     TimeElapsedColumn,
 )
-from rich.text import Text
 from rich.style import Style
-import kuristo.ui as ui
+from rich.text import Text
+
 import kuristo.config as config
+import kuristo.ui as ui
 from kuristo.job import Job, JobJoiner
+from kuristo.job_spec import JobSpec
 from kuristo.resources import Resources
 
 

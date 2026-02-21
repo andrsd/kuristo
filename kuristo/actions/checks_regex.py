@@ -1,6 +1,7 @@
 import re
-from kuristo.registry import action
+
 from kuristo.actions.regex_base import RegexBaseAction
+from kuristo.registry import action
 
 ALIAS_PATTERNS = {
     "float": r"([-+]?(?:\d*\.\d+|\d+)(?:[eE][-+]?\d+)?)",

@@ -39,7 +39,7 @@ exclude = [
 ]
 
 [tool.ruff.lint]
-select = ["E", "F", "W"]
+select = ["E", "F", "W", "I"]  # I = isort (import sorting)
 ignore = [
     "E203",  # Whitespace before ':'
     "E501",  # Line too long (handled by formatter)

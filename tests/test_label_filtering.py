@@ -1,4 +1,5 @@
 from pathlib import Path
+
 from kuristo.job_spec import JobSpec, parse_workflow_files
 from kuristo.utils import filter_specs_by_labels
 

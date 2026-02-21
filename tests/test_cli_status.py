@@ -1,6 +1,8 @@
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import patch, MagicMock
-from kuristo.cli._status import summarize, print_report, status
+
+from kuristo.cli._status import print_report, status, summarize
 
 
 def test_summarize_counts_correctly():

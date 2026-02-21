@@ -1,9 +1,10 @@
 import os
-import yaml
-from pathlib import Path
-from pydantic import BaseModel, Field, PrivateAttr, ValidationError, model_validator
-from typing import List, Optional, Union, Dict, Any
 from itertools import product
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
+
+import yaml
+from pydantic import BaseModel, Field, PrivateAttr, ValidationError, model_validator
 
 
 class StrategyMatrix(BaseModel):

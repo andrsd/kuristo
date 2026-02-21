@@ -1,6 +1,8 @@
-import pytest
 from pathlib import Path
 from tempfile import TemporaryDirectory
+
+import pytest
+
 import kuristo.utils as utils
 
 

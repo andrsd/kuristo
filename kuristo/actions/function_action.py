@@ -1,8 +1,9 @@
-from kuristo.actions.action import Action
-from kuristo.context import Context
-from io import StringIO
 import contextlib as ctxlib
 from abc import abstractmethod
+from io import StringIO
+
+from kuristo.actions.action import Action
+from kuristo.context import Context
 
 
 class FunctionAction(Action):

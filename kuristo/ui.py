@@ -1,10 +1,11 @@
 from dataclasses import dataclass
+
 from rich.console import Console
 from rich.text import Text
+
 import kuristo.config as config
 from kuristo.job import Job, JobJoiner
 from kuristo.utils import human_time
-
 
 _console_instance = None
 

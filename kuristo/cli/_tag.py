@@ -1,7 +1,8 @@
 from rich.table import Table
-import kuristo.utils as utils
+
 import kuristo.config as config
 import kuristo.ui as ui
+import kuristo.utils as utils
 
 
 def tag_add(args):

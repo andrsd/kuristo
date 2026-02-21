@@ -1,9 +1,11 @@
-import kuristo.config as config
-import kuristo.utils as utils
-import kuristo.ui as ui
 from datetime import datetime
 from pathlib import Path
+
 from rich.text import Text
+
+import kuristo.config as config
+import kuristo.ui as ui
+import kuristo.utils as utils
 
 
 def parse_log_line(line):

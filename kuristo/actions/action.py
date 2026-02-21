@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 from kuristo.context import Context
 from kuristo.utils import interpolate_str
 

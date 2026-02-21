@@ -1,6 +1,7 @@
+import math
+
 from kuristo.actions.checks_regex import RegexCheck
 from kuristo.registry import action
-import math
 
 
 @action("checks/regex-float")

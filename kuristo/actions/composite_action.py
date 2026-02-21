@@ -1,4 +1,5 @@
 from abc import abstractmethod
+
 from kuristo.actions.action import Action
 
 

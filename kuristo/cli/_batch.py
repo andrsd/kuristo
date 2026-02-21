@@ -1,24 +1,26 @@
-import yaml
-import os
 import fcntl
+import os
 import re
 import threading
 from datetime import datetime
 from pathlib import Path
+
+import yaml
+
+import kuristo.cli._run as cli_run
 import kuristo.config as config
 import kuristo.ui as ui
 import kuristo.utils as utils
-from kuristo.scanner import scan_locations
+from kuristo.action_factory import ActionFactory
 from kuristo.batch import get_backend
 from kuristo.batch.backend import ScriptParameters
-from kuristo.scheduler import Scheduler, create_jobs
-from kuristo.resources import Resources
-from kuristo.job import Job
-from kuristo.job_spec import JobSpec, specs_from_file, parse_workflow_files
-from kuristo.action_factory import ActionFactory
 from kuristo.context import Context
+from kuristo.job import Job
+from kuristo.job_spec import JobSpec, parse_workflow_files, specs_from_file
 from kuristo.plugin_loader import load_user_steps_from_kuristo_dir
-import kuristo.cli._run as cli_run
+from kuristo.resources import Resources
+from kuristo.scanner import scan_locations
+from kuristo.scheduler import Scheduler, create_jobs
 
 
 def build_actions(spec, context):

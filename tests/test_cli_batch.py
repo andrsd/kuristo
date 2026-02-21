@@ -1,13 +1,14 @@
-from unittest.mock import patch, MagicMock, ANY, mock_open
-from types import SimpleNamespace
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import ANY, MagicMock, mock_open, patch
+
 from kuristo.batch.backend import ScriptParameters
 from kuristo.cli._batch import (
     build_actions,
-    required_cores,
     create_script_params,
-    write_job_metadata,
     read_job_metadata,
+    required_cores,
+    write_job_metadata,
 )
 
 

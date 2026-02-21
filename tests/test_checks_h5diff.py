@@ -1,7 +1,9 @@
-import pytest
 from unittest.mock import MagicMock, patch
-from kuristo.context import Context
+
+import pytest
+
 from kuristo.actions import H5DiffCheck
+from kuristo.context import Context
 
 
 @pytest.fixture

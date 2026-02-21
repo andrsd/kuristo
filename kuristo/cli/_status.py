@@ -1,7 +1,6 @@
+import kuristo.config as config
 import kuristo.ui as ui
 import kuristo.utils as utils
-import kuristo.config as config
-
 
 STATUS_LABELS = {
     "success": "PASS",

@@ -1,12 +1,13 @@
-import threading
 import logging
-import time
 import os
+import threading
+import time
 from pathlib import Path
-from kuristo.job_spec import JobSpec
+
 from kuristo.action_factory import ActionFactory
 from kuristo.context import Context
 from kuristo.env import Env
+from kuristo.job_spec import JobSpec
 from kuristo.utils import interpolate_str
 
 

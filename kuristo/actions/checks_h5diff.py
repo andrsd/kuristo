@@ -1,9 +1,10 @@
+import os
 import shlex
 import subprocess
-import os
-from kuristo.registry import action
+
 from kuristo.actions.process_action import ProcessAction
 from kuristo.context import Context
+from kuristo.registry import action
 
 
 @action("checks/h5diff")

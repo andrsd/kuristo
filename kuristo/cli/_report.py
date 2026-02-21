@@ -1,10 +1,11 @@
-import kuristo.config as config
-import kuristo.utils as utils
-import kuristo.cli._show as show
-import kuristo.ui as ui
-from pathlib import Path
 import xml.etree.ElementTree as ET
 from datetime import datetime
+from pathlib import Path
+
+import kuristo.cli._show as show
+import kuristo.config as config
+import kuristo.ui as ui
+import kuristo.utils as utils
 
 
 def generate_junit(results, xml_filename: Path, stat):

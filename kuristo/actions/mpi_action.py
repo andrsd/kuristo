@@ -1,8 +1,8 @@
-from kuristo.registry import action
+import kuristo.config as config
 from kuristo.actions.process_action import ProcessAction
 from kuristo.context import Context
+from kuristo.registry import action
 from kuristo.utils import interpolate_str
-import kuristo.config as config
 
 
 @action("core/mpi-run")

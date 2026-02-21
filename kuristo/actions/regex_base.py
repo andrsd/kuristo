@@ -1,5 +1,6 @@
 import re
 from abc import abstractmethod
+
 from kuristo.actions.action import Action
 from kuristo.utils import interpolate_str
 

@@ -1,4 +1,5 @@
 from rich.text import Text
+
 import kuristo.ui as ui
 from kuristo.job_spec import parse_workflow_files
 from kuristo.scanner import scan_locations

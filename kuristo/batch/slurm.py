@@ -1,7 +1,9 @@
 import subprocess
-from pathlib import Path
-from jinja2 import Environment, FileSystemLoader
 from importlib.resources import files
+from pathlib import Path
+
+from jinja2 import Environment, FileSystemLoader
+
 from kuristo.batch.backend import BatchBackend, ScriptParameters
 from kuristo.utils import minutes_to_hhmmss
 

@@ -1,8 +1,9 @@
-from kuristo.actions.action import Action
-from kuristo.context import Context
 import os
 import subprocess
 from abc import abstractmethod
+
+from kuristo.actions.action import Action
+from kuristo.context import Context
 
 
 class ProcessAction(Action):
