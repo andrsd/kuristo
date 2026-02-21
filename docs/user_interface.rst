@@ -1,6 +1,12 @@
 User Interface
 ==============
 
+Global Options
+--------------
+
+``--version``
+   Show the version number and exit.
+
 ``-f|--config <file>``
    Supply a config file.
 
@@ -72,11 +78,11 @@ show
 
 Show the output (log) of a specified job.
 
-``--job``
+``--job <id>`` (required)
    Job ID to display information about.
 
-``--run-id``
-   Run ID. If not specified, the latest run is assumed.
+``--run-id <id>``
+   Run ID to display results for. If not specified, the latest run is assumed.
 
 batch
 -----
@@ -87,19 +93,28 @@ Interact with a batch system
    Submit workflows into a batch system.
 
    ``--backend``
-      Secify the backend. Possible value ``slurm``.
+      Specify the backend. Possible value ``slurm``.
 
    ``--partition``
       Partition name to submit into.
 
-   ``<location>``
-      Location to search for tests.
-
-   ``<file>``
-      File to submit into a queue.
+   ``<location> [<location>]``
+      Locations to search for workflow files. Multiple locations can be specified.
 
 ``status``
-   Show status of jobs submited into a batch system.
+   Show status of jobs submitted into a batch system.
+
+``run``
+   Run a job in the batch system.
+
+   ``<run_id>``
+      ID of the run.
+
+   ``<first_job_id>``
+      First job ID to start from.
+
+   ``<workflow_file>``
+      Path to the workflow file to run.
 
 
 doctor
