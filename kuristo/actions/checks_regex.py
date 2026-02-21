@@ -1,6 +1,7 @@
 import re
-from kuristo.registry import action
+
 from kuristo.actions.regex_base import RegexBaseAction
+from kuristo.registry import action
 
 ALIAS_PATTERNS = {
     "float": r"([-+]?(?:\d*\.\d+|\d+)(?:[eE][-+]?\d+)?)",
@@ -12,14 +13,9 @@ ALIAS_RE = re.compile(r"{:(\w+):}")
 
 @action("checks/regex")
 class RegexCheck(RegexBaseAction):
-
     def __init__(self, name, context, **kwargs):
         pattern = kwargs.pop("pattern", [])
-        super().__init__(
-            name,
-            context,
-            pattern=self._expand_pattern(pattern),
-            **kwargs)
+        super().__init__(name, context, pattern=self._expand_pattern(pattern), **kwargs)
 
     def on_success(self, match) -> int:
         self.output = "Regex check passed."

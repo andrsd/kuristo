@@ -1,11 +1,11 @@
 import unittest
-from unittest.mock import patch, MagicMock
 from pathlib import Path
-from kuristo.batch.slurm import SlurmBackend, ScriptParameters
+from unittest.mock import MagicMock, patch
+
+from kuristo.batch.slurm import ScriptParameters, SlurmBackend
 
 
 class TestSlurmBackend(unittest.TestCase):
-
     def setUp(self):
         self.backend = SlurmBackend()
         self.params = ScriptParameters(
@@ -15,16 +15,13 @@ class TestSlurmBackend(unittest.TestCase):
             name="test_job",
             work_dir=Path("test_dir"),
             n_cores=4,
-            max_time=30  # in minutes
+            max_time=30,  # in minutes
         )
         Path("test_dir").mkdir(exist_ok=True)
 
     @patch("subprocess.run")
     def test_submit_success(self, mock_run):
-        mock_run.return_value = MagicMock(
-            returncode=0,
-            stdout="Submitted batch job 123456"
-        )
+        mock_run.return_value = MagicMock(returncode=0, stdout="Submitted batch job 123456")
 
         job_id = self.backend.submit(self.params)
         self.assertEqual(job_id, "123456")
@@ -34,10 +31,7 @@ class TestSlurmBackend(unittest.TestCase):
 
     @patch("subprocess.run")
     def test_submit_failure(self, mock_run):
-        mock_run.return_value = MagicMock(
-            returncode=1,
-            stderr="Something went wrong"
-        )
+        mock_run.return_value = MagicMock(returncode=1, stderr="Something went wrong")
 
         with self.assertRaises(RuntimeError) as ctx:
             self.backend.submit(self.params)
@@ -46,27 +40,19 @@ class TestSlurmBackend(unittest.TestCase):
 
     @patch("subprocess.run")
     def test_status_running(self, mock_run):
-        mock_run.return_value = MagicMock(
-            returncode=0,
-            stdout="RUNNING\n"
-        )
+        mock_run.return_value = MagicMock(returncode=0, stdout="RUNNING\n")
         status = self.backend.status("123456")
         self.assertEqual(status, "RUNNING")
 
     @patch("subprocess.run")
     def test_status_completed_empty_output(self, mock_run):
-        mock_run.return_value = MagicMock(
-            returncode=0,
-            stdout=""
-        )
+        mock_run.return_value = MagicMock(returncode=0, stdout="")
         status = self.backend.status("123456")
         self.assertEqual(status, "COMPLETED")
 
     @patch("subprocess.run")
     def test_status_failure(self, mock_run):
-        mock_run.return_value = MagicMock(
-            returncode=1
-        )
+        mock_run.return_value = MagicMock(returncode=1)
         status = self.backend.status("123456")
         self.assertEqual(status, "UNKNOWN")
 

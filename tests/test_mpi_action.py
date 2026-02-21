@@ -1,4 +1,5 @@
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
 from kuristo.actions.mpi_action import MPIAction
 from kuristo.context import Context
 
@@ -22,7 +23,7 @@ def test_default_num_cores():
 
 def test_custom_num_cores():
     ctx = make_context()
-    action = DummyMPIAction(name="mpi_test", context=ctx, **{'num-procs': 8})
+    action = DummyMPIAction(name="mpi_test", context=ctx, **{"num-procs": 8})
     assert action.num_cores == 8
 
 
@@ -30,7 +31,7 @@ def test_custom_num_cores():
 def test_create_command_uses_config_and_sub_command(mock_get):
     ctx = make_context()
     mock_get.return_value = MagicMock(mpi_launcher="mpirun")
-    action = DummyMPIAction(name="mpi_test", context=ctx, **{'num-procs': 4})
+    action = DummyMPIAction(name="mpi_test", context=ctx, **{"num-procs": 4})
 
     result = action.create_command()
 

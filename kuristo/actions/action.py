@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 from kuristo.context import Context
 from kuristo.utils import interpolate_str
 
@@ -49,7 +50,7 @@ class Action(ABC):
         if self._output:
             return self._output
         else:
-            return ''
+            return ""
 
     @output.setter
     def output(self, out):

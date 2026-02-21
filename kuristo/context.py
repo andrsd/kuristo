@@ -11,7 +11,4 @@ class Context:
         self.working_directory = working_directory
         self.defaults = defaults
         # variables for substitution
-        self.vars = {
-            "matrix": matrix,
-            "steps": {}
-        }
+        self.vars = {"matrix": matrix, "steps": {}}

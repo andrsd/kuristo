@@ -26,3 +26,26 @@ include = ["kuristo*"]
 
 [tool.setuptools.package-data]
 "kuristo" = ["templates/*.j2", "_version.py"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+exclude = [
+    "__pycache__",
+    "build",
+    "dist",
+    ".venv",
+    ".git",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]  # I = isort (import sorting)
+ignore = [
+    "E203",  # Whitespace before ':'
+    "E501",  # Line too long (handled by formatter)
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"

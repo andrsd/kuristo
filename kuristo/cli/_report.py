@@ -1,10 +1,11 @@
-import kuristo.config as config
-import kuristo.utils as utils
-import kuristo.cli._show as show
-import kuristo.ui as ui
-from pathlib import Path
 import xml.etree.ElementTree as ET
 from datetime import datetime
+from pathlib import Path
+
+import kuristo.cli._show as show
+import kuristo.config as config
+import kuristo.ui as ui
+import kuristo.utils as utils
 
 
 def generate_junit(results, xml_filename: Path, stat):
@@ -26,7 +27,7 @@ def generate_junit(results, xml_filename: Path, stat):
         errors=str(errors),
         skipped=str(skipped),
         time=f"{time:.3f}",
-        timestamp=created
+        timestamp=created,
     )
 
     for r in results:
@@ -35,21 +36,17 @@ def generate_junit(results, xml_filename: Path, stat):
             "testcase",
             classname="jobs",
             name=r.get("job-name", f"id-{r.get('id')}"),
-            time=f"{float(r.get('duration', 0)):.3f}"
+            time=f"{float(r.get('duration', 0)):.3f}",
         )
 
         if r.get("status") == "failed":
             ET.SubElement(
                 testcase,
                 "failure",
-                message=f"Process completed with exit code {r.get('return-code')}"
+                message=f"Process completed with exit code {r.get('return-code')}",
             ).text = "Failed"
         elif r.get("status") == "skipped":
-            ET.SubElement(
-                testcase,
-                "skipped",
-                message=f"{r.get('reason')}"
-            )
+            ET.SubElement(testcase, "skipped", message=f"{r.get('reason')}")
 
     tree = ET.ElementTree(testsuites)
     tree.write(xml_filename, encoding="utf-8", xml_declaration=True)
@@ -75,7 +72,7 @@ def report(args):
 
     if args.output:
         try:
-            format, filename = args.output.split(':')
+            format, filename = args.output.split(":")
         except ValueError:
             raise RuntimeError("Expected format of the file parameter is <format>:<filename>")
 
@@ -89,8 +86,8 @@ def report(args):
         for entry in filtered:
             log_path = Path(runs_dir / f"job-{entry['id']}.log")
             if len(filters) == 0:
-                ui.job_header_line(entry['id'], cfg.console_width)
+                ui.job_header_line(entry["id"], cfg.console_width)
                 show.display_job_log(log_path)
-            elif entry['status'] in filters:
-                ui.job_header_line(entry['id'], cfg.console_width)
+            elif entry["status"] in filters:
+                ui.job_header_line(entry["id"], cfg.console_width)
                 show.display_job_log(log_path, filters)

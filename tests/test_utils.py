@@ -1,7 +1,8 @@
-import pytest
 from unittest.mock import MagicMock
-from kuristo.utils import interpolate_str, minutes_to_hhmmss, human_time
-from kuristo.utils import build_filters
+
+import pytest
+
+from kuristo.utils import build_filters, human_time, interpolate_str, minutes_to_hhmmss
 
 
 def test_interpolate_str_vars():

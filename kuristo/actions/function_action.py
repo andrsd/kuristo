@@ -1,8 +1,9 @@
-from kuristo.actions.action import Action
-from kuristo.context import Context
-from io import StringIO
 import contextlib as ctxlib
 from abc import abstractmethod
+from io import StringIO
+
+from kuristo.actions.action import Action
+from kuristo.context import Context
 
 
 class FunctionAction(Action):
@@ -11,11 +12,7 @@ class FunctionAction(Action):
     """
 
     def __init__(self, name, context: Context, **params):
-        super().__init__(
-            name,
-            context,
-            **params
-        )
+        super().__init__(name, context, **params)
         self._params = params
 
     def run(self) -> int:

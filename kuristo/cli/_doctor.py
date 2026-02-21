@@ -1,15 +1,17 @@
-from pathlib import Path
 import os
 import platform
-import sys
 import subprocess
+import sys
+from pathlib import Path
+
 from rich.table import Table
 from rich.text import Text
+
 import kuristo.config as config
 import kuristo.ui as ui
+from kuristo._version import __version__
 from kuristo.plugin_loader import find_kuristo_root, load_user_steps_from_kuristo_dir
 from kuristo.registry import _ACTION_REGISTRY
-from kuristo._version import __version__
 
 
 def print_diag(args):
@@ -31,7 +33,10 @@ def print_diag(args):
     table.add_row("Python", f"{platform.python_version()} @ {sys.executable}")
     table.add_row("Config location", f"{cfg.path}")
     table.add_row("Log directory", f"{runs_dir}")
-    table.add_row("Latest run", Text.from_markup(str(latest.resolve() if latest.exists() else "[dim]none[/]")))
+    table.add_row(
+        "Latest run",
+        Text.from_markup(str(latest.resolve() if latest.exists() else "[dim]none[/]")),
+    )
     table.add_row("MPI launcher", Text.from_markup(f"[green]{cfg.mpi_launcher}[/]"))
 
     console.print(table)
@@ -48,10 +53,11 @@ def print_diag(args):
     # Resources
     console.print(Text.from_markup("[bold]Resources[/]"))
     try:
-        output = subprocess.check_output(
-            ["sysctl", "-n", "hw.perflevel0.physicalcpu"],
-            text=True
-        ) if sys.platform == "darwin" else None
+        output = (
+            subprocess.check_output(["sysctl", "-n", "hw.perflevel0.physicalcpu"], text=True)
+            if sys.platform == "darwin"
+            else None
+        )
         perf_cores = int(output.strip()) if output else None
     except Exception:
         perf_cores = None

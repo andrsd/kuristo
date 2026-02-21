@@ -1,15 +1,24 @@
-import networkx as netx
-import threading
 import sys
+import threading
 import time
 from pathlib import Path
-from kuristo.job_spec import JobSpec
-from rich.progress import (Progress, SpinnerColumn, TextColumn, BarColumn, ProgressColumn, TimeElapsedColumn)
-from rich.text import Text
+
+import networkx as netx
+from rich.progress import (
+    BarColumn,
+    Progress,
+    ProgressColumn,
+    SpinnerColumn,
+    TextColumn,
+    TimeElapsedColumn,
+)
 from rich.style import Style
-import kuristo.ui as ui
+from rich.text import Text
+
 import kuristo.config as config
+import kuristo.ui as ui
 from kuristo.job import Job, JobJoiner
+from kuristo.job_spec import JobSpec
 from kuristo.resources import Resources
 
 
@@ -82,7 +91,7 @@ class Scheduler:
                 BarColumn(style=Style(color="grey23"), pulse_style=Style(color="grey46")),
                 StepCountColumn(),
                 TimeElapsedColumn(),
-                transient=True
+                transient=True,
             )
             ui.set_console(self._progress.console)
         # tasks that are executed
@@ -90,7 +99,7 @@ class Scheduler:
         self._n_success = 0
         self._n_failed = 0
         self._n_skipped = 0
-        self._total_runtime = 0.
+        self._total_runtime = 0.0
 
     @property
     def total_runtime(self):
@@ -127,11 +136,13 @@ class Scheduler:
             self._progress.console.print("")
 
         ui.line(cfg.console_width)
-        ui.stats(ui.RunStats(
-            n_success=self._n_success,
-            n_failed=self._n_failed,
-            n_skipped=self._n_skipped
-        ))
+        ui.stats(
+            ui.RunStats(
+                n_success=self._n_success,
+                n_failed=self._n_failed,
+                n_skipped=self._n_skipped,
+            )
+        )
         ui.time(self._total_runtime)
 
     def _create_graph(self, specs):
@@ -151,7 +162,9 @@ class Scheduler:
         for job in self._graph.nodes:
             for dep_name in job.needs:
                 if dep_name not in job_map:
-                    raise ValueError(f"{job.spec.file_name}: Job '{job.spec.id}' depends on unknown job '{dep_name}'")
+                    raise ValueError(
+                        f"{job.spec.file_name}: Job '{job.spec.id}' depends on unknown job '{dep_name}'"
+                    )
                 self._graph.add_edge(job_map[dep_name], job_map[job.id])
 
     def _get_ready_jobs(self):
@@ -186,7 +199,7 @@ class Scheduler:
                         job_name = ui.job_name_markup(job.name)
                         task_id = self._progress.add_task(
                             Text.from_markup(f"[cyan]{job_name}[/]"),
-                            total=job.num_steps
+                            total=job.num_steps,
                         )
                         self._tasks[job.num] = task_id
                         job.create_step_tasks(self._progress)

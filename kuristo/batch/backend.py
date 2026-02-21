@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
-from pathlib import Path
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Optional
 
 
@@ -25,7 +25,6 @@ class ScriptParameters:
 
 
 class BatchBackend(ABC):
-
     def __init__(self, name):
         self._name = name
 

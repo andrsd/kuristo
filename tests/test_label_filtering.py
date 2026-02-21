@@ -1,4 +1,5 @@
 from pathlib import Path
+
 from kuristo.job_spec import JobSpec, parse_workflow_files
 from kuristo.utils import filter_specs_by_labels
 
@@ -10,34 +11,22 @@ class TestLabelFiltering:
         """Set up test fixtures"""
         # Create sample specs with and without labels
         self.spec_with_smoke = JobSpec(
-            description="Smoke test",
-            steps=[],
-            labels=["smoke", "quick"]
+            description="Smoke test", steps=[], labels=["smoke", "quick"]
         )
         self.spec_with_smoke.set_id("smoke-test")
         self.spec_with_smoke.set_file_name("test.yaml")
 
         self.spec_with_integration = JobSpec(
-            description="Integration test",
-            steps=[],
-            labels=["integration", "slow"]
+            description="Integration test", steps=[], labels=["integration", "slow"]
         )
         self.spec_with_integration.set_id("integration-test")
         self.spec_with_integration.set_file_name("test.yaml")
 
-        self.spec_without_labels = JobSpec(
-            description="No labels",
-            steps=[],
-            labels=None
-        )
+        self.spec_without_labels = JobSpec(description="No labels", steps=[], labels=None)
         self.spec_without_labels.set_id("no-label-test")
         self.spec_without_labels.set_file_name("test.yaml")
 
-        self.spec_with_empty_labels = JobSpec(
-            description="Empty labels",
-            steps=[],
-            labels=[]
-        )
+        self.spec_with_empty_labels = JobSpec(description="Empty labels", steps=[], labels=[])
         self.spec_with_empty_labels.set_id("empty-label-test")
         self.spec_with_empty_labels.set_file_name("test.yaml")
 
@@ -59,7 +48,11 @@ class TestLabelFiltering:
 
     def test_filter_single_label_exact_match(self):
         """Filter by single label matches jobs with that label"""
-        specs = [self.spec_with_smoke, self.spec_with_integration, self.spec_without_labels]
+        specs = [
+            self.spec_with_smoke,
+            self.spec_with_integration,
+            self.spec_without_labels,
+        ]
         filtered, total, count = filter_specs_by_labels(specs, ["smoke"])
         assert count == 1
         assert total == 3
@@ -68,7 +61,11 @@ class TestLabelFiltering:
 
     def test_filter_or_logic_multiple_labels(self):
         """Multiple labels use OR logic"""
-        specs = [self.spec_with_smoke, self.spec_with_integration, self.spec_without_labels]
+        specs = [
+            self.spec_with_smoke,
+            self.spec_with_integration,
+            self.spec_without_labels,
+        ]
         filtered, total, count = filter_specs_by_labels(specs, ["smoke", "integration"])
         assert count == 2
         assert total == 3

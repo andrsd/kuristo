@@ -1,6 +1,8 @@
-import pytest
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
+
+import pytest
+
 from kuristo.scanner import Scanner, scan_locations  # adjust import path
 
 
@@ -21,13 +23,13 @@ def test_scanner_scan_finds_files(mock_config):
     with patch("os.walk") as mock_walk:
         mock_walk.return_value = [
             ("/some/path", ["dir1"], ["workflow.yml", "other.txt"]),
-            ("/some/path/dir1", [], ["workflow.yml"])
+            ("/some/path/dir1", [], ["workflow.yml"]),
         ]
         scanner = Scanner("/some/path")
         results = scanner.scan()
         assert results == [
             Path("/some/path/workflow.yml"),
-            Path("/some/path/dir1/workflow.yml")
+            Path("/some/path/dir1/workflow.yml"),
         ]
 
 
@@ -39,22 +41,28 @@ def test_scanner_scan_no_files(mock_config):
 
 
 def test_scan_locations_with_directory(mock_config):
-    with patch("os.path.isdir", return_value=True), \
-         patch("os.walk", return_value=[("/loc", [], ["workflow.yml"])]):
+    with (
+        patch("os.path.isdir", return_value=True),
+        patch("os.walk", return_value=[("/loc", [], ["workflow.yml"])]),
+    ):
         results = scan_locations(["/loc"])
         assert results == [Path("/loc/workflow.yml")]
 
 
 def test_scan_locations_with_file(mock_config):
-    with patch("os.path.isfile", return_value=True), \
-         patch("os.path.isdir", return_value=False):
+    with (
+        patch("os.path.isfile", return_value=True),
+        patch("os.path.isdir", return_value=False),
+    ):
         results = scan_locations(["/file/path"])
         assert results == [Path("/file/path")]
 
 
 def test_scan_locations_invalid_path_raises(mock_config):
-    with patch("os.path.isfile", return_value=False), \
-         patch("os.path.isdir", return_value=False):
+    with (
+        patch("os.path.isfile", return_value=False),
+        patch("os.path.isdir", return_value=False),
+    ):
         with pytest.raises(RuntimeError) as excinfo:
             scan_locations(["/bad/path"])
         assert "No such file or directory" in str(excinfo.value)

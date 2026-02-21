@@ -1,6 +1,7 @@
+import math
+
 from kuristo.actions.checks_regex import RegexCheck
 from kuristo.registry import action
-import math
 
 
 @action("checks/regex-float")
@@ -15,9 +16,7 @@ class RegexFloatCheck(RegexCheck):
         try:
             value = float(match.group(1))
             if math.isclose(value, self._gold, rel_tol=self._rel_tol, abs_tol=self._abs_tol):
-                self.output = (
-                    f"Regex float check passed: got {value}, expected {self._gold}"
-                )
+                self.output = f"Regex float check passed: got {value}, expected {self._gold}"
                 return 0
             else:
                 self.output = (
@@ -26,9 +25,7 @@ class RegexFloatCheck(RegexCheck):
                 )
                 return -1
         except ValueError:
-            self.output = (
-                f"Regex matched value '{match.group(1)}' but it is not a float."
-            )
+            self.output = f"Regex matched value '{match.group(1)}' but it is not a float."
             return -1
 
     def on_failure(self):

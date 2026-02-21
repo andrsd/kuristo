@@ -1,12 +1,13 @@
-import threading
 import logging
-import time
 import os
+import threading
+import time
 from pathlib import Path
-from kuristo.job_spec import JobSpec
+
 from kuristo.action_factory import ActionFactory
 from kuristo.context import Context
 from kuristo.env import Env
+from kuristo.job_spec import JobSpec
 from kuristo.utils import interpolate_str
 
 
@@ -38,7 +39,7 @@ class Job:
             self._logger.setLevel(logging.INFO)
             formatter = Job.TaggedFormatter()
 
-            file_handler = logging.FileHandler(log_file, mode='w')
+            file_handler = logging.FileHandler(log_file, mode="w")
             file_handler.setFormatter(formatter)
             self._logger.addHandler(file_handler)
 
@@ -76,7 +77,9 @@ class Job:
             for key, value in env.items():
                 self.env(key, value)
 
-    def __init__(self, id, event: threading.Event, job_spec: JobSpec, log_dir: Path, matrix=None) -> None:
+    def __init__(
+        self, id, event: threading.Event, job_spec: JobSpec, log_dir: Path, matrix=None
+    ) -> None:
         """
         @param event Signalling event when job status changes
         @param job_spec Job specification
@@ -89,10 +92,7 @@ class Job:
         self._path_file = log_dir / f"job-{self._num}.path"
         self._thread = None
         self._process = None
-        self._logger = self.Logger(
-            self._num,
-            log_dir / f'job-{self._num}.log'
-        )
+        self._logger = self.Logger(self._num, log_dir / f"job-{self._num}.log")
         self._return_code = None
         self._id = id
         self._name = self._create_job_name(job_spec, matrix)
@@ -102,14 +102,14 @@ class Job:
             base_env=self._get_base_env(),
             working_directory=job_spec.working_directory,
             defaults=job_spec.defaults,
-            matrix=matrix
+            matrix=matrix,
         )
         self._context.env.update((var, str(val)) for var, val in job_spec.env.items())
         self._steps = self._build_steps(job_spec)
         if job_spec.skip:
             self.skip(job_spec.skip_reason)
         self._step_task_ids = {}
-        self._elapsed_time = 0.
+        self._elapsed_time = 0.0
         self._cancelled = threading.Event()
         self._timeout_timer = None
         self._step_lock = threading.Lock()
@@ -284,7 +284,7 @@ class Job:
             self._logger.task_start(step.name)
             self.on_step_start(self, step)
             try:
-                if hasattr(step, 'command'):
+                if hasattr(step, "command"):
                     for line in step.command.splitlines():
                         self._logger.script_line(line)
                 exit_code = step.run()
@@ -299,11 +299,17 @@ class Job:
                 self._logger.log(line)
 
             if self._cancelled.is_set():
-                self._logger.log(f'* Job timed out after {self.timeout_minutes} minutes', tag="TASK_END")
+                self._logger.log(
+                    f"* Job timed out after {self.timeout_minutes} minutes",
+                    tag="TASK_END",
+                )
                 self._return_code = 124
                 break
             elif exit_code == 124:
-                self._logger.log(f'* Step timed out after {step.timeout_minutes} minutes', tag="TASK_END")
+                self._logger.log(
+                    f"* Step timed out after {step.timeout_minutes} minutes",
+                    tag="TASK_END",
+                )
             else:
                 self._logger.task_end(exit_code)
 
@@ -318,10 +324,10 @@ class Job:
 
     def skip_process(self):
         self._logger.job_start(self.name)
-        self._logger.log(f'* Skipped: {self.skip_reason}', tag="TASK_END")
+        self._logger.log(f"* Skipped: {self.skip_reason}", tag="TASK_END")
         self._logger.job_end()
         self._status = Job.FINISHED
-        self._elapsed_time = 0.
+        self._elapsed_time = 0.0
         self._event.set()
 
     def _finish_process(self):
@@ -362,7 +368,11 @@ class Job:
                 additional_paths = []
             for p in reversed(additional_paths):
                 sanitized_path = p.strip()
-                if os.path.isabs(sanitized_path) and os.path.exists(sanitized_path) and sanitized_path not in current:
+                if (
+                    os.path.isabs(sanitized_path)
+                    and os.path.exists(sanitized_path)
+                    and sanitized_path not in current
+                ):
                     current.insert(0, sanitized_path)
             self._context.env["PATH"] = ":".join(current)
 
@@ -371,14 +381,14 @@ class Job:
             "KURISTO_ENV": self._env_file,
             "KURISTO_PATH": self._path_file,
             "KURISTO_JOB": self._name,
-            "KURISTO_JOBID": self._num
+            "KURISTO_JOBID": self._num,
         }
 
     def _noop(self, *args, **kwargs):
         pass
 
     def _create_job_name(self, job_spec, matrix):
-        ipol_name = interpolate_str(job_spec.name, {"matrix" : matrix})
+        ipol_name = interpolate_str(job_spec.name, {"matrix": matrix})
         if ipol_name == job_spec.name and matrix is not None:
             param_str = ",".join(f"{k}={v}" for k, v in matrix.items())
             return f"{job_spec.name}[{param_str}]"
@@ -387,9 +397,7 @@ class Job:
 
     def create_step_tasks(self, progress):
         self._step_task_ids = {
-            step.name: progress.add_task(
-                f"  ↳ [magenta]{step.name}", total=None, visible=False
-            )
+            step.name: progress.add_task(f"  ↳ [magenta]{step.name}", total=None, visible=False)
             for step in self._steps
         }
 

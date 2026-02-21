@@ -1,8 +1,8 @@
-from kuristo.registry import action
+import kuristo.config as config
 from kuristo.actions.process_action import ProcessAction
 from kuristo.context import Context
+from kuristo.registry import action
 from kuristo.utils import interpolate_str
-import kuristo.config as config
 
 
 @action("core/mpi-run")
@@ -28,14 +28,11 @@ class MPIAction(ProcessAction):
         if self.context is None:
             cmds = self._commands
         else:
-            cmds = interpolate_str(
-                self._commands,
-                self.context.vars
-            )
+            cmds = interpolate_str(self._commands, self.context.vars)
         return cmds
 
     def create_command(self):
         cfg = config.get()
         launcher = cfg.mpi_launcher
         cmd = self.create_sub_command()
-        return f'{launcher} -np {self._n_ranks} {cmd}'
+        return f"{launcher} -np {self._n_ranks} {cmd}"

@@ -1,5 +1,6 @@
 import sys
 from unittest.mock import patch
+
 from kuristo.__main__ import main
 
 

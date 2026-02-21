@@ -1,11 +1,11 @@
 import re
 from abc import abstractmethod
+
 from kuristo.actions.action import Action
 from kuristo.utils import interpolate_str
 
 
 class RegexBaseAction(Action):
-
     def __init__(self, name, context, pattern, **kwargs):
         super().__init__(name, context, **kwargs)
         self._target_step = kwargs.get("input")

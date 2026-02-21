@@ -1,6 +1,8 @@
-import pytest
 from pathlib import Path
 from tempfile import TemporaryDirectory
+
+import pytest
+
 import kuristo.utils as utils
 
 
@@ -279,6 +281,7 @@ class TestPruneOldRunsWithTags:
 
         # Set specific modification times to ensure predictable sort order
         import time
+
         runs_dir = log_dir / "runs"
         time.sleep(0.01)
         (runs_dir / run_ids[1]).touch()
@@ -310,6 +313,7 @@ class TestPruneOldRunsWithTags:
         # We need to set different mtimes
         runs_dir = log_dir / "runs"
         import time
+
         time.sleep(0.01)
         (runs_dir / run_ids[1]).touch()
         time.sleep(0.01)

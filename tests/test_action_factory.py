@@ -1,5 +1,7 @@
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
+
 from kuristo.action_factory import ActionFactory
 
 
@@ -14,7 +16,7 @@ class DummyStep:
         num_cores=1,
         run=None,
         uses=None,
-        params=None
+        params=None,
     ):
         self.name = name
         self.id = id
@@ -47,7 +49,7 @@ def test_create_shell_action_when_uses_is_none(dummy_context):
         continue_on_error=False,
         num_cores=1,
         commands=ts.run,
-        env={}
+        env={},
     )
     assert result == mock_shell.return_value
 

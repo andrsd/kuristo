@@ -1,13 +1,14 @@
-from unittest.mock import patch, MagicMock, ANY, mock_open
-from types import SimpleNamespace
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import ANY, MagicMock, mock_open, patch
+
 from kuristo.batch.backend import ScriptParameters
 from kuristo.cli._batch import (
     build_actions,
-    required_cores,
     create_script_params,
+    read_job_metadata,
+    required_cores,
     write_job_metadata,
-    read_job_metadata
 )
 
 
@@ -69,18 +70,24 @@ def test_create_script_params_basic(mock_config_get, mock_build_actions):
 
     # Return value of Config()
     mock_config_instance = MagicMock()
-    mock_config_instance.batch_partition = 'normal'
+    mock_config_instance.batch_partition = "normal"
     mock_config_get.return_value = mock_config_instance
 
     # 2 specs: one skipped, one active
-    skipped_spec = SimpleNamespace(skip=True, timeout_minutes=0, defaults=None, working_directory=None)
-    active_spec = SimpleNamespace(skip=False, timeout_minutes=30, defaults=None, working_directory=None)
+    skipped_spec = SimpleNamespace(
+        skip=True, timeout_minutes=0, defaults=None, working_directory=None
+    )
+    active_spec = SimpleNamespace(
+        skip=False, timeout_minutes=30, defaults=None, working_directory=None
+    )
 
     # build_actions returns actions with num_cores
     mock_build_actions.return_value = [SimpleNamespace(num_cores=4)]
 
     # Act
-    params = create_script_params("kuristo-job-1", Path("wf.yaml"), "12", 1, [skipped_spec, active_spec], workdir)
+    params = create_script_params(
+        "kuristo-job-1", Path("wf.yaml"), "12", 1, [skipped_spec, active_spec], workdir
+    )
 
     # Assert
     assert isinstance(params, ScriptParameters)
@@ -88,7 +95,7 @@ def test_create_script_params_basic(mock_config_get, mock_build_actions):
     assert params.work_dir == workdir
     assert params.n_cores == 4
     assert params.max_time == 30
-    assert params.partition == 'normal'
+    assert params.partition == "normal"
     mock_build_actions.assert_called_once_with(active_spec, ANY)
 
 
@@ -97,7 +104,7 @@ def test_create_script_params_basic(mock_config_get, mock_build_actions):
 def test_create_script_params_all_skipped(mock_config_get, mock_build_actions):
     # Return value of Config()
     mock_config_instance = MagicMock()
-    mock_config_instance.batch_partition = 'normal'
+    mock_config_instance.batch_partition = "normal"
     mock_config_get.return_value = mock_config_instance
 
     workdir = Path("/workdir")
@@ -109,7 +116,7 @@ def test_create_script_params_all_skipped(mock_config_get, mock_build_actions):
     assert params.n_cores == 1  # default
     assert params.max_time == 0
     assert params.work_dir == workdir
-    assert params.partition == 'normal'
+    assert params.partition == "normal"
     mock_build_actions.assert_not_called()
 
 
@@ -118,7 +125,7 @@ def test_create_script_params_all_skipped(mock_config_get, mock_build_actions):
 def test_create_script_params_accumulates_time_and_max_cores(mock_config_get, mock_build_actions):
     # Return value of Config()
     mock_config_instance = MagicMock()
-    mock_config_instance.batch_partition = 'normal'
+    mock_config_instance.batch_partition = "normal"
     mock_config_get.return_value = mock_config_instance
 
     workdir = Path("/data")
@@ -129,14 +136,14 @@ def test_create_script_params_accumulates_time_and_max_cores(mock_config_get, mo
     # First spec -> 2 cores, second -> 8 cores
     mock_build_actions.side_effect = [
         [SimpleNamespace(num_cores=2)],
-        [SimpleNamespace(num_cores=8)]
+        [SimpleNamespace(num_cores=8)],
     ]
 
     params = create_script_params("job-2", Path("wf.yaml"), "12", 2, specs, workdir)
 
     assert params.n_cores == 8  # max of both
     assert params.max_time == 30  # sum
-    assert params.partition == 'normal'
+    assert params.partition == "normal"
 
 
 def test_write_metadata():
@@ -148,7 +155,7 @@ def test_write_metadata():
     with patch("builtins.open", m), patch("yaml.safe_dump") as mock_safe_dump:
         write_job_metadata(job_id, backend_name, workdir)
 
-    expected_metadata = {'job': {'id': job_id, 'backend': backend_name}}
+    expected_metadata = {"job": {"id": job_id, "backend": backend_name}}
     mock_safe_dump.assert_called_once_with(expected_metadata, m(), sort_keys=False)
 
     # The *first* call to open() should be with the file path and mode "w"

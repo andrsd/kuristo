@@ -1,6 +1,6 @@
 from kuristo.actions.process_action import ProcessAction
-from kuristo.utils import interpolate_str
 from kuristo.context import Context
+from kuristo.utils import interpolate_str
 
 
 class ShellAction(ProcessAction):
@@ -17,10 +17,7 @@ class ShellAction(ProcessAction):
         if self.context is None:
             cmds = self._commands
         else:
-            cmds = interpolate_str(
-                self._commands,
-                self.context.vars
-            )
+            cmds = interpolate_str(self._commands, self.context.vars)
         return cmds
 
     @property

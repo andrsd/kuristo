@@ -1,9 +1,10 @@
 import os
-import yaml
-from pathlib import Path
-from pydantic import BaseModel, Field, PrivateAttr, ValidationError, model_validator
-from typing import List, Optional, Union, Dict, Any
 from itertools import product
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union
+
+import yaml
+from pydantic import BaseModel, Field, PrivateAttr, ValidationError, model_validator
 
 
 class StrategyMatrix(BaseModel):
@@ -53,7 +54,7 @@ class Strategy(BaseModel):
 
 class JobDefaultsRun(BaseModel):
     # Working directory
-    working_directory: Optional[str] = Field(alias='working-directory', default=None)
+    working_directory: Optional[str] = Field(alias="working-directory", default=None)
 
 
 class JobDefaults(BaseModel):
@@ -80,9 +81,9 @@ class Step(BaseModel):
     # Step ID
     id: Optional[str] = None
     # Working directory
-    working_directory: Optional[str] = Field(alias='working-directory', default=None)
+    working_directory: Optional[str] = Field(alias="working-directory", default=None)
     # Timeout in minutes
-    timeout_minutes: Optional[int] = Field(alias='timeout-minutes', default=60)
+    timeout_minutes: Optional[int] = Field(alias="timeout-minutes", default=60)
     # Continue on error
     continue_on_error: bool = Field(alias="continue-on-error", default=False)
     # Number of cores
@@ -90,9 +91,7 @@ class Step(BaseModel):
     # Environment for this step
     env: Optional[dict] = Field(default={})
 
-    model_config = {
-        "populate_by_name": True
-    }
+    model_config = {"populate_by_name": True}
 
     @property
     def params(self):
@@ -117,13 +116,13 @@ class JobSpec(BaseModel):
     # Job steps
     steps: List[Step]
     # Should the job be skipped?
-    skip_: Optional[str] = Field(alias='skip', default=None)
+    skip_: Optional[str] = Field(alias="skip", default=None)
     # Timeout in minutes
-    timeout_minutes: int = Field(alias='timeout-minutes', default=60)
+    timeout_minutes: int = Field(alias="timeout-minutes", default=60)
     # Strategy
     strategy: Optional[Strategy] = None
     #
-    needs_: Optional[Union[str, List[str]]] = Field(alias='needs', default=None)
+    needs_: Optional[Union[str, List[str]]] = Field(alias="needs", default=None)
     # Job ID
     _id: str = PrivateAttr()
     # Job name
@@ -261,10 +260,10 @@ def parse_workflow_files(workflow_files: list[Path]) -> list[JobSpec]:
 def specs_from_file(file_path) -> list[JobSpec]:
     location = os.path.dirname(file_path)
     specs = []
-    with open(file_path, 'r') as file:
+    with open(file_path, "r") as file:
         data = yaml.safe_load(file)
         if data is not None:
-            jobs = data.get('jobs', {})
+            jobs = data.get("jobs", {})
             for id, params in jobs.items():
                 try:
                     jspec = JobSpec.from_dict(file_path, id, params)
@@ -274,7 +273,7 @@ def specs_from_file(file_path) -> list[JobSpec]:
                     n = len(exp.errors())
                     msgs.append(f"{n} syntax error found in {location}:")
                     for error in exp.errors():
-                        loc_str = ".".join(str(p) for p in error['loc'])
+                        loc_str = ".".join(str(p) for p in error["loc"])
                         msgs.append(f"- {loc_str}: {error['msg']}")
                     raise RuntimeError("\n".join(msgs))
     return specs

@@ -1,14 +1,16 @@
-import yaml
 from pathlib import Path
+
+import yaml
+
 import kuristo.config as config
-import kuristo.utils as utils
 import kuristo.ui as ui
-from kuristo.scheduler import Scheduler
-from kuristo.resources import Resources
+import kuristo.utils as utils
 from kuristo.job import Job
-from kuristo.plugin_loader import load_user_steps_from_kuristo_dir
 from kuristo.job_spec import parse_workflow_files
+from kuristo.plugin_loader import load_user_steps_from_kuristo_dir
+from kuristo.resources import Resources
 from kuristo.scanner import scan_locations
+from kuristo.scheduler import Scheduler
 from kuristo.utils import filter_specs_by_labels
 
 
@@ -23,29 +25,30 @@ def create_results(jobs):
     for job in jobs:
         if isinstance(job, Job):
             if job.is_skipped:
-                results.append({
-                    "id": job.num,
-                    "job-name": job.name,
-                    "status": "skipped",
-                    "reason": job.skip_reason
-                })
+                results.append(
+                    {
+                        "id": job.num,
+                        "job-name": job.name,
+                        "status": "skipped",
+                        "reason": job.skip_reason,
+                    }
+                )
             else:
-                results.append({
-                    "id": job.num,
-                    "job-name": job.name,
-                    "return-code": job.return_code,
-                    "status": "success" if job.return_code == 0 else "failed",
-                    "duration": round(job.elapsed_time, 3)
-                })
+                results.append(
+                    {
+                        "id": job.num,
+                        "job-name": job.name,
+                        "return-code": job.return_code,
+                        "status": "success" if job.return_code == 0 else "failed",
+                        "duration": round(job.elapsed_time, 3),
+                    }
+                )
     return results
 
 
 def write_report_yaml(yaml_path: Path, results, total_runtime):
     with open(yaml_path, "w") as f:
-        yaml.safe_dump({
-            "results": results,
-            "total-runtime": total_runtime
-        }, f, sort_keys=False)
+        yaml.safe_dump({"results": results, "total-runtime": total_runtime}, f, sort_keys=False)
 
 
 def run_jobs(args):
@@ -62,13 +65,17 @@ def run_jobs(args):
     specs = parse_workflow_files(workflow_files)
 
     # Filter by labels if specified
-    requested_labels = getattr(args, 'labels', None)
+    requested_labels = getattr(args, "labels", None)
     if requested_labels:
         specs, total_jobs, filtered_jobs = filter_specs_by_labels(specs, requested_labels)
         if filtered_jobs == 0:
-            ui.console().print(f"[yellow]Warning: No jobs found matching labels: {', '.join(requested_labels)}[/]")
+            ui.console().print(
+                f"[yellow]Warning: No jobs found matching labels: {', '.join(requested_labels)}[/]"
+            )
             return 0
-        ui.console().print(f"[cyan]Filtered to {filtered_jobs} of {total_jobs} jobs matching labels:[/] [magenta]{', '.join(requested_labels)}[/]")
+        ui.console().print(
+            f"[cyan]Filtered to {filtered_jobs} of {total_jobs} jobs matching labels:[/] [magenta]{', '.join(requested_labels)}[/]"
+        )
 
     rcs = Resources()
     scheduler = Scheduler(specs, rcs, out_dir)

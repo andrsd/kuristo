@@ -1,16 +1,16 @@
 import argparse
 from pathlib import Path
+
 from kuristo._version import __version__
-from kuristo.cli._run import run_jobs
+from kuristo.cli._batch import batch
 from kuristo.cli._doctor import print_diag
 from kuristo.cli._list import list_jobs
-from kuristo.cli._batch import batch
-from kuristo.cli._status import status
 from kuristo.cli._log import log
-from kuristo.cli._show import show
 from kuristo.cli._report import report
+from kuristo.cli._run import run_jobs
+from kuristo.cli._show import show
+from kuristo.cli._status import status
 from kuristo.cli._tag import tag
-
 
 __all__ = [
     "__version__",
@@ -22,21 +22,33 @@ __all__ = [
     "log",
     "show",
     "report",
-    "tag"
+    "tag",
 ]
 
 
 def build_parser():
     parser = argparse.ArgumentParser(prog="kuristo", description="Kuristo automation framework")
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
-    parser.add_argument("--no-ansi", action="store_true", help="Disable rich output (no colors or progress bars)")
-    parser.add_argument("-f", "--config", type=Path, metavar="FILE", help="Path to configuration file")
+    parser.add_argument(
+        "--no-ansi",
+        action="store_true",
+        help="Disable rich output (no colors or progress bars)",
+    )
+    parser.add_argument(
+        "-f", "--config", type=Path, metavar="FILE", help="Path to configuration file"
+    )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     # Run command
     run_parser = subparsers.add_parser("run", help="Run jobs")
     run_parser.add_argument("--verbose", "-v", type=int, default=0, help="Verbose level")
-    run_parser.add_argument("--label", action="append", dest="labels", metavar="LABEL", help="Filter jobs by label (can be specified multiple times)")
+    run_parser.add_argument(
+        "--label",
+        action="append",
+        dest="labels",
+        metavar="LABEL",
+        help="Filter jobs by label (can be specified multiple times)",
+    )
     run_parser.add_argument("locations", nargs="*", help="Locations to scan for workflow files")
 
     # Doctor command
@@ -44,7 +56,13 @@ def build_parser():
 
     # List command
     list_parser = subparsers.add_parser("list", help="List available jobs")
-    list_parser.add_argument("--label", action="append", dest="labels", metavar="LABEL", help="Filter jobs by label (can be specified multiple times)")
+    list_parser.add_argument(
+        "--label",
+        action="append",
+        dest="labels",
+        metavar="LABEL",
+        help="Filter jobs by label (can be specified multiple times)",
+    )
     list_parser.add_argument("locations", nargs="*", help="Locations to scan for workflow files")
 
     # Batch command
@@ -54,7 +72,9 @@ def build_parser():
     batch_submit_parser = batch_subparsers.add_parser("submit", help="Submit jobs to HPC queue")
     batch_submit_parser.add_argument("--backend", type=str, help="Batch backend to use: ['slurm']")
     batch_submit_parser.add_argument("--partition", type=str, help="Partition name to use")
-    batch_submit_parser.add_argument("locations", nargs="*", help="Locations to scan for workflow files")
+    batch_submit_parser.add_argument(
+        "locations", nargs="*", help="Locations to scan for workflow files"
+    )
 
     batch_subparsers.add_parser("status", help="Check HPC job status")
 
@@ -87,14 +107,23 @@ def build_parser():
     group.add_argument("--skipped", action="store_true", help="Show only tests that were skipped")
     group.add_argument("--passed", action="store_true", help="Show only tests that passed")
 
-    report_parser.add_argument("--output", help="File name to store the report into: <format>:<filename>")
+    report_parser.add_argument(
+        "--output", help="File name to store the report into: <format>:<filename>"
+    )
 
     # Tag command
     tag_parser = subparsers.add_parser("tag", help="Manage run tags")
     tag_parser.add_argument("name", nargs="?", help="Tag name")
     tag_parser.add_argument("--run-id", type=str, help="Run ID to tag (default: latest)")
     tag_group = tag_parser.add_mutually_exclusive_group()
-    tag_group.add_argument("-D", "--delete", action="store_true", help="Delete tag (does not delete the run)")
-    tag_group.add_argument("-l", "--list", dest="list_tags", action="store_true", help="List all tags")
+    tag_group.add_argument(
+        "-D",
+        "--delete",
+        action="store_true",
+        help="Delete tag (does not delete the run)",
+    )
+    tag_group.add_argument(
+        "-l", "--list", dest="list_tags", action="store_true", help="List all tags"
+    )
 
     return parser

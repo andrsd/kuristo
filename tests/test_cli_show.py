@@ -1,17 +1,19 @@
-from unittest.mock import patch, MagicMock
-import pytest
-from pathlib import Path
 from datetime import datetime, timedelta
+from pathlib import Path
+from unittest.mock import MagicMock, patch
+
+import pytest
+from rich.text import Text
+
 from kuristo.cli._show import (
+    display_job_log,
     parse_log_line,
     parse_sections,
-    render_title,
     render_section,
     render_sections,
-    display_job_log,
-    show
+    render_title,
+    show,
 )
-from rich.text import Text
 
 
 def test_parse_log_line_valid():
@@ -26,16 +28,20 @@ def test_parse_log_line_valid():
     assert msg == "something happened"
 
 
-@pytest.mark.parametrize("line", [
-    "invalid line",
-    "2025-07-26 13:00:00 - INFO - missing milliseconds",
-    "2025-07-26 13:00:00,123 - only two parts",
-    "2025-07-26 13:00:00,123 - INFO",  # missing msg
-    "2025-07-26 13:00:00,123",         # no dashes
-    "2025-07-26T13:00:00,123 - INFO - ISO format timestamp",  # bad timestamp format
-])
+@pytest.mark.parametrize(
+    "line",
+    [
+        "invalid line",
+        "2025-07-26 13:00:00 - INFO - missing milliseconds",
+        "2025-07-26 13:00:00,123 - only two parts",
+        "2025-07-26 13:00:00,123 - INFO",  # missing msg
+        "2025-07-26 13:00:00,123",  # no dashes
+        "2025-07-26T13:00:00,123 - INFO - ISO format timestamp",  # bad timestamp format
+    ],
+)
 def test_parse_log_line_invalid(line):
     assert parse_log_line(line) is None
+
 
 # ---
 
@@ -125,6 +131,7 @@ def test_unclosed_task():
     assert task["end_time"] is None
     assert task["lines"] == [("INFO", "Still going")]
 
+
 # ---
 
 
@@ -186,6 +193,7 @@ def test_render_title_long_title(mock_human_time, mock_console):
 
     # No crash, still prints
     mock_console_instance.print.assert_called()
+
 
 # ---
 
@@ -273,14 +281,16 @@ def test_render_section_handles_dot_padding(mock_human_time, mock_console):
 @patch("kuristo.cli._show.render_title")
 @patch("kuristo.cli._show.render_section")
 @patch("kuristo.cli._show.config.get")
-def test_render_sections_calls_correct_renderers(mock_cfg_get, mock_render_section, mock_render_title):
+def test_render_sections_calls_correct_renderers(
+    mock_cfg_get, mock_render_section, mock_render_title
+):
     mock_cfg = MagicMock()
     mock_cfg.console_width = 80
     mock_cfg_get.return_value = mock_cfg
 
     sections = [
         {"type": "title", "title": "Header", "start_time": None, "end_time": None},
-        make_section()
+        make_section(),
     ]
 
     render_sections(sections)
