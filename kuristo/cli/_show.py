@@ -184,6 +184,7 @@ def display_job_log(log_path: Path, filters=None):
 def show(args):
     cfg = config.get()
     run_name = args.run_id or "latest"
+    run_name = utils.resolve_run_id(cfg.log_dir, run_name)
     runs_dir = cfg.log_dir / "runs" / run_name
 
     log_path = Path(runs_dir / f"job-{args.job}.log")
