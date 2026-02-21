@@ -14,12 +14,12 @@ Jobs contain one or more **steps** to execute.
 .. code-block:: yaml
 
    jobs:
-      job1:
-         name: simulation
-         steps:
-            - run: ./prepare.sh
-            - run: ./simulate --input data.in
-            - run: ./postprocess.sh
+     job1:
+       name: simulation
+       steps:
+         - run: ./prepare.sh
+         - run: ./simulate --input data.in
+         - run: ./postprocess.sh
 
 ``jobs.<id>`` (string, required)
    Job ID that is unique within the workflow file
@@ -57,12 +57,12 @@ Each step represents a unit of work (e.g., a script or an action).
 .. code-block:: yaml
 
    jobs:
-      mesh:
-         name: Generate mesh
-         steps:
-            - uses: my-action/execute
-            with:
-               input: input_file.txt
+     mesh:
+       name: Generate mesh
+       steps:
+         - uses: my-action/execute
+           with:
+             input: input_file.txt
 
 ``jobs.<id>.steps[*].uses`` (string)
    The name of the action to execute

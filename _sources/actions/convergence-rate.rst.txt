@@ -14,11 +14,11 @@ Example Usage
    steps:
      - uses: checks/convergence-rate
        with:
-          input: some/file.h5
-          x-axis: "/dataset-name-for-x"
-          y-axis: "/dataset-name-for-y"
-          expected-order: 2.
-          abs-tol: 1e-3
+         input: some/file.h5
+         x-axis: "/dataset-name-for-x"
+         y-axis: "/dataset-name-for-y"
+         expected-order: 2.
+         abs-tol: 1e-3
 
 
 Arguments
