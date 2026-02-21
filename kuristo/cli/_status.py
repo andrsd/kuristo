@@ -61,6 +61,7 @@ def print_report(report, filters: list):
 def status(args):
     cfg = config.get()
     run_name = args.run_id or "latest"
+    run_name = utils.resolve_run_id(cfg.log_dir, run_name)
     runs_dir = cfg.log_dir / "runs" / run_name
     report_path = runs_dir / "report.yaml"
     if not report_path.exists():

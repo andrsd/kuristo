@@ -185,6 +185,28 @@ def is_run_tagged(log_dir: Path, run_id: str) -> bool:
     return len(get_tags_for_run(log_dir, run_id)) > 0
 
 
+def resolve_run_id(log_dir: Path, run_id: str) -> str:
+    """
+    Resolve a run ID (which may be an alias like a tag) to the actual run ID.
+    If run_id is a tag, follows the symlink to get the actual run ID.
+    Otherwise returns run_id unchanged.
+    """
+    tags_dir = log_dir / "tags"
+    tag_path = tags_dir / run_id
+
+    # Check if it's a tag
+    if tag_path.is_symlink():
+        try:
+            target = tag_path.resolve()
+            return target.name
+        except Exception:
+            # If symlink is broken, return the original input
+            return run_id
+
+    # Not a tag, return as-is
+    return run_id
+
+
 def interpolate_str(text: str, variables: dict) -> str:
     normalized = text.replace("${{", "{{")
     template = Template(normalized)
