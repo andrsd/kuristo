@@ -1,25 +1,30 @@
 Configuration
-====
+=============
 
 Kuristo’s behavior can be customized using a configuration file named ``config.yaml``.
 Kuristo searches for this file in a ``.kuristo`` directory, starting from the current working directory and moving up through parent directories until it finds the first match.
 The available configuration options are listed below.
 
 Basic options
-----
+-------------
 
 ``base:``
-   Logging settings section.
+   General settings section.
 
-``workflow-filename``
+``base.workflow-filename``
    Name of files that contain workflow descriptions.
-   These files are looked for whne we have kuristo execute workflows from a location.
+   These files are looked for when Kuristo executes workflows from a location.
 
    Default value: ``kuristo.yaml``
 
+``base.console-width``
+   Maximum width for console output, in characters.
+
+   Default value: ``100``
+
 
 Logging options
-----
+---------------
 
 ``log:``
    Logging settings section.
@@ -36,8 +41,21 @@ Logging options
    Currently, does nothing.
 
 
+Resources
+---------
+
+``resources:``
+   Resource allocation settings.
+
+``resources.num-cores``
+   Maximum number of CPU cores available for parallel job execution.
+   Kuristo will not attempt to run more than this many cores in parallel.
+
+   Default value: System CPU count (determined automatically)
+
+
 Runner
-----
+------
 
 ``runner:``
    Main runner settings.
@@ -47,9 +65,15 @@ Runner
 
    Default value: ``mpirun``
 
+   Can be overridden with the ``KURISTO_MPI_LAUNCHER`` environment variable:
+
+   .. code:: bash
+
+      KURISTO_MPI_LAUNCHER=mpiexec kuristo run tests/
+
 
 Batch
-----
+-----
 
 ``batch:``
    Batch submission settings.
@@ -65,7 +89,7 @@ Batch
 
 
 Example
-----
+-------
 
 This example shows how to setup kuristo for a slurm queue, submitting into
 a ``default`` partition.

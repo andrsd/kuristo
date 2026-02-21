@@ -53,6 +53,7 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#basic-options">Basic options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#logging-options">Logging options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#resources">Resources</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#runner">Runner</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#batch">Batch</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#example">Example</a></li>
@@ -94,11 +95,14 @@ The available configuration options are listed below.</p>
 <section id="basic-options">
 <h2>Basic options<a class="headerlink" href="#basic-options" title="Link to this heading"></a></h2>
 <dl>
-<dt><code class="docutils literal notranslate"><span class="pre">base:</span></code></dt><dd><p>Logging settings section.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">base:</span></code></dt><dd><p>General settings section.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">workflow-filename</span></code></dt><dd><p>Name of files that contain workflow descriptions.
-These files are looked for whne we have kuristo execute workflows from a location.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">base.workflow-filename</span></code></dt><dd><p>Name of files that contain workflow descriptions.
+These files are looked for when Kuristo executes workflows from a location.</p>
 <p>Default value: <code class="docutils literal notranslate"><span class="pre">kuristo.yaml</span></code></p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">base.console-width</span></code></dt><dd><p>Maximum width for console output, in characters.</p>
+<p>Default value: <code class="docutils literal notranslate"><span class="pre">100</span></code></p>
 </dd>
 </dl>
 </section>
@@ -116,6 +120,17 @@ These files are looked for whne we have kuristo execute workflows from a locatio
 </dd>
 </dl>
 </section>
+<section id="resources">
+<h2>Resources<a class="headerlink" href="#resources" title="Link to this heading"></a></h2>
+<dl>
+<dt><code class="docutils literal notranslate"><span class="pre">resources:</span></code></dt><dd><p>Resource allocation settings.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">resources.num-cores</span></code></dt><dd><p>Maximum number of CPU cores available for parallel job execution.
+Kuristo will not attempt to run more than this many cores in parallel.</p>
+<p>Default value: System CPU count (determined automatically)</p>
+</dd>
+</dl>
+</section>
 <section id="runner">
 <h2>Runner<a class="headerlink" href="#runner" title="Link to this heading"></a></h2>
 <dl>
@@ -123,6 +138,10 @@ These files are looked for whne we have kuristo execute workflows from a locatio
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">runner.mpi-launcher</span></code></dt><dd><p>MPI command used to launch jobs.</p>
 <p>Default value: <code class="docutils literal notranslate"><span class="pre">mpirun</span></code></p>
+<p>Can be overridden with the <code class="docutils literal notranslate"><span class="pre">KURISTO_MPI_LAUNCHER</span></code> environment variable:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">KURISTO_MPI_LAUNCHER</span><span class="o">=</span>mpiexec<span class="w"> </span>kuristo<span class="w"> </span>run<span class="w"> </span>tests/
+</pre></div>
+</div>
 </dd>
 </dl>
 </section>

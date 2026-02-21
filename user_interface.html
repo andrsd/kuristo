@@ -47,6 +47,7 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">User Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#global-options">Global Options</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#run">run</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#list">list</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#status">status</a></li>
@@ -91,12 +92,17 @@
              
   <section id="user-interface">
 <h1>User Interface<a class="headerlink" href="#user-interface" title="Link to this heading"></a></h1>
+<section id="global-options">
+<h2>Global Options<a class="headerlink" href="#global-options" title="Link to this heading"></a></h2>
 <dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">--version</span></code></dt><dd><p>Show the version number and exit.</p>
+</dd>
 <dt><code class="docutils literal notranslate"><span class="pre">-f|--config</span> <span class="pre">&lt;file&gt;</span></code></dt><dd><p>Supply a config file.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">--no-ansi</span></code></dt><dd><p>Use plain terminal output, i.e. no colors, etc.</p>
 </dd>
 </dl>
+</section>
 <section id="run">
 <h2>run<a class="headerlink" href="#run" title="Link to this heading"></a></h2>
 <p>Run workflow(s).</p>
@@ -153,9 +159,9 @@ By default, it will show the latest run status.</p>
 <h2>show<a class="headerlink" href="#show" title="Link to this heading"></a></h2>
 <p>Show the output (log) of a specified job.</p>
 <dl class="simple">
-<dt><code class="docutils literal notranslate"><span class="pre">--job</span></code></dt><dd><p>Job ID to display information about.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">--job</span> <span class="pre">&lt;id&gt;</span></code> (required)</dt><dd><p>Job ID to display information about.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">--run-id</span></code></dt><dd><p>Run ID. If not specified, the latest run is assumed.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">--run-id</span> <span class="pre">&lt;id&gt;</span></code></dt><dd><p>Run ID to display results for. If not specified, the latest run is assumed.</p>
 </dd>
 </dl>
 </section>
@@ -165,17 +171,25 @@ By default, it will show the latest run status.</p>
 <dl>
 <dt><code class="docutils literal notranslate"><span class="pre">submit</span></code></dt><dd><p>Submit workflows into a batch system.</p>
 <dl class="simple">
-<dt><code class="docutils literal notranslate"><span class="pre">--backend</span></code></dt><dd><p>Secify the backend. Possible value <code class="docutils literal notranslate"><span class="pre">slurm</span></code>.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">--backend</span></code></dt><dd><p>Specify the backend. Possible value <code class="docutils literal notranslate"><span class="pre">slurm</span></code>.</p>
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">--partition</span></code></dt><dd><p>Partition name to submit into.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">&lt;location&gt;</span></code></dt><dd><p>Location to search for tests.</p>
-</dd>
-<dt><code class="docutils literal notranslate"><span class="pre">&lt;file&gt;</span></code></dt><dd><p>File to submit into a queue.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">&lt;location&gt;</span> <span class="pre">[&lt;location&gt;]</span></code></dt><dd><p>Locations to search for workflow files. Multiple locations can be specified.</p>
 </dd>
 </dl>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">status</span></code></dt><dd><p>Show status of jobs submited into a batch system.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">status</span></code></dt><dd><p>Show status of jobs submitted into a batch system.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">run</span></code></dt><dd><p>Run a job in the batch system.</p>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">&lt;run_id&gt;</span></code></dt><dd><p>ID of the run.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&lt;first_job_id&gt;</span></code></dt><dd><p>First job ID to start from.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">&lt;workflow_file&gt;</span></code></dt><dd><p>Path to the workflow file to run.</p>
+</dd>
+</dl>
 </dd>
 </dl>
 </section>

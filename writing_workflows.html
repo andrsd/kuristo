@@ -51,6 +51,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#basic-structure">Basic Structure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#step-fields">Step Fields</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#job-dependencies">Job Dependencies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#strategy-matrix">Strategy Matrix</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#job-labels">Job Labels</a></li>
 </ul>
 </li>
@@ -168,6 +169,47 @@ Jobs contain one or more <strong>steps</strong> to execute.</p>
 </dd>
 </dl>
 <p>Jobs without dependencies may run in parallel, depending on available system resources.</p>
+</section>
+<section id="strategy-matrix">
+<h2>Strategy Matrix<a class="headerlink" href="#strategy-matrix" title="Link to this heading"></a></h2>
+<p>Use <code class="docutils literal notranslate"><span class="pre">jobs.&lt;id&gt;.strategy.matrix</span></code> to create multiple job variations automatically. Each combination runs as a separate job.
+This is useful for running the same test or simulation with different parameters, configurations, or mesh sizes.</p>
+<p class="rubric">Cartesian Product</p>
+<p>Create jobs from all combinations of matrix variables:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">convergence-study</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">strategy</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">matrix</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">mesh_size</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">coarse</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">medium</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">fine</span><span class="p p-Indicator">]</span>
+<span class="w">        </span><span class="nt">solver</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">direct</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">iterative</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./simulate --mesh ${{ matrix.mesh_size }} --solver ${{ matrix.solver }}</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">checks/exodiff</span>
+<span class="w">        </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">results.e</span>
+<span class="w">          </span><span class="nt">gold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gold/results_${{ matrix.mesh_size }}_${{ matrix.solver }}.e</span>
+</pre></div>
+</div>
+<p>This creates 6 job variations (3 mesh sizes × 2 solvers), each running independently.</p>
+<p class="rubric">Explicit Combinations</p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">include</span></code> to specify exact combinations when not all are valid or needed:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">verification</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">strategy</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">matrix</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">include</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">model</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">steady_state</span>
+<span class="w">            </span><span class="nt">preconditioner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ilu</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">model</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">transient</span>
+<span class="w">            </span><span class="nt">preconditioner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ml</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">model</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">transient</span>
+<span class="w">            </span><span class="nt">preconditioner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ilu</span>
+<span class="w">            </span><span class="nt">slow</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./verify --model ${{ matrix.model }} --prec ${{ matrix.preconditioner }}</span>
+</pre></div>
+</div>
+<p>This creates only the specified 3 combinations rather than all possible pairs.</p>
 </section>
 <section id="job-labels">
 <h2>Job Labels<a class="headerlink" href="#job-labels" title="Link to this heading"></a></h2>

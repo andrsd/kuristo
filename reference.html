@@ -58,6 +58,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#jobs-id-description">jobs.&lt;id&gt;.description</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#jobs-id-needs">jobs.&lt;id&gt;.needs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#jobs-id-labels">jobs.&lt;id&gt;.labels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#jobs-id-env">jobs.&lt;id&gt;.env</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#jobs-id-skip">jobs.&lt;id&gt;.skip</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#jobs-id-timeout-minutes">jobs.&lt;id&gt;.timeout-minutes</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#jobs-id-strategy">jobs.&lt;id&gt;.strategy</a></li>
@@ -69,12 +70,14 @@
 <li class="toctree-l2"><a class="reference internal" href="#jobs-id-steps-num-cores">jobs.&lt;id&gt;.steps[*].num-cores</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#jobs-id-steps-continue-on-error">jobs.&lt;id&gt;.steps[*].continue-on-error</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#jobs-id-steps-description">jobs.&lt;id&gt;.steps[*].description</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#jobs-id-steps-run">jobs.&lt;id&gt;.steps[*].run</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#jobs-id-steps-uses">jobs.&lt;id&gt;.steps[*].uses</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#jobs-id-steps-with">jobs.&lt;id&gt;.steps[*].with</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#jobs-id-steps-run">jobs.&lt;id&gt;.steps[*].run</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#jobs-id-steps-shell">jobs.&lt;id&gt;.steps[*].shell</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#jobs-id-steps-working-directory">jobs.&lt;id&gt;.steps[*].working-directory</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#jobs-id-steps-env">jobs.&lt;id&gt;.steps[*].env</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#jobs-id-steps-timeout-minutes">jobs.&lt;id&gt;.steps[*].timeout-minutes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">jobs.&lt;id&gt;.steps[*].continue-on-error</a></li>
 </ul>
 </li>
 </ul>
@@ -113,20 +116,76 @@ If you are new to YAML, you can <a class="reference external" href="https://lear
 </section>
 <section id="jobs-id">
 <h2>jobs.&lt;id&gt;<a class="headerlink" href="#jobs-id" title="Link to this heading"></a></h2>
-<p>This is the job ID and must be unique within the workflow file.</p>
+<p>The job ID, which must be unique within the workflow file.
+This ID is used to reference the job in <code class="docutils literal notranslate"><span class="pre">needs</span></code> dependencies and in command line output.</p>
 </section>
 <section id="jobs-id-name">
 <h2>jobs.&lt;id&gt;.name<a class="headerlink" href="#jobs-id-name" title="Link to this heading"></a></h2>
-<p>Job name which will be displayed in the user interface.</p>
+<div class="line-block">
+<div class="line">Display name for the job shown in the user interface and logs.</div>
+<div class="line">Optional field; defaults to the job ID if not specified.</div>
+</div>
+<p>Example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">my-job</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Convergence</span><span class="nv"> </span><span class="s">Study&quot;</span>
+</pre></div>
+</div>
 </section>
 <section id="jobs-id-description">
 <h2>jobs.&lt;id&gt;.description<a class="headerlink" href="#jobs-id-description" title="Link to this heading"></a></h2>
-<p>Job description.</p>
+<div class="line-block">
+<div class="line">Longer description of what the job does.</div>
+<div class="line">Optional field used for documentation purposes.</div>
+</div>
+<p>Example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">my-job</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Run</span><span class="nv"> </span><span class="s">simulation</span><span class="nv"> </span><span class="s">with</span><span class="nv"> </span><span class="s">varying</span><span class="nv"> </span><span class="s">mesh</span><span class="nv"> </span><span class="s">refinements&quot;</span>
+</pre></div>
+</div>
 </section>
 <section id="jobs-id-needs">
 <h2>jobs.&lt;id&gt;.needs<a class="headerlink" href="#jobs-id-needs" title="Link to this heading"></a></h2>
-<p>Job dependecies.
-These are job IDs that must finish before this job starts.</p>
+<div class="line-block">
+<div class="line">Job dependencies - other jobs that must finish before this job starts.</div>
+<div class="line">Optional field; can be a single job ID (string) or multiple job IDs (list).</div>
+<div class="line">Dependent jobs run in parallel only if all their dependencies are satisfied.</div>
+</div>
+<p>Example with single dependency:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">prepare</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Generate</span><span class="nv"> </span><span class="s">mesh&quot;</span>
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./generate_mesh.sh</span>
+
+<span class="w">  </span><span class="nt">simulate</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Run</span><span class="nv"> </span><span class="s">Simulation&quot;</span>
+<span class="w">    </span><span class="nt">needs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">prepare</span>
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./simulate</span>
+</pre></div>
+</div>
+<p>Example with multiple dependencies:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">build</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">make</span>
+
+<span class="w">  </span><span class="nt">test-unit</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">needs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">build</span>
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pytest unit_tests/</span>
+
+<span class="w">  </span><span class="nt">test-integration</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">needs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">build</span>
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pytest integration_tests/</span>
+
+<span class="w">  </span><span class="nt">report</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">needs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">test-unit</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">test-integration</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./generate_report.py</span>
+</pre></div>
+</div>
 </section>
 <section id="jobs-id-labels">
 <h2>jobs.&lt;id&gt;.labels<a class="headerlink" href="#jobs-id-labels" title="Link to this heading"></a></h2>
@@ -134,13 +193,43 @@ These are job IDs that must finish before this job starts.</p>
 <div class="line">List of labels for filtering jobs during execution.</div>
 <div class="line">Allows selective execution of job subsets using the <code class="docutils literal notranslate"><span class="pre">--label</span></code> CLI option.</div>
 <div class="line">Optional field with no default value.</div>
-<div class="line">Example: <code class="docutils literal notranslate"><span class="pre">labels:</span> <span class="pre">[smoke,</span> <span class="pre">quick]</span></code></div>
+</div>
+<p>Example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">my-job</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">labels</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">smoke</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">quick</span><span class="p p-Indicator">]</span>
+</pre></div>
+</div>
+</section>
+<section id="jobs-id-env">
+<h2>jobs.&lt;id&gt;.env<a class="headerlink" href="#jobs-id-env" title="Link to this heading"></a></h2>
+<div class="line-block">
+<div class="line">Environment variables for the job.</div>
+<div class="line">Optional field; a dictionary of key-value pairs passed to all steps in the job.</div>
+</div>
+<p>Example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">my-job</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">env</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">PRECISION</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">double</span>
+<span class="w">    </span><span class="nt">NUM_THREADS</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<span class="w">  </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./simulate</span><span class="w">  </span><span class="c1"># Can use $PRECISION and $NUM_THREADS</span>
+</pre></div>
 </div>
 </section>
 <section id="jobs-id-skip">
 <h2>jobs.&lt;id&gt;.skip<a class="headerlink" href="#jobs-id-skip" title="Link to this heading"></a></h2>
-<p>If set, the job will be skipped.
-It is recommended to describe the reason why the job is skipped.</p>
+<div class="line-block">
+<div class="line">Skip this job and mark it as skipped in the report.</div>
+<div class="line">Optional field; provide a string describing why the job is skipped.</div>
+<div class="line">If not set or empty, the job runs normally.</div>
+</div>
+<p>Example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">my-job</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">skip</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Not</span><span class="nv"> </span><span class="s">supported</span><span class="nv"> </span><span class="s">on</span><span class="nv"> </span><span class="s">this</span><span class="nv"> </span><span class="s">platform&quot;</span>
+<span class="w">  </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./test</span>
+</pre></div>
+</div>
 </section>
 <section id="jobs-id-timeout-minutes">
 <h2>jobs.&lt;id&gt;.timeout-minutes<a class="headerlink" href="#jobs-id-timeout-minutes" title="Link to this heading"></a></h2>
@@ -151,32 +240,94 @@ It is recommended to describe the reason why the job is skipped.</p>
 </section>
 <section id="jobs-id-strategy">
 <h2>jobs.&lt;id&gt;.strategy<a class="headerlink" href="#jobs-id-strategy" title="Link to this heading"></a></h2>
-<p>TODO</p>
+<div class="line-block">
+<div class="line">Defines matrix configurations to create multiple job variations.</div>
+<div class="line">Optional field; if not specified, the job runs once without variations.</div>
+</div>
 </section>
 <section id="jobs-id-strategy-matrix">
 <h2>jobs.&lt;id&gt;.strategy.matrix<a class="headerlink" href="#jobs-id-strategy-matrix" title="Link to this heading"></a></h2>
-<p>TODO</p>
+<div class="line-block">
+<div class="line">Dictionary of variables and their values for creating job combinations.</div>
+<div class="line">Creates a job for each combination of variable values (Cartesian product).</div>
+<div class="line">Variables are accessible in steps and job fields via <code class="docutils literal notranslate"><span class="pre">${{</span> <span class="pre">matrix.variable-name</span> <span class="pre">}}</span></code>.</div>
+</div>
+<p>Example (Cartesian product of 3 mesh sizes × 2 solvers = 6 jobs):</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">my-job</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">strategy</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">matrix</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">mesh</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">coarse</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">medium</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">fine</span><span class="p p-Indicator">]</span>
+<span class="w">      </span><span class="nt">solver</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">direct</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">iterative</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./simulate --mesh ${{ matrix.mesh }} --solver ${{ matrix.solver }}</span>
+</pre></div>
+</div>
 </section>
 <section id="jobs-id-strategy-matrix-include">
 <h2>jobs.&lt;id&gt;.strategy.matrix.include<a class="headerlink" href="#jobs-id-strategy-matrix-include" title="Link to this heading"></a></h2>
-<p>TODO</p>
+<div class="line-block">
+<div class="line">List of explicit combinations to use instead of a full Cartesian product.</div>
+<div class="line">Optional field; if present, only these combinations are created.</div>
+<div class="line">Useful when not all variable combinations are valid or desired.</div>
+</div>
+<p>Example (only 2 specific combinations):</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">my-job</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">strategy</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">matrix</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">include</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mesh</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">coarse</span>
+<span class="w">          </span><span class="nt">solver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">direct</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">mesh</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fine</span>
+<span class="w">          </span><span class="nt">solver</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">iterative</span>
+<span class="w">  </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./simulate --mesh ${{ matrix.mesh }} --solver ${{ matrix.solver }}</span>
+</pre></div>
+</div>
 </section>
 <section id="jobs-id-steps">
 <h2>jobs.&lt;id&gt;.steps<a class="headerlink" href="#jobs-id-steps" title="Link to this heading"></a></h2>
-<p>Steps that made up the job</p>
+<div class="line-block">
+<div class="line">List of steps that make up the job.</div>
+<div class="line">Required field; every job must have at least one step.</div>
+<div class="line">Steps are executed sequentially within a job.</div>
+<div class="line">If any step fails (unless <code class="docutils literal notranslate"><span class="pre">continue-on-error</span></code> is true), the job fails.</div>
+</div>
 </section>
 <section id="jobs-id-steps-id">
 <h2>jobs.&lt;id&gt;.steps[*].id<a class="headerlink" href="#jobs-id-steps-id" title="Link to this heading"></a></h2>
-<p>Step ID.</p>
+<div class="line-block">
+<div class="line">Unique identifier for the step within the job.</div>
+<div class="line">Optional field; useful for referencing step outputs in later steps.</div>
+</div>
+<p>Example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">simulation</span>
+<span class="w">    </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./simulate &gt; results.txt</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Verify results</span>
+<span class="w">    </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">grep &quot;SUCCESS&quot; ${{ steps.simulation.output }}</span>
+</pre></div>
+</div>
 </section>
 <section id="jobs-id-steps-name">
 <h2>jobs.&lt;id&gt;.steps[*].name<a class="headerlink" href="#jobs-id-steps-name" title="Link to this heading"></a></h2>
-<p>Step name.
-This is displayed in user interface.</p>
+<div class="line-block">
+<div class="line">Display name for the step shown in logs and user interface.</div>
+<div class="line">Optional field; defaults to showing the step index if not specified.</div>
+</div>
+<p>Example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Run</span><span class="nv"> </span><span class="s">convergence</span><span class="nv"> </span><span class="s">study&quot;</span>
+<span class="w">    </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./simulate</span>
+</pre></div>
+</div>
 </section>
 <section id="jobs-id-steps-num-cores">
 <h2>jobs.&lt;id&gt;.steps[*].num-cores<a class="headerlink" href="#jobs-id-steps-num-cores" title="Link to this heading"></a></h2>
-<p>Number of cores to use.</p>
+<div class="line-block">
+<div class="line">Number of CPU cores required for this step.</div>
+<div class="line">Optional field; default is <code class="docutils literal notranslate"><span class="pre">1</span></code>.</div>
+<div class="line">Kuristo will allocate the requested cores and ensure total allocation doesn’t exceed configured limit.</div>
+</div>
 </section>
 <section id="jobs-id-steps-continue-on-error">
 <h2>jobs.&lt;id&gt;.steps[*].continue-on-error<a class="headerlink" href="#jobs-id-steps-continue-on-error" title="Link to this heading"></a></h2>
@@ -187,36 +338,114 @@ This is displayed in user interface.</p>
 </section>
 <section id="jobs-id-steps-description">
 <h2>jobs.&lt;id&gt;.steps[*].description<a class="headerlink" href="#jobs-id-steps-description" title="Link to this heading"></a></h2>
-<p>Step description.</p>
-</section>
-<section id="jobs-id-steps-uses">
-<h2>jobs.&lt;id&gt;.steps[*].uses<a class="headerlink" href="#jobs-id-steps-uses" title="Link to this heading"></a></h2>
-<p>Action name that is used for this step.</p>
-</section>
-<section id="jobs-id-steps-with">
-<h2>jobs.&lt;id&gt;.steps[*].with<a class="headerlink" href="#jobs-id-steps-with" title="Link to this heading"></a></h2>
-<p>Parameters passed into the action.</p>
+<div class="line-block">
+<div class="line">Documentation string describing what the step does.</div>
+<div class="line">Optional field; useful for understanding workflow purpose.</div>
+</div>
 </section>
 <section id="jobs-id-steps-run">
 <h2>jobs.&lt;id&gt;.steps[*].run<a class="headerlink" href="#jobs-id-steps-run" title="Link to this heading"></a></h2>
-<p>Shell commands to execute.</p>
+<div class="line-block">
+<div class="line">Shell commands to execute.</div>
+<div class="line">Either <code class="docutils literal notranslate"><span class="pre">run</span></code> or <code class="docutils literal notranslate"><span class="pre">uses</span></code> must be specified (mutually exclusive).</div>
+<div class="line">Commands are executed with the specified shell.</div>
+</div>
+<p>Example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Prepare</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">run</span><span class="nv"> </span><span class="s">simulation&quot;</span>
+<span class="w">    </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">      </span><span class="no">./prepare_mesh.sh data/input.msh</span>
+<span class="w">      </span><span class="no">./simulate --config sim.cfg --output results.e</span>
+<span class="w">      </span><span class="no">./postprocess.py results.e &gt; analysis.txt</span>
+</pre></div>
+</div>
+</section>
+<section id="jobs-id-steps-uses">
+<h2>jobs.&lt;id&gt;.steps[*].uses<a class="headerlink" href="#jobs-id-steps-uses" title="Link to this heading"></a></h2>
+<div class="line-block">
+<div class="line">Name of a custom action (plugin) to execute.</div>
+<div class="line">Either <code class="docutils literal notranslate"><span class="pre">run</span></code> or <code class="docutils literal notranslate"><span class="pre">uses</span></code> must be specified (mutually exclusive).</div>
+<div class="line">Action names follow the format <code class="docutils literal notranslate"><span class="pre">namespace/action-name</span></code>.</div>
+</div>
+<p>Example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Validate</span><span class="nv"> </span><span class="s">output&quot;</span>
+<span class="w">    </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">checks/exodiff</span>
+<span class="w">    </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">results.e</span>
+<span class="w">      </span><span class="nt">gold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gold.e</span>
+</pre></div>
+</div>
+</section>
+<section id="jobs-id-steps-with">
+<h2>jobs.&lt;id&gt;.steps[*].with<a class="headerlink" href="#jobs-id-steps-with" title="Link to this heading"></a></h2>
+<div class="line-block">
+<div class="line">Parameters passed to the action specified by <code class="docutils literal notranslate"><span class="pre">uses</span></code>.</div>
+<div class="line">Optional field; a dictionary of key-value pairs.</div>
+<div class="line">Each action defines which parameters it accepts.</div>
+</div>
+<p>Example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">checks/regex</span>
+<span class="w">    </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">input</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">output.txt</span>
+<span class="w">      </span><span class="nt">pattern</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;SUCCESS&quot;</span>
+</pre></div>
+</div>
 </section>
 <section id="jobs-id-steps-shell">
 <h2>jobs.&lt;id&gt;.steps[*].shell<a class="headerlink" href="#jobs-id-steps-shell" title="Link to this heading"></a></h2>
 <div class="line-block">
-<div class="line">Shell to use.</div>
-<div class="line">Default value is <code class="docutils literal notranslate"><span class="pre">sh</span></code>.</div>
+<div class="line">Shell to use for executing <code class="docutils literal notranslate"><span class="pre">run</span></code> commands.</div>
+<div class="line">Optional field; default is <code class="docutils literal notranslate"><span class="pre">sh</span></code>.</div>
+<div class="line">Common values: <code class="docutils literal notranslate"><span class="pre">sh</span></code>, <code class="docutils literal notranslate"><span class="pre">bash</span></code>, <code class="docutils literal notranslate"><span class="pre">zsh</span></code>.</div>
 </div>
 </section>
 <section id="jobs-id-steps-working-directory">
 <h2>jobs.&lt;id&gt;.steps[*].working-directory<a class="headerlink" href="#jobs-id-steps-working-directory" title="Link to this heading"></a></h2>
-<p>Working directory for the step.</p>
+<div class="line-block">
+<div class="line">Directory to execute the step in.</div>
+<div class="line">Optional field; if not specified, uses the job’s working directory.</div>
+</div>
+<p>Example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Build&quot;</span>
+<span class="w">    </span><span class="nt">working-directory</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">build/</span>
+<span class="w">    </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cmake .. &amp;&amp; make</span>
+</pre></div>
+</div>
+</section>
+<section id="jobs-id-steps-env">
+<h2>jobs.&lt;id&gt;.steps[*].env<a class="headerlink" href="#jobs-id-steps-env" title="Link to this heading"></a></h2>
+<div class="line-block">
+<div class="line">Environment variables specific to this step.</div>
+<div class="line">Optional field; a dictionary of key-value pairs.</div>
+<div class="line">Merged with job-level environment variables.</div>
+</div>
+<p>Example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Run</span><span class="nv"> </span><span class="s">with</span><span class="nv"> </span><span class="s">custom</span><span class="nv"> </span><span class="s">settings&quot;</span>
+<span class="w">    </span><span class="nt">env</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">OMP_NUM_THREADS</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<span class="w">      </span><span class="nt">DEBUG</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">    </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">./simulate</span>
+</pre></div>
+</div>
 </section>
 <section id="jobs-id-steps-timeout-minutes">
 <h2>jobs.&lt;id&gt;.steps[*].timeout-minutes<a class="headerlink" href="#jobs-id-steps-timeout-minutes" title="Link to this heading"></a></h2>
 <div class="line-block">
-<div class="line">Maximum time for the step to finish, in minutes.</div>
-<div class="line">Default value is <code class="docutils literal notranslate"><span class="pre">60</span></code>.</div>
+<div class="line">Maximum time for the step to complete, in minutes.</div>
+<div class="line">Optional field; default is <code class="docutils literal notranslate"><span class="pre">60</span></code>.</div>
+<div class="line">If exceeded, the step is terminated and marked as failed.</div>
+</div>
+</section>
+<section id="id1">
+<h2>jobs.&lt;id&gt;.steps[*].continue-on-error<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<div class="line-block">
+<div class="line">Continue job execution if this step fails.</div>
+<div class="line">Optional field; default is <code class="docutils literal notranslate"><span class="pre">false</span></code>.</div>
+<div class="line">When <code class="docutils literal notranslate"><span class="pre">true</span></code>, a failed step does not fail the entire job.</div>
 </div>
 </section>
 </section>
