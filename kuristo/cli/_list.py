@@ -1,6 +1,7 @@
 from rich.text import Text
 
 import kuristo.ui as ui
+import kuristo.utils as utils
 from kuristo.job_spec import parse_workflow_files
 from kuristo.scanner import scan_locations
 from kuristo.utils import filter_specs_by_labels
@@ -28,16 +29,20 @@ def list_jobs(args):
         else:
             job_names = [(sp.id, None)]
         n_jobs += len(job_names)
-        for name, _ in job_names:
+        for name, variant in job_names:
             jnm = ui.job_name_markup(name)
+            # Interpolate job name with matrix variables if present
+            job_display_name = sp.name
+            if variant:
+                job_display_name = utils.interpolate_str(sp.name, {"matrix": variant})
             txt = Text("")
             if sp.skip:
-                txt.append(Text.from_markup(f"• {jnm}: {sp.name}", style="grey35"))
+                txt.append(Text.from_markup(f"• {jnm}: {job_display_name}", style="grey35"))
             else:
                 txt.append(Text.from_markup("• "))
                 txt.append(Text.from_markup(jnm, style="bold cyan"))
                 txt.append(": ")
-                txt.append(Text.from_markup(sp.name, style="grey70"))
+                txt.append(Text.from_markup(job_display_name, style="grey70"))
                 if sp.labels:
                     txt.append(Text.from_markup(f" ({', '.join(sp.labels)})", style="magenta"))
             console.print(txt)
