@@ -277,6 +277,14 @@ class TestPruneOldRunsWithTags:
         """Test that tagged runs are not deleted during pruning"""
         log_dir, run_ids = sample_runs
 
+        # Set specific modification times to ensure predictable sort order
+        import time
+        runs_dir = log_dir / "runs"
+        time.sleep(0.01)
+        (runs_dir / run_ids[1]).touch()
+        time.sleep(0.01)
+        (runs_dir / run_ids[2]).touch()
+
         # Tag the oldest run
         utils.create_tag(log_dir, "v1.0", run_ids[0])
 
@@ -287,7 +295,7 @@ class TestPruneOldRunsWithTags:
         run_path = log_dir / "runs" / run_ids[0]
         assert run_path.exists()
 
-        # Other runs should still exist (we're keeping 2)
+        # The two newest runs should still exist (we're keeping 2)
         assert (log_dir / "runs" / run_ids[1]).exists()
         assert (log_dir / "runs" / run_ids[2]).exists()
 
