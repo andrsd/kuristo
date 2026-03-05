@@ -80,4 +80,4 @@ class ConvergenceRateCheck(Action):
                 return -1
         except FileNotFoundError:
             self.output = f"Failed to open {self._input_file}"
-            return 0
+            return -2
