@@ -27,8 +27,6 @@ class ExodiffCheck(ProcessAction):
         name,
         context: Context,
         id,
-        working_dir,
-        timeout_minutes,
         reference=None,
         test=None,
         floor=None,
@@ -41,8 +39,6 @@ class ExodiffCheck(ProcessAction):
         super().__init__(
             name=name,
             context=context,
-            working_dir=working_dir,
-            timeout_minutes=timeout_minutes,
             **kwargs,
         )
         self._source_root = source_root or os.getcwd()
