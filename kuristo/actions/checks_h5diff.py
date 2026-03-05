@@ -137,7 +137,7 @@ class H5DiffCheck(ProcessAction):
                 process = subprocess.Popen(
                     cmd,
                     shell=True,
-                    cwd=self._cwd,
+                    cwd=self.working_directory,
                     env=env,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.STDOUT,

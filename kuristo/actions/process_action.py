@@ -32,7 +32,7 @@ class ProcessAction(Action):
         self._process = subprocess.Popen(
             self.command,
             shell=True,
-            cwd=self._cwd,
+            cwd=self.working_directory,
             env=env,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
