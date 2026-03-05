@@ -282,6 +282,8 @@ class Job:
             with self._step_lock:
                 self._active_step = step
             self._logger.task_start(step.name)
+            old_wd = os.getcwd()
+            os.chdir(step.working_directory)
             self.on_step_start(self, step)
             try:
                 if hasattr(step, "command"):
@@ -292,6 +294,7 @@ class Job:
                 self._logger.log(str(e))
                 exit_code = -1
             self.on_step_finish(self, step)
+            os.chdir(old_wd)
             self._load_env()
 
             log_data = step.output

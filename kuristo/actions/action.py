@@ -76,6 +76,13 @@ class Action(ABC):
         return self._context
 
     @property
+    def working_directory(self):
+        """
+        Return working directory
+        """
+        return self._cwd
+
+    @property
     def continue_on_error(self):
         return self._continue_on_error
 
