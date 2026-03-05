@@ -1,3 +1,5 @@
+name: test-labels
+
 jobs:
   smoke-test-1:
     description: Quick smoke test

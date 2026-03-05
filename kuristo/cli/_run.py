@@ -3,15 +3,13 @@ from pathlib import Path
 import yaml
 
 import kuristo.config as config
-import kuristo.ui as ui
 import kuristo.utils as utils
 from kuristo.job import Job
-from kuristo.job_spec import parse_workflow_files
 from kuristo.plugin_loader import load_user_steps_from_kuristo_dir
 from kuristo.resources import Resources
 from kuristo.scanner import scan_locations
 from kuristo.scheduler import Scheduler
-from kuristo.utils import filter_specs_by_labels
+from kuristo.workflow import parse_workflow_files
 
 
 def create_results(jobs):
@@ -62,23 +60,10 @@ def run_jobs(args):
     load_user_steps_from_kuristo_dir()
 
     workflow_files = scan_locations(locations)
-    specs = parse_workflow_files(workflow_files)
-
-    # Filter by labels if specified
-    requested_labels = getattr(args, "labels", None)
-    if requested_labels:
-        specs, total_jobs, filtered_jobs = filter_specs_by_labels(specs, requested_labels)
-        if filtered_jobs == 0:
-            ui.console().print(
-                f"[yellow]Warning: No jobs found matching labels: {', '.join(requested_labels)}[/]"
-            )
-            return 0
-        ui.console().print(
-            f"[cyan]Filtered to {filtered_jobs} of {total_jobs} jobs matching labels:[/] [magenta]{', '.join(requested_labels)}[/]"
-        )
+    workflows = parse_workflow_files(workflow_files)
 
     rcs = Resources()
-    scheduler = Scheduler(specs, rcs, out_dir)
+    scheduler = Scheduler(workflows, rcs, out_dir)
     scheduler.check()
     scheduler.run_all_jobs()
 

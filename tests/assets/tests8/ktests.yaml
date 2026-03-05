@@ -1,3 +1,5 @@
+name: test-8
+
 jobs:
   step-1:
     steps:

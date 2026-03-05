@@ -1,3 +1,5 @@
+name: test-3
+
 jobs:
   test-stdout-stderr:
     description: "Print to stdout and stderr"

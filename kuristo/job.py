@@ -4,11 +4,11 @@ import threading
 import time
 from pathlib import Path
 
+import kuristo.utils as utils
 from kuristo.action_factory import ActionFactory
 from kuristo.context import Context
 from kuristo.env import Env
-from kuristo.job_spec import JobSpec
-from kuristo.utils import interpolate_str
+from kuristo.workflow import JobSpec
 
 
 class Job:
@@ -391,7 +391,7 @@ class Job:
         pass
 
     def _create_job_name(self, job_spec, matrix):
-        ipol_name = interpolate_str(job_spec.name, {"matrix": matrix})
+        ipol_name = utils.render_job_name(job_spec, matrix)
         if ipol_name == job_spec.name and matrix is not None:
             param_str = ",".join(f"{k}={v}" for k, v in matrix.items())
             return f"{job_spec.name}[{param_str}]"

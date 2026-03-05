@@ -16,11 +16,11 @@ from kuristo.batch import get_backend
 from kuristo.batch.backend import ScriptParameters
 from kuristo.context import Context
 from kuristo.job import Job
-from kuristo.job_spec import JobSpec, parse_workflow_files, specs_from_file
 from kuristo.plugin_loader import load_user_steps_from_kuristo_dir
 from kuristo.resources import Resources
 from kuristo.scanner import scan_locations
 from kuristo.scheduler import Scheduler, create_jobs
+from kuristo.workflow import Workflow, parse_workflow_files, workflow_from_file
 
 
 def build_actions(spec, context):
@@ -41,10 +41,9 @@ def required_cores(actions):
 
 def create_script_params(
     job_name: str,
-    workflow_file: Path,
     run_id: str,
     first_job_num: int,
-    specs: list[JobSpec],
+    workflow: Workflow,
     workdir: Path,
 ) -> ScriptParameters:
     """
@@ -61,18 +60,18 @@ def create_script_params(
     """
     n_cores = 1
     max_time = 0
-    for sp in specs:
-        if sp.skip:
+    for job in workflow.jobs.values():
+        if job.skip:
             pass
         else:
             context = Context(
                 base_env=None,
-                working_directory=sp.working_directory,
-                defaults=sp.defaults,
+                working_directory=job.working_directory,
+                defaults=job.defaults,
             )
-            actions = build_actions(sp, context)
+            actions = build_actions(job, context)
             n_cores = max(n_cores, required_cores(actions))
-            max_time += sp.timeout_minutes
+            max_time += job.timeout_minutes
 
     cfg = config.get()
     return ScriptParameters(
@@ -83,7 +82,7 @@ def create_script_params(
         partition=cfg.batch_partition,
         run_id=run_id,
         first_job_num=first_job_num,
-        workflow_file=workflow_file,
+        workflow_file=workflow.file_name,
     )
 
 
@@ -158,16 +157,17 @@ def batch_submit(args):
         workdir = out_dir / f"job-{n_jobs}"
         workdir.mkdir()
 
-        specs = specs_from_file(f)
-        job_name = f"kuristo-job-{n_jobs}"
-        s = create_script_params(job_name, f, run_id, job_num, specs, workdir)
+        workflow = workflow_from_file(f)
+        if workflow is not None:
+            job_name = f"kuristo-job-{n_jobs}"
+            s = create_script_params(job_name, run_id, job_num, workflow, workdir)
 
-        batch_job_id = backend.submit(s)
-        write_job_metadata(batch_job_id, backend.name, workdir)
+            batch_job_id = backend.submit(s)
+            write_job_metadata(batch_job_id, backend.name, workdir)
 
-        for sp in specs:
-            jobs = create_jobs(sp, out_dir, cond)
-            job_num += len(jobs)
+            for sp in workflow.jobs.values():
+                jobs = create_jobs(sp, out_dir, cond)
+                job_num += len(jobs)
 
     ui.console().print(f"Submitted {n_jobs} jobs")
 

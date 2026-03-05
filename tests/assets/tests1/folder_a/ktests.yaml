@@ -1,3 +1,5 @@
+name: test-folder-a
+
 jobs:
   test-fa-1:
     description: "Run a test that requires 4 cores"
