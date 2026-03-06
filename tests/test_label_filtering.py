@@ -1,7 +1,8 @@
 from pathlib import Path
 
-from kuristo.job_spec import JobSpec, parse_workflow_files
+from kuristo.job_spec import JobSpec
 from kuristo.utils import filter_specs_by_labels
+from kuristo.workflow import parse_workflow_files
 
 
 class TestLabelFiltering:
@@ -123,9 +124,12 @@ class TestLabelFiltering:
         """Test parsing and filtering from actual workflow file"""
         test_file = Path("tests/assets/test_labels/ktests.yaml")
         if test_file.exists():
-            specs = parse_workflow_files([test_file])
+            workflows = parse_workflow_files([test_file])
 
             # All specs should have labels or be labelless
+            assert len(workflows) == 1
+
+            specs = workflows[0].jobs.values()
             assert len(specs) == 4
 
             # Filter by smoke

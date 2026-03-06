@@ -1,10 +1,8 @@
 import os
 from itertools import product
-from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
-import yaml
-from pydantic import BaseModel, Field, PrivateAttr, ValidationError, model_validator
+from pydantic import BaseModel, Field, PrivateAttr, model_validator
 
 
 class StrategyMatrix(BaseModel):
@@ -91,8 +89,6 @@ class Step(BaseModel):
     # Environment for this step
     env: Optional[dict] = Field(default={})
 
-    model_config = {"populate_by_name": True}
-
     @property
     def params(self):
         """
@@ -126,7 +122,7 @@ class JobSpec(BaseModel):
     # Job ID
     _id: str = PrivateAttr()
     # Job name
-    _name: str = PrivateAttr()
+    name: str = ""
     # File name where the job specification was defined
     _file_name: str = PrivateAttr()
     # Environment for this job
@@ -135,6 +131,8 @@ class JobSpec(BaseModel):
     defaults: Optional[JobDefaults] = None
     # Labels for filtering jobs
     labels: Optional[List[str]] = None
+    # Working directory
+    _work_dir: str = PrivateAttr("")
 
     @property
     def id(self):
@@ -142,13 +140,6 @@ class JobSpec(BaseModel):
         Return job ID
         """
         return self._id
-
-    @property
-    def name(self):
-        """
-        Return job name
-        """
-        return self._name
 
     @property
     def needs(self) -> List[str]:
@@ -174,13 +165,6 @@ class JobSpec(BaseModel):
         return self.skip_
 
     @property
-    def file_name(self):
-        """
-        Return file name where this job specification was
-        """
-        return self._file_name
-
-    @property
     def working_directory(self):
         """
         Return file name where this job specification was
@@ -189,12 +173,6 @@ class JobSpec(BaseModel):
 
     def set_id(self, id):
         self._id = id
-
-    def set_name(self, name: str):
-        self._name = name
-
-    def set_file_name(self, file_name):
-        self._file_name = file_name
 
     def set_working_directory(self, work_dir: str):
         self._work_dir = work_dir
@@ -233,47 +211,3 @@ class JobSpec(BaseModel):
         """
         param_str = ",".join(f"{k}={v}" for k, v in variant.items())
         return f"{self.id}[{param_str}]"
-
-    @staticmethod
-    def from_dict(file_name, id, data):
-        if isinstance(data, dict):
-            ts = JobSpec(**data)
-            ts.set_file_name(file_name)
-            ts.set_working_directory(os.path.dirname(os.path.abspath(file_name)))
-            ts.set_id(id)
-            ts.set_name(data.get("name", id))
-            return ts
-        else:
-            raise RuntimeError("Expected dict as 'data'")
-
-
-def parse_workflow_files(workflow_files: list[Path]) -> list[JobSpec]:
-    """
-    Parse workflow files (kuristo.yaml)
-    """
-    specs = []
-    for file in workflow_files:
-        specs.extend(specs_from_file(file))
-    return specs
-
-
-def specs_from_file(file_path) -> list[JobSpec]:
-    location = os.path.dirname(file_path)
-    specs = []
-    with open(file_path, "r") as file:
-        data = yaml.safe_load(file)
-        if data is not None:
-            jobs = data.get("jobs", {})
-            for id, params in jobs.items():
-                try:
-                    jspec = JobSpec.from_dict(file_path, id, params)
-                    specs.append(jspec)
-                except ValidationError as exp:
-                    msgs = []
-                    n = len(exp.errors())
-                    msgs.append(f"{n} syntax error found in {location}:")
-                    for error in exp.errors():
-                        loc_str = ".".join(str(p) for p in error["loc"])
-                        msgs.append(f"- {loc_str}: {error['msg']}")
-                    raise RuntimeError("\n".join(msgs))
-    return specs

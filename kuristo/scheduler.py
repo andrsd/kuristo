@@ -20,6 +20,7 @@ import kuristo.ui as ui
 from kuristo.job import Job, JobJoiner
 from kuristo.job_spec import JobSpec
 from kuristo.resources import Resources
+from kuristo.workflow import Workflow
 
 
 class StepCountColumn(ProgressColumn):
@@ -65,9 +66,9 @@ class Scheduler:
     new one(s). We run until all jobs have FINISHED status.
     """
 
-    def __init__(self, specs, rcs: Resources, out_dir) -> None:
+    def __init__(self, workflows: list[Workflow], rcs: Resources, out_dir) -> None:
         """
-        @param specs: [JobSpec] List of job specifications
+        @param workflows: [Workflows] List of workflows
         @param rcs: Resources Resource to be scheduled
         @param out_dir: Directory where we write logs
         @param config: Configuration
@@ -80,7 +81,7 @@ class Scheduler:
         self._active_jobs = set()
         self._lock = threading.Lock()
         self._event = threading.Event()
-        self._create_graph(specs)
+        self._create_graph(workflows)
         self._resources = rcs
         if cfg.no_ansi:
             self._progress = NullProgress()
@@ -145,27 +146,29 @@ class Scheduler:
         )
         ui.time(self._total_runtime)
 
-    def _create_graph(self, specs):
+    def _create_graph(self, workflows):
         self._graph = netx.DiGraph()
-        job_map = {}
-        for sp in specs:
-            spec_jobs = create_jobs(sp, self._out_dir, self._event)
-            for job in spec_jobs:
-                job.on_finish = self._job_completed
-                job.on_step_start = self._on_step_start
-                job.on_step_finish = self._on_step_finish
-                self._graph.add_node(job)
-                job_map[job.id] = job
-                self._max_label_len = max(self._max_label_len, len(job.name) + 1)
-        self._max_id_width = len(str(self._graph.number_of_nodes()))
+        for wf in workflows:
+            job_map = {}
+            for sp in wf.jobs.values():
+                spec_jobs = create_jobs(sp, self._out_dir, self._event)
+                for job in spec_jobs:
+                    job.on_finish = self._job_completed
+                    job.on_step_start = self._on_step_start
+                    job.on_step_finish = self._on_step_finish
+                    self._graph.add_node(job)
+                    job_map[job.id] = job
+                    self._max_label_len = max(self._max_label_len, len(job.name) + 1)
 
-        for job in self._graph.nodes:
-            for dep_name in job.needs:
-                if dep_name not in job_map:
-                    raise ValueError(
-                        f"{job.spec.file_name}: Job '{job.spec.id}' depends on unknown job '{dep_name}'"
-                    )
-                self._graph.add_edge(job_map[dep_name], job_map[job.id])
+            for job in job_map.values():
+                for dep_name in job.needs:
+                    if dep_name not in job_map:
+                        raise ValueError(
+                            f"{wf.file_name}: Job '{job.spec.id}' depends on unknown job '{dep_name}'"
+                        )
+                    self._graph.add_edge(job_map[dep_name], job_map[job.id])
+
+        self._max_id_width = len(str(self._graph.number_of_nodes()))
 
     def _get_ready_jobs(self):
         """

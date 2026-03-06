@@ -16,11 +16,12 @@ from kuristo.batch import get_backend
 from kuristo.batch.backend import ScriptParameters
 from kuristo.context import Context
 from kuristo.job import Job
-from kuristo.job_spec import JobSpec, parse_workflow_files, specs_from_file
+from kuristo.job_spec import JobSpec
 from kuristo.plugin_loader import load_user_steps_from_kuristo_dir
 from kuristo.resources import Resources
 from kuristo.scanner import scan_locations
 from kuristo.scheduler import Scheduler, create_jobs
+from kuristo.workflow import Workflow, parse_workflow_files, workflow_from_file
 
 
 def build_actions(spec, context):
@@ -41,10 +42,9 @@ def required_cores(actions):
 
 def create_script_params(
     job_name: str,
-    workflow_file: Path,
     run_id: str,
     first_job_num: int,
-    specs: list[JobSpec],
+    workflow: Workflow,
     workdir: Path,
 ) -> ScriptParameters:
     """
@@ -61,7 +61,7 @@ def create_script_params(
     """
     n_cores = 1
     max_time = 0
-    for sp in specs:
+    for sp in workflow.jobs.values():
         if sp.skip:
             pass
         else:
@@ -83,7 +83,7 @@ def create_script_params(
         partition=cfg.batch_partition,
         run_id=run_id,
         first_job_num=first_job_num,
-        workflow_file=workflow_file,
+        workflow_file=workflow.file_name,
     )
 
 
@@ -158,9 +158,9 @@ def batch_submit(args):
         workdir = out_dir / f"job-{n_jobs}"
         workdir.mkdir()
 
-        specs = specs_from_file(f)
+        workflow = workflow_from_file(f)
         job_name = f"kuristo-job-{n_jobs}"
-        s = create_script_params(job_name, f, run_id, job_num, specs, workdir)
+        s = create_script_params(job_name, run_id, job_num, workflow, workdir)
 
         batch_job_id = backend.submit(s)
         write_job_metadata(batch_job_id, backend.name, workdir)
@@ -207,9 +207,9 @@ def batch_run(args):
 
     load_user_steps_from_kuristo_dir()
 
-    specs = parse_workflow_files([args.workflow_file])
+    workflows = parse_workflow_files([args.workflow_file])
     rcs = Resources()
-    scheduler = Scheduler(specs, rcs, out_dir)
+    scheduler = Scheduler(workflows, rcs, out_dir)
     scheduler.check()
     scheduler.run_all_jobs()
 

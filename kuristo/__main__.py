@@ -1,4 +1,5 @@
 import sys
+import traceback
 
 import kuristo.cli as cli
 import kuristo.config as config
@@ -32,6 +33,7 @@ def main():
             cli.tag(args)
     except Exception as e:
         print(e)
+        traceback.print_exc()
         sys.exit(1)
 
 
