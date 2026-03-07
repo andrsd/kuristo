@@ -20,7 +20,7 @@ class Config:
         self.workflow_filename = self._get("base.workflow-filename", "kuristo.yaml")
 
         self.log_dir = (config_dir.parent / self._get("log.dir-name", ".kuristo-out")).resolve()
-        self.log_history = int(self._get("log.history", 5))
+        self.log_history = self._get_int("log.history", 5)
         # Options: on_success, always, never
         self.log_cleanup = self._get("log.cleanup", "always")
         self.num_cores = self._resolve_cores()
@@ -29,11 +29,11 @@ class Config:
             "KURISTO_MPI_LAUNCHER", self._get("runner.mpi-launcher", "mpirun")
         )
 
-        self.batch_backend = self._get("batch.backend", None)
-        self.batch_default_account = self._get("batch.default-account", None)
-        self.batch_partition = self._get("batch.partition", None)
+        self.batch_backend = self._get_str("batch.backend")
+        self.batch_default_account = self._get_str("batch.default-account")
+        self.batch_partition = self._get_str("batch.partition")
 
-        self.console_width = self._get("base.console-width", 100)
+        self.console_width = self._get_int("base.console-width", 100)
 
     def _load(self):
         try:
@@ -51,9 +51,23 @@ class Config:
             val = val.get(part, default)
         return val
 
+    def _get_int(self, key: str, default: int) -> int:
+        val = self._get(key, default)
+        if not isinstance(val, int):
+            raise TypeError(f"{key} must be an integer")
+        return val
+
+    def _get_str(self, key: str) -> str | None:
+        val = self._get(key)
+        if val is None:
+            return None
+        if not isinstance(val, str):
+            raise TypeError(f"{key} must be a string")
+        return val
+
     def _resolve_cores(self) -> int:
         system_default = utils.get_default_core_limit()
-        value = self._get("resources.num-cores", system_default)
+        value = self._get_int("resources.num-cores", system_default)
 
         try:
             value = int(value)
