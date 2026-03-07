@@ -207,6 +207,8 @@ class Scheduler:
                         ui.status_line(job, "STARTING", self._max_id_width, self._max_label_len)
 
     def _job_completed(self, job):
+        assert isinstance(job, Job)
+
         with self._lock:
             if job.return_code == 0:
                 ui.status_line(job, "PASS", self._max_id_width, self._max_label_len)
@@ -272,6 +274,8 @@ class Scheduler:
         self._progress.update(step_task_id, visible=True)
 
     def _on_step_finish(self, job, step):
+        assert isinstance(job, Job)
+
         step_task_id = job.step_task_id(step)
         self._progress.remove_task(step_task_id)
 

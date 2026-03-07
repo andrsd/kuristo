@@ -441,9 +441,7 @@ class JobJoiner:
         @param event Signalling event when job status changes
         @param job_spec Job specification
         """
-        Job.ID = Job.ID + 1
         self._event = event
-        self._num = Job.ID
         self._id = id
         self._name = id
         self._spec = spec
@@ -470,13 +468,6 @@ class JobJoiner:
         Return job name
         """
         return self._name
-
-    @property
-    def num(self):
-        """
-        Return job number
-        """
-        return self._num
 
     @property
     def is_skipped(self):
