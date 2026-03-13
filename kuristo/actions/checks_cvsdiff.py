@@ -2,6 +2,7 @@ import csv
 import math
 
 from kuristo.actions.action import Action
+from kuristo.exceptions import UserException
 from kuristo.registry import action
 
 
@@ -60,7 +61,7 @@ class CSVDiffCheck(Action):
             return range(max_len)
         elif isinstance(self._lines, list):
             return [(i if i >= 0 else max_len + i) for i in self._lines]
-        raise ValueError(f"Invalid lines selector: {self._lines}")
+        raise UserException(f"Invalid lines selector: {self._lines}")
 
     def _resolve_columns(self, gold_data, test_data):
         all_cols = set(gold_data[0].keys()) & set(test_data[0].keys())
@@ -68,4 +69,4 @@ class CSVDiffCheck(Action):
             return all_cols
         elif isinstance(self._columns, list):
             return self._columns
-        raise ValueError(f"Invalid columns selector: {self._columns}")
+        raise UserException(f"Invalid columns selector: {self._columns}")

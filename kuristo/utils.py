@@ -9,6 +9,8 @@ from pathlib import Path
 import yaml
 from jinja2 import Template
 
+from kuristo.exceptions import UserException
+
 RUN_DIR_PATTERN = re.compile(r"\d{8}-\d{6}")
 
 
@@ -80,7 +82,7 @@ def create_run_output_dir(base_log_dir: Path, sub_dir=None) -> Path:
     elif RUN_DIR_PATTERN.match(sub_dir):
         timestamp = sub_dir
     else:
-        raise RuntimeError("run-id must have the YYYYmmDD-HHMMSS pattern")
+        raise UserException("run-id must have the YYYYmmDD-HHMMSS pattern")
     run_dir = runs_dir / timestamp
     run_dir.mkdir(exist_ok=True)
     return run_dir
@@ -120,7 +122,7 @@ def validate_tag_name(tag_name: str) -> bool:
 def create_tag(log_dir: Path, tag_name: str, run_id: str):
     """Create a tag (symlink) pointing to a run directory"""
     if not validate_tag_name(tag_name):
-        raise RuntimeError(
+        raise UserException(
             f"Invalid tag name '{tag_name}'. Must contain only letters, numbers, dots, hyphens, and underscores."
         )
 
@@ -131,7 +133,7 @@ def create_tag(log_dir: Path, tag_name: str, run_id: str):
     # Verify run exists
     run_dir = runs_dir / run_id
     if not run_dir.exists():
-        raise RuntimeError(f"Run '{run_id}' does not exist")
+        raise UserException(f"Run '{run_id}' does not exist")
 
     # Create or update tag
     tag_path = tags_dir / tag_name
@@ -148,7 +150,7 @@ def delete_tag(log_dir: Path, tag_name: str):
     tag_path = tags_dir / tag_name
 
     if not tag_path.exists() and not tag_path.is_symlink():
-        raise RuntimeError(f"Tag '{tag_name}' does not exist")
+        raise UserException(f"Tag '{tag_name}' does not exist")
 
     tag_path.unlink()
 

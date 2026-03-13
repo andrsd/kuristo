@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from kuristo.action_factory import ActionFactory
+from kuristo.exceptions import UserException
 
 
 class DummyStep:
@@ -76,6 +77,6 @@ def test_create_registered_action(dummy_context):
 def test_create_unknown_action_raises(dummy_context):
     ts = DummyStep(uses="unknown.action")
     with patch("kuristo.action_factory.get_action", return_value=None):
-        with pytest.raises(RuntimeError) as excinfo:
+        with pytest.raises(UserException) as excinfo:
             ActionFactory.create(ts, dummy_context)
     assert "unknown.action" in str(excinfo.value)

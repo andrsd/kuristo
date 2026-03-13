@@ -1,14 +1,16 @@
 import sys
+import traceback
 
 import kuristo.cli as cli
 import kuristo.config as config
+from kuristo.exceptions import UserException
 
 
 def main():
-    try:
-        parser = cli.build_parser()
-        args = parser.parse_args()
+    parser = cli.build_parser()
+    args = parser.parse_args()
 
+    try:
         config.construct(args)
 
         if args.command == "run":
@@ -30,8 +32,10 @@ def main():
             cli.report(args)
         elif args.command == "tag":
             cli.tag(args)
-    except Exception as e:
+    except UserException as e:
         print(e)
+        if args.debug:
+            traceback.print_exc()
         sys.exit(1)
 
 

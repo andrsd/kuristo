@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 import kuristo.config as config
+from kuristo.exceptions import UserException
 
 
 class Scanner:
@@ -44,5 +45,5 @@ def scan_locations(locations) -> list[Path]:
         elif os.path.isfile(loc):
             workflow_files.append(Path(loc))
         else:
-            raise RuntimeError(f"No such file or directory: {loc}")
+            raise UserException(f"No such file or directory: {loc}")
     return workflow_files

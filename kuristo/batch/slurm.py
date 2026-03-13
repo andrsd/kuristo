@@ -5,6 +5,7 @@ from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 
 from kuristo.batch.backend import BatchBackend, ScriptParameters
+from kuristo.exceptions import UserException
 from kuristo.utils import minutes_to_hhmmss
 
 
@@ -21,7 +22,7 @@ class SlurmBackend(BatchBackend):
 
         result = subprocess.run(["sbatch", str(script_path)], capture_output=True, text=True)
         if result.returncode != 0:
-            raise RuntimeError(f"sbatch failed: {result.stderr.strip()}")
+            raise UserException(f"sbatch failed: {result.stderr.strip()}")
 
         # Parse SLURM job ID from output like "Submitted batch job 123456"
         job_id = result.stdout.strip().split()[-1]

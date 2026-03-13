@@ -30,6 +30,11 @@ def build_parser():
     parser = argparse.ArgumentParser(prog="kuristo", description="Kuristo automation framework")
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="Enable debug mode (print tracebacks for errors)",
+    )
+    parser.add_argument(
         "--no-ansi",
         action="store_true",
         help="Disable rich output (no colors or progress bars)",

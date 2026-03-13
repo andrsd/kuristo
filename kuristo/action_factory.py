@@ -1,4 +1,5 @@
 from kuristo.actions.shell_action import ShellAction
+from kuristo.exceptions import UserException
 from kuristo.registry import get_action
 
 
@@ -43,4 +44,4 @@ class ActionFactory:
                 **step.params,
             )
         else:
-            raise RuntimeError(f"Requested unknown action: {step.uses}")
+            raise UserException(f"Requested unknown action: {step.uses}")

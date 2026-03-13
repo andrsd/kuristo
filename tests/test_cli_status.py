@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from kuristo.cli._status import print_report, status, summarize
+from kuristo.exceptions import UserException
 
 
 def test_summarize_counts_correctly():
@@ -121,5 +122,5 @@ def test_status_missing_report_raises(mock_cfg_get, tmp_path):
     args = MagicMock()
     args.run = None
 
-    with pytest.raises(RuntimeError, match="No report found"):
+    with pytest.raises(UserException, match="No report found"):
         status(args)

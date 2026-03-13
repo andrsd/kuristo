@@ -4,6 +4,7 @@ from tempfile import TemporaryDirectory
 import pytest
 
 import kuristo.utils as utils
+from kuristo.exceptions import UserException
 
 
 @pytest.fixture
@@ -110,14 +111,14 @@ class TestCreateTag:
         """Test error when tagging a non-existent run"""
         log_dir, _ = sample_runs
 
-        with pytest.raises(RuntimeError, match="does not exist"):
+        with pytest.raises(UserException, match="does not exist"):
             utils.create_tag(log_dir, "v1.0", "nonexistent-run")
 
     def test_invalid_tag_name(self, sample_runs):
         """Test error with invalid tag name"""
         log_dir, run_ids = sample_runs
 
-        with pytest.raises(RuntimeError, match="Invalid tag name"):
+        with pytest.raises(UserException, match="Invalid tag name"):
             utils.create_tag(log_dir, "invalid/tag", run_ids[0])
 
     def test_overwrite_existing_tag(self, sample_runs):
@@ -156,7 +157,7 @@ class TestDeleteTag:
         """Test error when deleting a non-existent tag"""
         log_dir, _ = sample_runs
 
-        with pytest.raises(RuntimeError, match="does not exist"):
+        with pytest.raises(UserException, match="does not exist"):
             utils.delete_tag(log_dir, "nonexistent")
 
     def test_delete_tag_preserves_run(self, sample_runs):
