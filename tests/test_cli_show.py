@@ -14,6 +14,7 @@ from kuristo.cli._show import (
     render_title,
     show,
 )
+from kuristo.exceptions import UserException
 
 
 def test_parse_log_line_valid():
@@ -319,7 +320,7 @@ def test_display_job_log_parses_and_renders(mock_parse_log_line, mock_render_sec
 
 
 def test_display_job_log_missing_file():
-    with pytest.raises(RuntimeError, match="Log file not found"):
+    with pytest.raises(UserException, match="Log file not found"):
         display_job_log(Path("/nonexistent/file.log"))
 
 

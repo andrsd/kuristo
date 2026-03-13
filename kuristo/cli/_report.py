@@ -6,6 +6,7 @@ import kuristo.cli._show as show
 import kuristo.config as config
 import kuristo.ui as ui
 import kuristo.utils as utils
+from kuristo.exceptions import UserException
 
 
 def generate_junit(results, xml_filename: Path, stat):
@@ -60,7 +61,7 @@ def report(args):
     runs_dir = cfg.log_dir / "runs" / run_name
     report_path = Path(runs_dir / "report.yaml")
     if not report_path.exists():
-        raise RuntimeError("No report found. Did you run any jobs yet?")
+        raise UserException("No report found. Did you run any jobs yet?")
 
     report = utils.read_report(report_path)
     filters = utils.build_filters(args)
@@ -75,13 +76,13 @@ def report(args):
         try:
             format, filename = args.output.split(":")
         except ValueError:
-            raise RuntimeError("Expected format of the file parameter is <format>:<filename>")
+            raise UserException("Expected format of the file parameter is <format>:<filename>")
 
         if format == "xml":
             stat = report_path.stat()
             generate_junit(filtered, Path(filename), stat)
         else:
-            raise RuntimeError(f"Requested unknown file format '{format}'")
+            raise UserException(f"Requested unknown file format '{format}'")
     else:
         # write to terminal
         for entry in filtered:

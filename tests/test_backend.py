@@ -1,6 +1,7 @@
 import pytest
 
 from kuristo.batch import get_backend
+from kuristo.exceptions import UserException
 
 
 def test_get_backend_valid():
@@ -9,10 +10,10 @@ def test_get_backend_valid():
 
 
 def test_get_backend_none():
-    with pytest.raises(RuntimeError):
+    with pytest.raises(UserException):
         get_backend(None)
 
 
 def test_get_backend_invalid():
-    with pytest.raises(ValueError):
+    with pytest.raises(UserException):
         get_backend("invalid_backend")

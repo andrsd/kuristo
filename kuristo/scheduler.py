@@ -1,4 +1,3 @@
-import sys
 import threading
 import time
 from pathlib import Path
@@ -17,6 +16,7 @@ from rich.text import Text
 
 import kuristo.config as config
 import kuristo.ui as ui
+from kuristo.exceptions import UserException
 from kuristo.job import Job, JobJoiner
 from kuristo.job_spec import JobSpec
 from kuristo.resources import Resources
@@ -162,7 +162,7 @@ class Scheduler:
         for job in self._graph.nodes:
             for dep_name in job.needs:
                 if dep_name not in job_map:
-                    raise ValueError(
+                    raise UserException(
                         f"{job.spec.file_name}: Job '{job.spec.id}' depends on unknown job '{dep_name}'"
                     )
                 self._graph.add_edge(job_map[dep_name], job_map[job.id])
@@ -234,9 +234,9 @@ class Scheduler:
             try:
                 cycle = netx.find_cycle(self._graph)
                 readable = " → ".join(job.name for job, _ in cycle)
-                sys.exit(f"Detected cyclic dependency: {readable}")
+                raise UserException(f"Detected cyclic dependency: {readable}")
             except netx.exception.NetworkXNoCycle:
-                sys.exit("Detected cyclic dependency")
+                raise UserException("Detected cyclic dependency")
 
     def _check_oversized_jobs(self):
         """

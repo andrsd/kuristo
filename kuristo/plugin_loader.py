@@ -1,6 +1,7 @@
 import importlib.util
 import sys
 
+from kuristo.exceptions import UserException
 from kuristo.utils import find_kuristo_root
 
 
@@ -17,4 +18,4 @@ def load_user_steps_from_kuristo_dir():
             sys.modules[module_name] = mod
             spec.loader.exec_module(mod)
         else:
-            raise RuntimeError(f"Failed to load {file}")
+            raise UserException(f"Failed to load {file}")

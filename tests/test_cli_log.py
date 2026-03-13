@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from kuristo.cli._log import log
+from kuristo.exceptions import UserException
 
 
 @patch("kuristo.cli._log.ui.console")
@@ -60,6 +61,6 @@ def test_log_no_runs(mock_config_get, mock_console, tmp_path):
     mock_cfg.log_dir = tmp_path
     mock_config_get.return_value = mock_cfg
 
-    # Expect RuntimeError due to missing runs/
-    with pytest.raises(RuntimeError, match="No runs found."):
+    # Expect UserException due to missing runs/
+    with pytest.raises(UserException, match="No runs found."):
         log(args={})

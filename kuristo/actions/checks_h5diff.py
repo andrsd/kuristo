@@ -4,6 +4,7 @@ import subprocess
 
 from kuristo.actions.process_action import ProcessAction
 from kuristo.context import Context
+from kuristo.exceptions import UserException
 from kuristo.registry import action
 
 
@@ -34,28 +35,28 @@ class H5DiffCheck(ProcessAction):
         if self._datasets:
             # Multiple datasets mode - validate each dataset
             if not isinstance(self._datasets, list):
-                raise RuntimeError("h5diff: `datasets` must be a list")
+                raise UserException("h5diff: `datasets` must be a list")
             self._validate_datasets()
         else:
             # Single file comparison mode (backward compatible)
             self._rel_tol = kwargs.get("rel-tol", None)
             self._abs_tol = kwargs.get("abs-tol", None)
             if self._rel_tol is None and self._abs_tol is None:
-                raise RuntimeError("h5diff: Must provide either `rel-tol` or `abs-tol`")
+                raise UserException("h5diff: Must provide either `rel-tol` or `abs-tol`")
 
     def _validate_datasets(self):
         """Validate that each dataset has required tolerance"""
         for i, dataset in enumerate(self._datasets):
             if not isinstance(dataset, dict):
-                raise RuntimeError(
+                raise UserException(
                     f"h5diff: dataset[{i}] must be a dictionary with 'path' and tolerance"
                 )
             if "path" not in dataset:
-                raise RuntimeError(f"h5diff: dataset[{i}] must have a 'path' field")
+                raise UserException(f"h5diff: dataset[{i}] must have a 'path' field")
             rel_tol = dataset.get("rel-tol", None)
             abs_tol = dataset.get("abs-tol", None)
             if rel_tol is None and abs_tol is None:
-                raise RuntimeError(
+                raise UserException(
                     f"h5diff: dataset[{i}] ({dataset['path']}) must provide either `rel-tol` or `abs-tol`"
                 )
 

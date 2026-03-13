@@ -4,6 +4,7 @@ from pathlib import Path
 import yaml
 
 import kuristo.utils as utils
+from kuristo.exceptions import UserException
 
 
 class Config:
@@ -54,7 +55,7 @@ class Config:
     def _get_int(self, key: str, default: int) -> int:
         val = self._get(key, default)
         if not isinstance(val, int):
-            raise TypeError(f"{key} must be an integer")
+            raise UserException(f"{key} must be an integer")
         return val
 
     def _get_str(self, key: str) -> str | None:
@@ -62,7 +63,7 @@ class Config:
         if val is None:
             return None
         if not isinstance(val, str):
-            raise TypeError(f"{key} must be a string")
+            raise UserException(f"{key} must be a string")
         return val
 
     def _resolve_cores(self) -> int:

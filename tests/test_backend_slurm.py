@@ -3,6 +3,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from kuristo.batch.slurm import ScriptParameters, SlurmBackend
+from kuristo.exceptions import UserException
 
 
 class TestSlurmBackend(unittest.TestCase):
@@ -33,7 +34,7 @@ class TestSlurmBackend(unittest.TestCase):
     def test_submit_failure(self, mock_run):
         mock_run.return_value = MagicMock(returncode=1, stderr="Something went wrong")
 
-        with self.assertRaises(RuntimeError) as ctx:
+        with self.assertRaises(UserException) as ctx:
             self.backend.submit(self.params)
 
         self.assertIn("sbatch failed", str(ctx.exception))

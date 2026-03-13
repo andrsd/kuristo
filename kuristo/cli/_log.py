@@ -3,6 +3,7 @@ from rich.table import Table
 import kuristo.config as config
 import kuristo.ui as ui
 import kuristo.utils as utils
+from kuristo.exceptions import UserException
 
 
 def log(args):
@@ -11,7 +12,7 @@ def log(args):
     cfg = config.get()
     runs_dir = cfg.log_dir / "runs"
     if not runs_dir.exists():
-        raise RuntimeError("No runs found.")
+        raise UserException("No runs found.")
 
     latest_tag = runs_dir / "latest"
     latest_target = None

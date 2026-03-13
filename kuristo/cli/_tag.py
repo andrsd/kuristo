@@ -3,12 +3,13 @@ from rich.table import Table
 import kuristo.config as config
 import kuristo.ui as ui
 import kuristo.utils as utils
+from kuristo.exceptions import UserException
 
 
 def tag_add(args):
     """Add a tag to a run"""
     if args.name is None:
-        raise RuntimeError("Tag name is required")
+        raise UserException("Tag name is required")
 
     cfg = config.get()
     runs_dir = cfg.log_dir / "runs"
@@ -20,7 +21,7 @@ def tag_add(args):
         # Use latest run
         latest_link = runs_dir / "latest"
         if not latest_link.is_symlink():
-            raise RuntimeError("No runs found. Cannot tag non-existent run.")
+            raise UserException("No runs found. Cannot tag non-existent run.")
         run_id = latest_link.resolve().name
 
     utils.create_tag(cfg.log_dir, args.name, run_id)
@@ -32,7 +33,7 @@ def tag_add(args):
 def tag_delete(args):
     """Delete a tag"""
     if args.name is None:
-        raise RuntimeError("Tag name is required for deletion")
+        raise UserException("Tag name is required for deletion")
 
     cfg = config.get()
     utils.delete_tag(cfg.log_dir, args.name)

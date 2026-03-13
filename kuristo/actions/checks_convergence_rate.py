@@ -4,6 +4,7 @@ import h5py
 import numpy as np
 
 from kuristo.actions.action import Action
+from kuristo.exceptions import UserException
 from kuristo.registry import action
 from kuristo.utils import scalar_or_list
 
@@ -21,7 +22,7 @@ def to_array(data, n_comps, name: str):
     elif array.ndim == 1 and array.size == n_comps:
         return array.astype(float)
     else:
-        raise ValueError(f"{name} must be scalar or length {n_comps}, got {data}")
+        raise UserException(f"{name} must be scalar or length {n_comps}, got {data}")
 
 
 @action("checks/convergence-rate")
@@ -48,7 +49,7 @@ class ConvergenceRateCheck(Action):
                 if err.shape[0] != logN.shape[0] and err.shape[1] == logN.shape[0]:
                     err = err.T
             else:
-                raise ValueError("y-axis dataset must be 1D or 2D")
+                raise UserException("y-axis dataset must be 1D or 2D")
 
             ncomp = err.shape[1]
             logE = np.log10(err)

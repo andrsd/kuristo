@@ -6,6 +6,7 @@ from rich.text import Text
 import kuristo.config as config
 import kuristo.ui as ui
 import kuristo.utils as utils
+from kuristo.exceptions import UserException
 
 
 def parse_log_line(line):
@@ -172,7 +173,7 @@ def render_sections(sections, filters=None):
 
 def display_job_log(log_path: Path, filters=None):
     if not log_path.exists():
-        raise RuntimeError(f"Log file not found: {log_path}")
+        raise UserException(f"Log file not found: {log_path}")
 
     with open(log_path) as f:
         lines = [parse_log_line(line) for line in f if parse_log_line(line)]

@@ -6,6 +6,8 @@ from typing import Any, Dict, List, Optional, Union
 import yaml
 from pydantic import BaseModel, Field, PrivateAttr, ValidationError, model_validator
 
+from kuristo.exceptions import UserException
+
 
 class StrategyMatrix(BaseModel):
     include: Optional[List[dict]] = []
@@ -244,7 +246,8 @@ class JobSpec(BaseModel):
             ts.set_name(data.get("name", id))
             return ts
         else:
-            raise RuntimeError("Expected dict as 'data'")
+            # TODO: improve this error message
+            raise UserException("Expected dict as 'data'")
 
 
 def parse_workflow_files(workflow_files: list[Path]) -> list[JobSpec]:
@@ -275,5 +278,5 @@ def specs_from_file(file_path) -> list[JobSpec]:
                     for error in exp.errors():
                         loc_str = ".".join(str(p) for p in error["loc"])
                         msgs.append(f"- {loc_str}: {error['msg']}")
-                    raise RuntimeError("\n".join(msgs))
+                    raise UserException("\n".join(msgs))
     return specs

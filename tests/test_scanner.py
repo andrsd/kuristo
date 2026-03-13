@@ -3,6 +3,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
+from kuristo.exceptions import UserException
 from kuristo.scanner import Scanner, scan_locations  # adjust import path
 
 
@@ -63,6 +64,6 @@ def test_scan_locations_invalid_path_raises(mock_config):
         patch("os.path.isfile", return_value=False),
         patch("os.path.isdir", return_value=False),
     ):
-        with pytest.raises(RuntimeError) as excinfo:
+        with pytest.raises(UserException) as excinfo:
             scan_locations(["/bad/path"])
         assert "No such file or directory" in str(excinfo.value)
