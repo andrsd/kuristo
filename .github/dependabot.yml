@@ -5,3 +5,4 @@ updates:
     schedule:
       interval: "monthly"
     labels: ["ignore-for-release"]
+    assignees: ["andrsd"]
