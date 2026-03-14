@@ -19,7 +19,7 @@ import kuristo.ui as ui
 from kuristo.exceptions import UserException
 from kuristo.job import Job, JobJoiner
 from kuristo.resources import Resources
-from kuristo.workflow import JobSpec
+from kuristo.workflow import JobSpec, Workflow
 
 
 class StepCountColumn(ProgressColumn):
@@ -65,7 +65,9 @@ class Scheduler:
     new one(s). We run until all jobs have FINISHED status.
     """
 
-    def __init__(self, workflows, rcs: Resources, out_dir, labels: list[str] | None = None) -> None:
+    def __init__(
+        self, workflows: list[Workflow], rcs: Resources, out_dir, labels: list[str] | None = None
+    ) -> None:
         """
         @param workflows: [Workflows] List of workflows
         @param rcs: Resources Resource to be scheduled
@@ -154,7 +156,7 @@ class Scheduler:
         )
         ui.time(self._total_runtime)
 
-    def _create_graph(self, workflows) -> netx.DiGraph:
+    def _create_graph(self, workflows: list[Workflow]) -> netx.DiGraph:
         graph = netx.DiGraph()
         for wf in workflows:
             job_map = {}
