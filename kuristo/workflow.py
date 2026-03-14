@@ -292,3 +292,49 @@ def workflow_from_file(file_path: Path) -> Workflow | None:
                 raise RuntimeError("\n".join(msgs))
         else:
             return None
+
+
+def get_job_ids_for_labels(workflows: list[Workflow], labels: list[str]) -> set[str]:
+    """
+    Find all job IDs that match any of the given labels, including their transitive dependencies.
+
+    @param workflows: List of workflows to search
+    @param labels: List of labels to match (union - matches any label)
+    @return: Set of job IDs to include
+    """
+    if not labels:
+        return set()
+
+    # Build dependency map: {job_id: set_of_dep_ids}
+    job_specs = {}  # job_id -> JobSpec
+    dependencies = {}  # job_id -> set of dep_ids
+
+    for wf in workflows:
+        for job_id, spec in wf.jobs.items():
+            job_specs[job_id] = spec
+            dependencies[job_id] = set(spec.needs)
+
+    # Find all specs with matching labels
+    matching_ids = set()
+    for job_id, spec in job_specs.items():
+        if spec.labels:
+            if any(label in spec.labels for label in labels):
+                matching_ids.add(job_id)
+
+    # BFS to expand to all transitive dependencies
+    result = set(matching_ids)
+    to_visit = list(matching_ids)
+    visited = set()
+
+    while to_visit:
+        current = to_visit.pop(0)
+        if current in visited:
+            continue
+        visited.add(current)
+
+        for dep_id in dependencies.get(current, set()):
+            if dep_id not in result:
+                result.add(dep_id)
+                to_visit.append(dep_id)
+
+    return result

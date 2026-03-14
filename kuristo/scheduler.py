@@ -65,22 +65,31 @@ class Scheduler:
     new one(s). We run until all jobs have FINISHED status.
     """
 
-    def __init__(self, workflows, rcs: Resources, out_dir) -> None:
+    def __init__(self, workflows, rcs: Resources, out_dir, labels: list[str] | None = None) -> None:
         """
         @param workflows: [Workflows] List of workflows
         @param rcs: Resources Resource to be scheduled
         @param out_dir: Directory where we write logs
+        @param labels: Optional list of labels to filter jobs
         @param config: Configuration
         @param job_times_path: File name to store timing report into
         """
         cfg = config.get()
-        self._max_label_len = cfg.console_width
-        self._max_id_width = 1
         self._out_dir = Path(out_dir)
         self._active_jobs = set()
         self._lock = threading.Lock()
         self._event = threading.Event()
-        self._create_graph(workflows)
+
+        self._graph = self._create_graph(workflows)
+        if labels:
+            self._graph = self._apply_label_filter(self._graph, labels)
+
+        self._max_label_len = cfg.console_width
+        for job in self._graph.nodes:
+            self._max_label_len = max(self._max_label_len, len(job.name) + 1)
+
+        self._max_id_width = len(str(self._graph.number_of_nodes()))
+
         self._resources = rcs
         if cfg.no_ansi:
             self._progress = NullProgress()
@@ -145,8 +154,8 @@ class Scheduler:
         )
         ui.time(self._total_runtime)
 
-    def _create_graph(self, workflows):
-        self._graph = netx.DiGraph()
+    def _create_graph(self, workflows) -> netx.DiGraph:
+        graph = netx.DiGraph()
         for wf in workflows:
             job_map = {}
             for sp in wf.jobs.values():
@@ -155,9 +164,8 @@ class Scheduler:
                     job.on_finish = self._job_completed
                     job.on_step_start = self._on_step_start
                     job.on_step_finish = self._on_step_finish
-                    self._graph.add_node(job)
+                    graph.add_node(job)
                     job_map[job.id] = job
-                    self._max_label_len = max(self._max_label_len, len(job.name) + 1)
 
             for job in job_map.values():
                 for dep_name in job.needs:
@@ -165,9 +173,46 @@ class Scheduler:
                         raise UserException(
                             f"{wf.file_name}: Job '{job.spec.id}' depends on unknown job '{dep_name}'"
                         )
-                    self._graph.add_edge(job_map[dep_name], job_map[job.id])
+                    graph.add_edge(job_map[dep_name], job_map[job.id])
+        return graph
 
-        self._max_id_width = len(str(self._graph.number_of_nodes()))
+    def _apply_label_filter(self, graph: netx.DiGraph, labels: list[str]) -> netx.DiGraph:
+        """
+        Filter jobs based on labels, marking non-matching jobs as skipped.
+        Includes all transitive dependencies of matching jobs.
+
+        @param labels: List of labels to filter by (union - matches any label)
+        """
+        # Find all jobs with matching labels
+        matching_jobs = set()
+        for job in graph.nodes:
+            if job.spec.labels:
+                if any(label in job.spec.labels for label in labels):
+                    matching_jobs.add(job)
+
+        # Collect all transitive dependencies of matching jobs
+        required_jobs = set(matching_jobs)
+        to_visit = list(matching_jobs)
+        visited = set()
+
+        while to_visit:
+            current = to_visit.pop(0)
+            if current in visited:
+                continue
+            visited.add(current)
+
+            for predecessor in graph.predecessors(current):
+                if predecessor not in required_jobs:
+                    required_jobs.add(predecessor)
+                    to_visit.append(predecessor)
+
+        # Skip all jobs not in required set
+        nodes_to_remove = []
+        for job in graph.nodes:
+            if job not in required_jobs:
+                nodes_to_remove.append(job)
+        graph.remove_nodes_from(nodes_to_remove)
+        return graph
 
     def _get_ready_jobs(self):
         """

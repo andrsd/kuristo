@@ -63,7 +63,7 @@ def run_jobs(args):
     workflows = parse_workflow_files(workflow_files)
 
     rcs = Resources()
-    scheduler = Scheduler(workflows, rcs, out_dir)
+    scheduler = Scheduler(workflows, rcs, out_dir, labels=args.labels)
     scheduler.check()
     scheduler.run_all_jobs()
 
