@@ -1,141 +1,158 @@
+import sys
 from pathlib import Path
+from unittest.mock import patch
 
-from kuristo.job_spec import JobSpec, parse_workflow_files
-from kuristo.utils import filter_specs_by_labels
+import pytest
+
+from kuristo.__main__ import main
+from kuristo.workflow import get_job_ids_for_labels, parse_workflow_files
+
+ASSETS_DIR = Path(__file__).parent / "assets"
+TEST_LABELS_YAML = ASSETS_DIR / "test_labels" / "ktests.yaml"
 
 
-class TestLabelFiltering:
-    """Test label filtering functionality"""
+class TestGetJobIdsForLabels:
+    """Test the get_job_ids_for_labels utility function"""
 
-    def setup_method(self):
-        """Set up test fixtures"""
-        # Create sample specs with and without labels
-        self.spec_with_smoke = JobSpec(
-            description="Smoke test", steps=[], labels=["smoke", "quick"]
-        )
-        self.spec_with_smoke.set_id("smoke-test")
-        self.spec_with_smoke.set_file_name("test.yaml")
+    @pytest.fixture
+    def workflows(self):
+        """Load test workflows"""
+        return parse_workflow_files([TEST_LABELS_YAML])
 
-        self.spec_with_integration = JobSpec(
-            description="Integration test", steps=[], labels=["integration", "slow"]
-        )
-        self.spec_with_integration.set_id("integration-test")
-        self.spec_with_integration.set_file_name("test.yaml")
+    def test_no_labels_returns_empty_set(self, workflows):
+        """Test that no labels returns empty set"""
+        result = get_job_ids_for_labels(workflows, [])
+        assert result == set()
 
-        self.spec_without_labels = JobSpec(description="No labels", steps=[], labels=None)
-        self.spec_without_labels.set_id("no-label-test")
-        self.spec_without_labels.set_file_name("test.yaml")
+    def test_smoke_label_includes_smoke_tests(self, workflows):
+        """Test smoke label includes smoke-test-1 and smoke-test-2"""
+        result = get_job_ids_for_labels(workflows, ["smoke"])
+        assert "smoke-test-1" in result
+        assert "smoke-test-2" in result
+        assert "integration-test" not in result
+        assert "free-job" not in result
+        assert "i-need-free-job" not in result
 
-        self.spec_with_empty_labels = JobSpec(description="Empty labels", steps=[], labels=[])
-        self.spec_with_empty_labels.set_id("empty-label-test")
-        self.spec_with_empty_labels.set_file_name("test.yaml")
+    def test_quick_label_includes_transitive_dependencies(self, workflows):
+        """Test quick label includes smoke-test-1, i-need-free-job, and their dependency free-job"""
+        result = get_job_ids_for_labels(workflows, ["quick"])
+        # smoke-test-1 and i-need-free-job have 'quick' label
+        assert "smoke-test-1" in result
+        assert "i-need-free-job" in result
+        # free-job is a dependency of i-need-free-job
+        assert "free-job" in result
+        # smoke-test-2 doesn't have 'quick' label
+        assert "smoke-test-2" not in result
+        assert "integration-test" not in result
 
-    def test_filter_no_labels_returns_all(self):
-        """When no labels specified, all specs are returned"""
-        specs = [self.spec_with_smoke, self.spec_without_labels]
-        filtered, total, count = filter_specs_by_labels(specs, None)
-        assert count == 2
-        assert total == 2
-        assert len(filtered) == 2
+    def test_multiple_labels_union(self, workflows):
+        """Test multiple labels are treated as union"""
+        result = get_job_ids_for_labels(workflows, ["smoke", "quick"])
+        # Jobs with smoke label
+        assert "smoke-test-1" in result
+        assert "smoke-test-2" in result
+        # Jobs with quick label
+        assert "i-need-free-job" in result
+        # Dependency of quick-labeled jobs
+        assert "free-job" in result
+        # No other jobs
+        assert "integration-test" not in result
 
-    def test_filter_empty_list_returns_all(self):
-        """When empty label list specified, all specs are returned"""
-        specs = [self.spec_with_smoke, self.spec_without_labels]
-        filtered, total, count = filter_specs_by_labels(specs, [])
-        assert count == 2
-        assert total == 2
-        assert len(filtered) == 2
+    def test_integration_label(self, workflows):
+        """Test integration label"""
+        result = get_job_ids_for_labels(workflows, ["integration"])
+        assert "integration-test" in result
+        # No dependencies for integration-test
+        assert len(result) == 1
 
-    def test_filter_single_label_exact_match(self):
-        """Filter by single label matches jobs with that label"""
-        specs = [
-            self.spec_with_smoke,
-            self.spec_with_integration,
-            self.spec_without_labels,
+    def test_nonexistent_label_returns_empty(self, workflows):
+        """Test nonexistent label returns empty set"""
+        result = get_job_ids_for_labels(workflows, ["nonexistent"])
+        assert result == set()
+
+
+class TestLabelFilteringCLI:
+    """Test label filtering in CLI commands"""
+
+    def test_list_all_jobs_no_label(self, capsys):
+        """Test list command without label filter shows all jobs"""
+        test_argv = ["kuristo", "--no-ansi", "list", str(ASSETS_DIR / "test_labels")]
+        with patch.object(sys, "argv", test_argv):
+            main()
+
+        captured = capsys.readouterr()
+        # Should show all jobs
+        assert "smoke-test-1" in captured.out
+        assert "smoke-test-2" in captured.out
+        assert "integration-test" in captured.out
+        assert "free-job" in captured.out
+        assert "i-need-free-job" in captured.out
+
+    def test_list_smoke_label(self, capsys):
+        """Test list command with smoke label filter"""
+        test_argv = [
+            "kuristo",
+            "--no-ansi",
+            "list",
+            "--label",
+            "smoke",
+            str(ASSETS_DIR / "test_labels"),
         ]
-        filtered, total, count = filter_specs_by_labels(specs, ["smoke"])
-        assert count == 1
-        assert total == 3
-        assert len(filtered) == 1
-        assert filtered[0].id == "smoke-test"
+        with patch.object(sys, "argv", test_argv):
+            main()
 
-    def test_filter_or_logic_multiple_labels(self):
-        """Multiple labels use OR logic"""
-        specs = [
-            self.spec_with_smoke,
-            self.spec_with_integration,
-            self.spec_without_labels,
+        captured = capsys.readouterr()
+        # Should show only smoke-labeled jobs
+        assert "smoke-test-1" in captured.out
+        assert "smoke-test-2" in captured.out
+        # Should not show non-smoke jobs
+        assert "integration-test" not in captured.out
+        assert "free-job" not in captured.out
+        assert "i-need-free-job" not in captured.out
+
+    def test_list_quick_label(self, capsys):
+        """Test list command with quick label filter"""
+        test_argv = [
+            "kuristo",
+            "--no-ansi",
+            "list",
+            "--label",
+            "quick",
+            str(ASSETS_DIR / "test_labels"),
         ]
-        filtered, total, count = filter_specs_by_labels(specs, ["smoke", "integration"])
-        assert count == 2
-        assert total == 3
-        assert len(filtered) == 2
-        assert set(spec.id for spec in filtered) == {"smoke-test", "integration-test"}
+        with patch.object(sys, "argv", test_argv):
+            main()
 
-    def test_filter_no_matches(self):
-        """Filter with non-matching label returns empty"""
-        specs = [self.spec_with_smoke, self.spec_with_integration]
-        filtered, total, count = filter_specs_by_labels(specs, ["nonexistent"])
-        assert count == 0
-        assert total == 2
-        assert len(filtered) == 0
+        captured = capsys.readouterr()
+        # Should show quick-labeled jobs
+        assert "smoke-test-1" in captured.out
+        assert "i-need-free-job" in captured.out
+        # Should not show other jobs
+        assert "smoke-test-2" not in captured.out
+        assert "integration-test" not in captured.out
+        # free-job is a dependency so it should be included
+        assert "free-job" in captured.out
 
-    def test_filter_excludes_jobs_without_labels(self):
-        """Jobs without labels are excluded when filter is active"""
-        specs = [self.spec_with_smoke, self.spec_without_labels]
-        filtered, total, count = filter_specs_by_labels(specs, ["smoke"])
-        assert count == 1
-        assert total == 2
-        assert len(filtered) == 1
-        assert filtered[0].id == "smoke-test"
+    def test_list_multiple_labels(self, capsys):
+        """Test list command with multiple label filters"""
+        test_argv = [
+            "kuristo",
+            "--no-ansi",
+            "list",
+            "--label",
+            "smoke",
+            "--label",
+            "quick",
+            str(ASSETS_DIR / "test_labels"),
+        ]
+        with patch.object(sys, "argv", test_argv):
+            main()
 
-    def test_filter_excludes_jobs_with_empty_labels(self):
-        """Jobs with empty labels list are excluded when filter is active"""
-        specs = [self.spec_with_smoke, self.spec_with_empty_labels]
-        filtered, total, count = filter_specs_by_labels(specs, ["smoke"])
-        assert count == 1
-        assert total == 2
-        assert len(filtered) == 1
-        assert filtered[0].id == "smoke-test"
-
-    def test_filter_label_from_first_label(self):
-        """Filter matches label from first position"""
-        specs = [self.spec_with_smoke]
-        filtered, total, count = filter_specs_by_labels(specs, ["smoke"])
-        assert count == 1
-        assert len(filtered) == 1
-
-    def test_filter_label_from_second_label(self):
-        """Filter matches label from second position"""
-        specs = [self.spec_with_smoke]
-        filtered, total, count = filter_specs_by_labels(specs, ["quick"])
-        assert count == 1
-        assert len(filtered) == 1
-
-    def test_filter_case_sensitive(self):
-        """Label matching is case sensitive"""
-        specs = [self.spec_with_smoke]
-        filtered, total, count = filter_specs_by_labels(specs, ["Smoke"])
-        assert count == 0
-        assert len(filtered) == 0
-
-    def test_parse_and_filter_from_file(self):
-        """Test parsing and filtering from actual workflow file"""
-        test_file = Path("tests/assets/test_labels/ktests.yaml")
-        if test_file.exists():
-            specs = parse_workflow_files([test_file])
-
-            # All specs should have labels or be labelless
-            assert len(specs) == 4
-
-            # Filter by smoke
-            filtered, total, count = filter_specs_by_labels(specs, ["smoke"])
-            assert count == 2
-
-            # Filter by smoke or integration
-            filtered, total, count = filter_specs_by_labels(specs, ["smoke", "integration"])
-            assert count == 3
-
-            # Filter by nonexistent
-            filtered, total, count = filter_specs_by_labels(specs, ["nonexistent"])
-            assert count == 0
+        captured = capsys.readouterr()
+        # Should show jobs matching either label
+        assert "smoke-test-1" in captured.out
+        assert "smoke-test-2" in captured.out
+        assert "i-need-free-job" in captured.out
+        assert "free-job" in captured.out
+        # integration-test has neither label
+        assert "integration-test" not in captured.out

@@ -1,3 +1,5 @@
+name: test-12
+
 jobs:
   convergence-rate:
     name: "Convergence rate"

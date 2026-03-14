@@ -1,3 +1,5 @@
+name: test-folder-b
+
 jobs:
   test-fb-1:
     description: "Run shell command"

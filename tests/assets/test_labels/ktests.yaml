@@ -1,3 +1,5 @@
+name: test-labels
+
 jobs:
   smoke-test-1:
     description: Quick smoke test
@@ -17,7 +19,14 @@ jobs:
     steps:
       - run: echo "Integration test"
 
-  no-label-test:
-    description: Test without labels
+  free-job:
+    description: Free job
     steps:
-      - run: echo "No labels"
+      - run: echo "free job"
+
+  i-need-free-job:
+    description: Job with a label and a dependency
+    needs: free-job
+    labels: [quick]
+    steps:
+      - run: echo "I need free job"

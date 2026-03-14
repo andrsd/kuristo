@@ -1,3 +1,5 @@
+name: test-2
+
 jobs:
   test-A:
     name: "Test A"

@@ -1,3 +1,5 @@
+name: test-11
+
 jobs:
   output-test:
     name: "Output test"

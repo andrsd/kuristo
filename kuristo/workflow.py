@@ -93,8 +93,6 @@ class Step(BaseModel):
     # Environment for this step
     env: Optional[dict] = Field(default={})
 
-    model_config = {"populate_by_name": True}
-
     @property
     def params(self):
         """
@@ -128,7 +126,7 @@ class JobSpec(BaseModel):
     # Job ID
     _id: str = PrivateAttr()
     # Job name
-    _name: str = PrivateAttr()
+    name: Optional[str] = None
     # File name where the job specification was defined
     _file_name: str = PrivateAttr()
     # Environment for this job
@@ -137,6 +135,8 @@ class JobSpec(BaseModel):
     defaults: Optional[JobDefaults] = None
     # Labels for filtering jobs
     labels: Optional[List[str]] = None
+    # Working directory
+    _work_dir: str = PrivateAttr("")
 
     @property
     def id(self):
@@ -144,13 +144,6 @@ class JobSpec(BaseModel):
         Return job ID
         """
         return self._id
-
-    @property
-    def name(self):
-        """
-        Return job name
-        """
-        return self._name
 
     @property
     def needs(self) -> List[str]:
@@ -168,19 +161,19 @@ class JobSpec(BaseModel):
         """
         return self.skip_ is not None
 
+    # @property
+    # def file_name(self):
+    #     """
+    #     Return file name where this job specification was
+    #     """
+    #     return self._file_name
+
     @property
     def skip_reason(self):
         """
         Return the reason why job is marked as skipped
         """
         return self.skip_
-
-    @property
-    def file_name(self):
-        """
-        Return file name where this job specification was
-        """
-        return self._file_name
 
     @property
     def working_directory(self):
@@ -192,11 +185,8 @@ class JobSpec(BaseModel):
     def set_id(self, id):
         self._id = id
 
-    def set_name(self, name: str):
-        self._name = name
-
-    def set_file_name(self, file_name):
-        self._file_name = file_name
+    # def set_file_name(self, file_name):
+    #     self._file_name = file_name
 
     def set_working_directory(self, work_dir: str):
         self._work_dir = work_dir
@@ -236,47 +226,115 @@ class JobSpec(BaseModel):
         param_str = ",".join(f"{k}={v}" for k, v in variant.items())
         return f"{self.id}[{param_str}]"
 
+
+class Workflow(BaseModel):
+    # Workflow name
+    name: Optional[str] = None
+    # Workflow description
+    description: str = ""
+    # Job steps
+    jobs: Dict[str, JobSpec]
+
+    _file_name: str = PrivateAttr()
+
+    model_config = {"populate_by_name": True}
+
+    @property
+    def file_name(self):
+        """
+        Return file name where this job specification was
+        """
+        return self._file_name
+
+    def set_file_name(self, file_name):
+        self._file_name = file_name
+
     @staticmethod
-    def from_dict(file_name, id, data):
+    def from_dict(file_name, data):
         if isinstance(data, dict):
-            ts = JobSpec(**data)
-            ts.set_file_name(file_name)
-            ts.set_working_directory(os.path.dirname(os.path.abspath(file_name)))
-            ts.set_id(id)
-            ts.set_name(data.get("name", id))
-            return ts
+            wf = Workflow(**data)
+            wf.set_file_name(file_name)
+            for name, job in wf.jobs.items():
+                job.set_id(name)
+                job.set_working_directory(os.path.dirname(os.path.abspath(file_name)))
+            return wf
         else:
-            # TODO: improve this error message
             raise UserException("Expected dict as 'data'")
 
 
-def parse_workflow_files(workflow_files: list[Path]) -> list[JobSpec]:
+def parse_workflow_files(workflow_files: list[Path]) -> list[Workflow]:
     """
-    Parse workflow files (kuristo.yaml)
+    Parse workflow files
     """
-    specs = []
+    workflows = []
     for file in workflow_files:
-        specs.extend(specs_from_file(file))
-    return specs
+        wf = workflow_from_file(file)
+        if wf is not None:
+            workflows.append(wf)
+    return workflows
 
 
-def specs_from_file(file_path) -> list[JobSpec]:
+def workflow_from_file(file_path: Path) -> Workflow | None:
     location = os.path.dirname(file_path)
-    specs = []
     with open(file_path, "r") as file:
         data = yaml.safe_load(file)
         if data is not None:
-            jobs = data.get("jobs", {})
-            for id, params in jobs.items():
-                try:
-                    jspec = JobSpec.from_dict(file_path, id, params)
-                    specs.append(jspec)
-                except ValidationError as exp:
-                    msgs = []
-                    n = len(exp.errors())
-                    msgs.append(f"{n} syntax error found in {location}:")
-                    for error in exp.errors():
-                        loc_str = ".".join(str(p) for p in error["loc"])
-                        msgs.append(f"- {loc_str}: {error['msg']}")
-                    raise UserException("\n".join(msgs))
-    return specs
+            try:
+                workflow = Workflow.from_dict(file_path, data)
+                return workflow
+            except ValidationError as exp:
+                msgs = []
+                n = len(exp.errors())
+                msgs.append(f"{n} syntax error found in {location}:")
+                for error in exp.errors():
+                    loc_str = ".".join(str(p) for p in error["loc"])
+                    msgs.append(f"- {loc_str}: {error['msg']}")
+                raise RuntimeError("\n".join(msgs))
+        else:
+            return None
+
+
+def get_job_ids_for_labels(workflows: list[Workflow], labels: list[str]) -> set[str]:
+    """
+    Find all job IDs that match any of the given labels, including their transitive dependencies.
+
+    @param workflows: List of workflows to search
+    @param labels: List of labels to match (union - matches any label)
+    @return: Set of job IDs to include
+    """
+    if not labels:
+        return set()
+
+    # Build dependency map: {job_id: set_of_dep_ids}
+    job_specs = {}  # job_id -> JobSpec
+    dependencies = {}  # job_id -> set of dep_ids
+
+    for wf in workflows:
+        for job_id, spec in wf.jobs.items():
+            job_specs[job_id] = spec
+            dependencies[job_id] = set(spec.needs)
+
+    # Find all specs with matching labels
+    matching_ids = set()
+    for job_id, spec in job_specs.items():
+        if spec.labels:
+            if any(label in spec.labels for label in labels):
+                matching_ids.add(job_id)
+
+    # BFS to expand to all transitive dependencies
+    result = set(matching_ids)
+    to_visit = list(matching_ids)
+    visited = set()
+
+    while to_visit:
+        current = to_visit.pop(0)
+        if current in visited:
+            continue
+        visited.add(current)
+
+        for dep_id in dependencies.get(current, set()):
+            if dep_id not in result:
+                result.add(dep_id)
+                to_visit.append(dep_id)
+
+    return result

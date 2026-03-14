@@ -1,3 +1,5 @@
+name: test-7
+
 jobs:
   job-a:
     description: Job-A

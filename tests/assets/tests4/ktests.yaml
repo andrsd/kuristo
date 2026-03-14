@@ -1,3 +1,5 @@
+name: test-4
+
 jobs:
   test-check:
     description: Run test and check output

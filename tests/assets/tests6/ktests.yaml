@@ -1,3 +1,5 @@
+name: test-6
+
 jobs:
   exodiff:
     description: Run exodiff
