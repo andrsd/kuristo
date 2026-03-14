@@ -262,7 +262,7 @@ class Workflow(BaseModel):
             raise UserException("Expected dict as 'data'")
 
 
-def parse_workflow_files(workflow_files: list[Path]) -> list[JobSpec]:
+def parse_workflow_files(workflow_files: list[Path]) -> list[Workflow]:
     """
     Parse workflow files
     """
