@@ -46,7 +46,6 @@ def job_name_markup(job_name):
 
 
 def status_line(job, state, max_id_width, max_label_len):
-    cfg = config.get()
     consol = console()
     if isinstance(job, Job):
         job_id = _padded_job_id(job.num, max_id_width)
@@ -74,11 +73,7 @@ def status_line(job, state, max_id_width, max_label_len):
     width = max_label_len - 15 - job_name_len - len(time_str)
     dots = "." * width
 
-    if state == "STARTING":
-        if cfg.no_ansi:
-            markup = f"         #{job_id} {job_name} "
-            consol.print(Text.from_markup(markup))
-    else:
+    if state != "STARTING":
         markup = ""
         if state == "SKIP":
             markup += "\\[ [yellow]SKIP[/] ]"
