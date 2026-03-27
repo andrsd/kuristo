@@ -78,7 +78,10 @@ def run_jobs(args):
         failed_job_nums = _get_failed_job_nums(cfg.log_dir)
 
     utils.prune_old_runs(cfg.log_dir, cfg.log_history)
-    utils.update_latest_symlink(cfg.log_dir, out_dir)
+
+    # Only update latest symlink and write report for full runs (not --rerun-failed)
+    if not args.rerun_failed:
+        utils.update_latest_symlink(cfg.log_dir, out_dir)
 
     load_user_steps_from_kuristo_dir()
 
@@ -97,8 +100,10 @@ def run_jobs(args):
     scheduler.check()
     scheduler.run_all_jobs()
 
-    results = create_results(scheduler.jobs)
-    yaml_path = out_dir / "report.yaml"
-    write_report_yaml(yaml_path, results, scheduler.total_runtime)
+    # Only write report for full runs (not --rerun-failed)
+    if not args.rerun_failed:
+        results = create_results(scheduler.jobs)
+        yaml_path = out_dir / "report.yaml"
+        write_report_yaml(yaml_path, results, scheduler.total_runtime)
 
     return scheduler.exit_code()
