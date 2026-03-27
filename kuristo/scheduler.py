@@ -66,13 +66,19 @@ class Scheduler:
     """
 
     def __init__(
-        self, workflows: list[Workflow], rcs: Resources, out_dir, labels: list[str] | None = None
+        self,
+        workflows: list[Workflow],
+        rcs: Resources,
+        out_dir,
+        labels: list[str] | None = None,
+        job_names: set[str] | None = None,
     ) -> None:
         """
         @param workflows: [Workflows] List of workflows
         @param rcs: Resources Resource to be scheduled
         @param out_dir: Directory where we write logs
         @param labels: Optional list of labels to filter jobs
+        @param job_names: Optional set of job names to run (e.g., from --rerun-failed)
         @param config: Configuration
         @param job_times_path: File name to store timing report into
         """
@@ -85,6 +91,8 @@ class Scheduler:
         self._graph = self._create_graph(workflows)
         if labels:
             self._graph = self._apply_label_filter(self._graph, labels)
+        if job_names:
+            self._graph = self._apply_name_filter(self._graph, job_names)
 
         self._max_label_len = cfg.console_width
         for job in self._graph.nodes:
@@ -213,6 +221,37 @@ class Scheduler:
         for job in graph.nodes:
             if job not in required_jobs:
                 nodes_to_remove.append(job)
+        graph.remove_nodes_from(nodes_to_remove)
+        return graph
+
+    def _apply_name_filter(self, graph: netx.DiGraph, job_names: set[str]) -> netx.DiGraph:
+        """
+        Filter jobs based on job names, including all transitive dependencies.
+        Used for --rerun-failed to re-run failed jobs and their dependencies.
+
+        @param job_names: Set of job names to run (e.g., from previous run's report)
+        """
+        # Find all jobs whose name is in job_names
+        matching_jobs = {job for job in graph.nodes if job.name in job_names}
+
+        # Collect all transitive dependencies of matching jobs
+        required_jobs = set(matching_jobs)
+        to_visit = list(matching_jobs)
+        visited = set()
+
+        while to_visit:
+            current = to_visit.pop(0)
+            if current in visited:
+                continue
+            visited.add(current)
+
+            for predecessor in graph.predecessors(current):
+                if predecessor not in required_jobs:
+                    required_jobs.add(predecessor)
+                    to_visit.append(predecessor)
+
+        # Remove all jobs not in required set
+        nodes_to_remove = [job for job in graph.nodes if job not in required_jobs]
         graph.remove_nodes_from(nodes_to_remove)
         return graph
 
