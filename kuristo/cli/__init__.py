@@ -54,6 +54,11 @@ def build_parser():
         metavar="LABEL",
         help="Filter jobs by label (can be specified multiple times)",
     )
+    run_parser.add_argument(
+        "--rerun-failed",
+        action="store_true",
+        help="Re-run only jobs that failed in the last run (includes their dependencies)",
+    )
     run_parser.add_argument("locations", nargs="*", help="Locations to scan for workflow files")
 
     # Doctor command

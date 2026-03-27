@@ -38,6 +38,7 @@ case $state in
           '--help[Show help message and exit]' \
           '--verbose[Verbose level]:int' \
           '*--label[Filter jobs by label \(can be specified multiple times\)]:label' \
+          '--rerun-failed[Re-run only jobs that failed in the last run \(includes their dependencies\)]' \
           '*:Locations to scan:_files'
         ;;
       doctor)

@@ -66,13 +66,19 @@ class Scheduler:
     """
 
     def __init__(
-        self, workflows: list[Workflow], rcs: Resources, out_dir, labels: list[str] | None = None
+        self,
+        workflows: list[Workflow],
+        rcs: Resources,
+        out_dir,
+        labels: list[str] | None = None,
+        job_names: set[str] | None = None,
     ) -> None:
         """
         @param workflows: [Workflows] List of workflows
         @param rcs: Resources Resource to be scheduled
         @param out_dir: Directory where we write logs
         @param labels: Optional list of labels to filter jobs
+        @param job_names: Optional set of job names to run (e.g., from --rerun-failed)
         @param config: Configuration
         @param job_times_path: File name to store timing report into
         """
@@ -85,12 +91,14 @@ class Scheduler:
         self._graph = self._create_graph(workflows)
         if labels:
             self._graph = self._apply_label_filter(self._graph, labels)
+        if job_names:
+            self._graph = self._apply_name_filter(self._graph, job_names)
 
         self._max_label_len = cfg.console_width
+        self._max_num_width = 1
         for job in self._graph.nodes:
             self._max_label_len = max(self._max_label_len, len(job.name) + 1)
-
-        self._max_id_width = len(str(self._graph.number_of_nodes()))
+            self._max_num_width = max(self._max_num_width, len(str(job.num)))
 
         self._resources = rcs
         if cfg.no_ansi:
@@ -216,6 +224,37 @@ class Scheduler:
         graph.remove_nodes_from(nodes_to_remove)
         return graph
 
+    def _apply_name_filter(self, graph: netx.DiGraph, job_names: set[str]) -> netx.DiGraph:
+        """
+        Filter jobs based on job names, including all transitive dependencies.
+        Used for --rerun-failed to re-run failed jobs and their dependencies.
+
+        @param job_names: Set of job names to run (e.g., from previous run's report)
+        """
+        # Find all jobs whose name is in job_names
+        matching_jobs = {job for job in graph.nodes if job.name in job_names}
+
+        # Collect all transitive dependencies of matching jobs
+        required_jobs = set(matching_jobs)
+        to_visit = list(matching_jobs)
+        visited = set()
+
+        while to_visit:
+            current = to_visit.pop(0)
+            if current in visited:
+                continue
+            visited.add(current)
+
+            for predecessor in graph.predecessors(current):
+                if predecessor not in required_jobs:
+                    required_jobs.add(predecessor)
+                    to_visit.append(predecessor)
+
+        # Remove all jobs not in required set
+        nodes_to_remove = [job for job in graph.nodes if job not in required_jobs]
+        graph.remove_nodes_from(nodes_to_remove)
+        return graph
+
     def _get_ready_jobs(self):
         """
         Find jobs whose dependencies are completed and are still waiting
@@ -234,7 +273,7 @@ class Scheduler:
             for job in ready_jobs:
                 if job.is_skipped:
                     job.skip_process()
-                    ui.status_line(job, "SKIP", self._max_id_width, self._max_label_len)
+                    ui.status_line(job, "SKIP", self._max_num_width, self._max_label_len)
                     self._n_skipped = self._n_skipped + 1
                     continue
 
@@ -253,20 +292,20 @@ class Scheduler:
                         self._tasks[job.num] = task_id
                         job.create_step_tasks(self._progress)
                         job.start()
-                        ui.status_line(job, "STARTING", self._max_id_width, self._max_label_len)
+                        ui.status_line(job, "STARTING", self._max_num_width, self._max_label_len)
 
     def _job_completed(self, job):
         assert isinstance(job, Job)
 
         with self._lock:
             if job.return_code == 0:
-                ui.status_line(job, "PASS", self._max_id_width, self._max_label_len)
+                ui.status_line(job, "PASS", self._max_num_width, self._max_label_len)
                 self._n_success = self._n_success + 1
             elif job.return_code == 124:
-                ui.status_line(job, "TIMEOUT", self._max_id_width, self._max_label_len)
+                ui.status_line(job, "TIMEOUT", self._max_num_width, self._max_label_len)
                 self._n_failed = self._n_failed + 1
             else:
-                ui.status_line(job, "FAIL", self._max_id_width, self._max_label_len)
+                ui.status_line(job, "FAIL", self._max_num_width, self._max_label_len)
                 self._n_failed = self._n_failed + 1
             task_id = self._tasks[job.num]
             self._progress.remove_task(task_id)

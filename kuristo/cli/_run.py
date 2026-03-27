@@ -4,12 +4,28 @@ import yaml
 
 import kuristo.config as config
 import kuristo.utils as utils
+from kuristo.exceptions import UserException
 from kuristo.job import Job
 from kuristo.plugin_loader import load_user_steps_from_kuristo_dir
 from kuristo.resources import Resources
 from kuristo.scanner import scan_locations
 from kuristo.scheduler import Scheduler
 from kuristo.workflow import parse_workflow_files
+
+
+def _get_failed_job_names(log_dir):
+    """
+    Read the latest run's report and return a set of failed job names.
+    Raises UserException if no previous run exists or no jobs failed.
+    """
+    report_path = log_dir / "runs" / "latest" / "report.yaml"
+    if not report_path.exists():
+        raise UserException("No previous run found. Cannot use --rerun-failed.")
+    report = utils.read_report(report_path)
+    failed = {r["job-name"] for r in report.get("results", []) if r.get("status") == "failed"}
+    if not failed:
+        raise UserException("No failed jobs found in the last run.")
+    return failed
 
 
 def create_results(jobs):
@@ -54,6 +70,12 @@ def run_jobs(args):
 
     cfg = config.get()
     out_dir = utils.create_run_output_dir(cfg.log_dir)
+
+    # Get failed job names before updating the "latest" symlink
+    failed_job_names = None
+    if args.rerun_failed:
+        failed_job_names = _get_failed_job_names(cfg.log_dir)
+
     utils.prune_old_runs(cfg.log_dir, cfg.log_history)
     utils.update_latest_symlink(cfg.log_dir, out_dir)
 
@@ -63,7 +85,7 @@ def run_jobs(args):
     workflows = parse_workflow_files(workflow_files)
 
     rcs = Resources()
-    scheduler = Scheduler(workflows, rcs, out_dir, labels=args.labels)
+    scheduler = Scheduler(workflows, rcs, out_dir, labels=args.labels, job_names=failed_job_names)
     scheduler.check()
     scheduler.run_all_jobs()
 
