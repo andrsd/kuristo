@@ -73,7 +73,7 @@ def run_jobs(args):
 
     # Get failed job names before updating the "latest" symlink
     failed_job_names = None
-    if args.rerun_failed:
+    if args.rerun_failed or args.failed_first:
         failed_job_names = _get_failed_job_names(cfg.log_dir)
 
     utils.prune_old_runs(cfg.log_dir, cfg.log_history)
@@ -85,7 +85,14 @@ def run_jobs(args):
     workflows = parse_workflow_files(workflow_files)
 
     rcs = Resources()
-    scheduler = Scheduler(workflows, rcs, out_dir, labels=args.labels, job_names=failed_job_names)
+    scheduler = Scheduler(
+        workflows,
+        rcs,
+        out_dir,
+        labels=args.labels,
+        job_names=failed_job_names if args.rerun_failed else None,
+        priority_job_names=failed_job_names if args.failed_first else None,
+    )
     scheduler.check()
     scheduler.run_all_jobs()
 

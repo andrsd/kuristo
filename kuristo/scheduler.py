@@ -72,6 +72,7 @@ class Scheduler:
         out_dir,
         labels: list[str] | None = None,
         job_names: set[str] | None = None,
+        priority_job_names: set[str] | None = None,
     ) -> None:
         """
         @param workflows: [Workflows] List of workflows
@@ -79,6 +80,7 @@ class Scheduler:
         @param out_dir: Directory where we write logs
         @param labels: Optional list of labels to filter jobs
         @param job_names: Optional set of job names to run (e.g., from --rerun-failed)
+        @param priority_job_names: Optional set of job names to run first (e.g., from --failed-first)
         @param config: Configuration
         @param job_times_path: File name to store timing report into
         """
@@ -87,6 +89,7 @@ class Scheduler:
         self._active_jobs = set()
         self._lock = threading.Lock()
         self._event = threading.Event()
+        self._priority_job_names = priority_job_names or set()
 
         self._graph = self._create_graph(workflows)
         if labels:
@@ -257,7 +260,8 @@ class Scheduler:
 
     def _get_ready_jobs(self):
         """
-        Find jobs whose dependencies are completed and are still waiting
+        Find jobs whose dependencies are completed and are still waiting.
+        If priority_job_names is set, prioritize those jobs first.
         """
         ready_jobs = []
         for job in self._graph.nodes:
@@ -265,6 +269,8 @@ class Scheduler:
                 predecessors = list(self._graph.predecessors(job))
                 if all(dep.status == Job.FINISHED for dep in predecessors):
                     ready_jobs.append(job)
+        if self._priority_job_names:
+            ready_jobs.sort(key=lambda job: job.name not in self._priority_job_names)
         return ready_jobs
 
     def _schedule_next_job(self):

@@ -39,6 +39,7 @@ case $state in
           '--verbose[Verbose level]:int' \
           '*--label[Filter jobs by label \(can be specified multiple times\)]:label' \
           '--rerun-failed[Re-run only jobs that failed in the last run \(includes their dependencies\)]' \
+          '--failed-first[Run jobs that failed in the last run first, then the rest]' \
           '*:Locations to scan:_files'
         ;;
       doctor)
