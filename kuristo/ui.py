@@ -22,11 +22,6 @@ def console() -> Console:
     return _console_instance
 
 
-def set_console(console: Console):
-    global _console_instance
-    _console_instance = console
-
-
 @dataclass
 class RunStats:
     # Number of successful

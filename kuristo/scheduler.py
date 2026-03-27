@@ -103,8 +103,8 @@ class Scheduler:
                 StepCountColumn(),
                 TimeElapsedColumn(),
                 transient=True,
+                console=ui.console(),
             )
-            ui.set_console(self._progress.console)
         # tasks that are executed
         self._tasks = {}
         self._n_success = 0
