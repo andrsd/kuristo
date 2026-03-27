@@ -59,6 +59,11 @@ def build_parser():
         action="store_true",
         help="Re-run only jobs that failed in the last run (includes their dependencies)",
     )
+    run_parser.add_argument(
+        "--failed-first",
+        action="store_true",
+        help="Run jobs that failed in the last run first, then the rest",
+    )
     run_parser.add_argument("locations", nargs="*", help="Locations to scan for workflow files")
 
     # Doctor command
