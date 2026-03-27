@@ -467,7 +467,7 @@ class JobJoiner:
         """
         Return job number
         """
-        return None
+        return 0
 
     @property
     def name(self):
