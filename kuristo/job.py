@@ -463,6 +463,13 @@ class JobJoiner:
         return self._id
 
     @property
+    def num(self):
+        """
+        Return job number
+        """
+        return None
+
+    @property
     def name(self):
         """
         Return job name

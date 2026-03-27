@@ -95,10 +95,10 @@ class Scheduler:
             self._graph = self._apply_name_filter(self._graph, job_names)
 
         self._max_label_len = cfg.console_width
+        self._max_num_width = 1
         for job in self._graph.nodes:
             self._max_label_len = max(self._max_label_len, len(job.name) + 1)
-
-        self._max_id_width = len(str(self._graph.number_of_nodes()))
+            self._max_num_width = max(self._max_num_width, len(str(job.num)))
 
         self._resources = rcs
         if cfg.no_ansi:
@@ -273,7 +273,7 @@ class Scheduler:
             for job in ready_jobs:
                 if job.is_skipped:
                     job.skip_process()
-                    ui.status_line(job, "SKIP", self._max_id_width, self._max_label_len)
+                    ui.status_line(job, "SKIP", self._max_num_width, self._max_label_len)
                     self._n_skipped = self._n_skipped + 1
                     continue
 
@@ -292,20 +292,20 @@ class Scheduler:
                         self._tasks[job.num] = task_id
                         job.create_step_tasks(self._progress)
                         job.start()
-                        ui.status_line(job, "STARTING", self._max_id_width, self._max_label_len)
+                        ui.status_line(job, "STARTING", self._max_num_width, self._max_label_len)
 
     def _job_completed(self, job):
         assert isinstance(job, Job)
 
         with self._lock:
             if job.return_code == 0:
-                ui.status_line(job, "PASS", self._max_id_width, self._max_label_len)
+                ui.status_line(job, "PASS", self._max_num_width, self._max_label_len)
                 self._n_success = self._n_success + 1
             elif job.return_code == 124:
-                ui.status_line(job, "TIMEOUT", self._max_id_width, self._max_label_len)
+                ui.status_line(job, "TIMEOUT", self._max_num_width, self._max_label_len)
                 self._n_failed = self._n_failed + 1
             else:
-                ui.status_line(job, "FAIL", self._max_id_width, self._max_label_len)
+                ui.status_line(job, "FAIL", self._max_num_width, self._max_label_len)
                 self._n_failed = self._n_failed + 1
             task_id = self._tasks[job.num]
             self._progress.remove_task(task_id)
