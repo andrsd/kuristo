@@ -398,15 +398,6 @@ class Job:
         else:
             return ipol_name
 
-    def create_step_tasks(self, progress):
-        self._step_task_ids = {
-            step.name: progress.add_task(f"  ↳ [magenta]{step.name}", total=None, visible=False)
-            for step in self._steps
-        }
-
-    def step_task_id(self, step):
-        return self._step_task_ids.get(step.name)
-
 
 class JobJoiner:
     """
@@ -525,9 +516,6 @@ class JobJoiner:
         Return job status
         """
         return self._status
-
-    def create_step_tasks(self, progress):
-        pass
 
     def start(self):
         self._status = Job.FINISHED
