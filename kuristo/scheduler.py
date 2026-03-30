@@ -23,9 +23,15 @@ from kuristo.workflow import JobSpec, Workflow
 
 
 class StepCountColumn(ProgressColumn):
+    def __init__(self, wd):
+        super().__init__()
+        self._width = wd
+
     def render(self, task) -> Text:
         if task.total is not None:
-            return Text(f"{int(task.completed)}/{int(task.total)}", style=Style(color="green"))
+            completed = f"{int(task.completed):>{self._width}}"
+            total = f"{int(task.total):>{self._width}}"
+            return Text.from_markup(f"[ [green]{completed}/{total}[/] ] ")
         else:
             return Text("")
 
@@ -109,9 +115,11 @@ class Scheduler:
         else:
             self._progress = Progress(
                 SpinnerColumn(),
+                StepCountColumn(self._max_num_width),
+                # TextColumn(" "),
                 TextColumn("[progress.description]{task.description}"),
                 BarColumn(style=Style(color="grey23"), pulse_style=Style(color="grey46")),
-                StepCountColumn(),
+                TextColumn(" "),
                 TimeElapsedColumn(),
                 transient=True,
                 console=ui.console(),
@@ -146,6 +154,12 @@ class Scheduler:
         cfg = config.get()
 
         self._create_out_dir()
+
+        self._total_task_id = self._progress.add_task(
+            Text.from_markup("[cyan]Total progress[/]"),
+            total=self._graph.number_of_nodes(),
+        )
+
         start_time = time.perf_counter()
         with self._progress:
             while any(not job.is_processed for job in self._graph.nodes):
@@ -296,7 +310,6 @@ class Scheduler:
                             total=job.num_steps,
                         )
                         self._tasks[job.num] = task_id
-                        job.create_step_tasks(self._progress)
                         job.start()
                         ui.status_line(job, "STARTING", self._max_num_width, self._max_label_len)
 
@@ -318,6 +331,7 @@ class Scheduler:
             del self._tasks[job.num]
             self._active_jobs.remove(job)
             self._resources.free_cores(job.required_cores)
+            self._progress.update(self._total_task_id, advance=1)
 
     def _check_for_cycles(self):
         """
@@ -364,14 +378,10 @@ class Scheduler:
         return 0
 
     def _on_step_start(self, job, step):
-        step_task_id = job.step_task_id(step)
-        self._progress.update(step_task_id, visible=True)
+        pass
 
     def _on_step_finish(self, job, step):
         assert isinstance(job, Job)
-
-        step_task_id = job.step_task_id(step)
-        self._progress.remove_task(step_task_id)
 
         job_task_num = self._tasks[job.num]
         self._progress.update(job_task_num, advance=1)
