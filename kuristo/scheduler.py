@@ -169,6 +169,8 @@ class Scheduler:
                 self._schedule_next_job()
                 self._event.wait()
                 self._event.clear()
+        for j in self._active_jobs:
+            j.wait()
         end_time = time.perf_counter()
         self._total_runtime = end_time - start_time
         if cfg.no_ansi:
@@ -335,7 +337,6 @@ class Scheduler:
             task_id = self._tasks[job.num]
             self._progress.remove_task(task_id)
             del self._tasks[job.num]
-            self._active_jobs.remove(job)
             self._resources.free_cores(job.required_cores)
             self._progress.update(self._total_task_id, advance=1)
 
