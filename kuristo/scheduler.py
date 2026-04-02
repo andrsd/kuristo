@@ -61,6 +61,9 @@ class NullProgress:
     def stop(self):
         pass
 
+    def refresh(self):
+        pass
+
 
 class Scheduler:
     """
@@ -312,10 +315,13 @@ class Scheduler:
                         self._tasks[job.num] = task_id
                         job.start()
                         ui.status_line(job, "STARTING", self._max_num_width, self._max_label_len)
+        self._progress.refresh()
 
     def _job_completed(self, job):
         assert isinstance(job, Job)
 
+        self._progress.refresh()
+        time.sleep(0.25)
         with self._lock:
             if job.return_code == 0:
                 ui.status_line(job, "PASS", self._max_num_width, self._max_label_len)
@@ -378,13 +384,14 @@ class Scheduler:
         return 0
 
     def _on_step_start(self, job, step):
-        pass
+        self._progress.refresh()
 
     def _on_step_finish(self, job, step):
         assert isinstance(job, Job)
 
         job_task_num = self._tasks[job.num]
         self._progress.update(job_task_num, advance=1)
+        self._progress.refresh()
 
 
 def create_jobs(spec: JobSpec, out_dir: Path, event: threading.Event):
