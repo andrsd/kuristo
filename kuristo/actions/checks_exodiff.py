@@ -1,5 +1,4 @@
 import os
-import shlex
 
 from kuristo.actions.process_action import ProcessAction
 from kuristo.context import Context
@@ -74,7 +73,7 @@ class ExodiffCheck(ProcessAction):
         cmd += self._extra_args
         cmd += [self._ref_path, self._test_path]
 
-        return shlex.join(cmd)
+        return cmd
 
     def run(self) -> int:
         exit_code = super().run()

@@ -1,5 +1,6 @@
 import os
 import re
+import shlex
 import shutil
 import subprocess
 import sys
@@ -283,3 +284,28 @@ def render_job_name(spec: JobSpec, matrix):
         return interpolate_str(spec.id, {"matrix": matrix})
     else:
         return interpolate_str(spec.name, {"matrix": matrix})
+
+
+def determine_shell_use(cmd: str | list):
+    """
+    If `cmd` is a string, we return `cmd` and `True`
+    If `cmd` is a list, we return `cmd and `False`
+
+    The return values can be used in a call to `subprocess.Popen`
+    """
+    if isinstance(cmd, str):
+        return cmd, True
+    else:
+        return cmd, False
+
+
+def make_shell_string(cmd: str | list):
+    """
+    Turn `cmd` into a string if it is a `list`
+
+    Use when you need the commond line as string for string processing
+    """
+    if isinstance(cmd, list):
+        return shlex.join(cmd)
+    else:
+        return cmd
