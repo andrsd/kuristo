@@ -12,8 +12,8 @@ class ExodiffCheck(ProcessAction):
     Run exodiff on two Exodus files.
 
     Parameters:
-        reference (str): Path to gold/reference file (can be prefixed with source: or build:)
-        test (str): Path to test output file (same rules apply)
+        reference (str): Path to gold/reference file
+        test (str): Path to test output file
         rel-tol (float): Relative tolerance
         abs-tol (float): Absolute tolerance
         floor (float): Floor tolerance
