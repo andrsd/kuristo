@@ -207,40 +207,6 @@ def test_create_command_with_absolute_paths(dummy_context):
     assert "/absolute/path/test.e" in cmd
 
 
-def test_create_command_with_source_prefix(dummy_context, temp_dirs):
-    """Test path resolution with source: prefix"""
-    source_root, build_root = temp_dirs
-    check = ExodiffCheck(
-        name="test",
-        context=dummy_context,
-        id=None,
-        reference="source:reference.e",
-        test="test.e",
-        source_root=str(source_root),
-        build_root=str(build_root),
-    )
-    cmd = check.create_command()
-    expected_ref = os.path.join(str(source_root), "reference.e")
-    assert expected_ref in cmd
-
-
-def test_create_command_with_build_prefix(dummy_context, temp_dirs):
-    """Test path resolution with build: prefix"""
-    source_root, build_root = temp_dirs
-    check = ExodiffCheck(
-        name="test",
-        context=dummy_context,
-        id=None,
-        reference="reference.e",
-        test="build:test.e",
-        source_root=str(source_root),
-        build_root=str(build_root),
-    )
-    cmd = check.create_command()
-    expected_test = os.path.join(str(build_root), "test.e")
-    assert expected_test in cmd
-
-
 def test_default_roots_to_cwd(dummy_context):
     """Test that source_root and build_root default to current working directory"""
     check = ExodiffCheck(

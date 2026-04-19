@@ -11,7 +11,7 @@ jobs:
       - name: Run exodiff
         uses: checks/exodiff
         with:
-          reference: source:input_file.inp
-          test: build:result.out
+          reference: input_file.inp
+          test: result.out
           abs-tol: 1e-17
           fail_on_diff: false
