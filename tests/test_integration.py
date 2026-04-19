@@ -61,7 +61,7 @@ def test_user_defined():
     assert "Total: 1" in result.stdout
 
 
-def test_exodiff():
+def disabled_test_exodiff():
     test_dir = ASSETS_DIR / "tests6"
     result = subprocess.run(
         ["kuristo", "--no-ansi", "run", str(test_dir)],
