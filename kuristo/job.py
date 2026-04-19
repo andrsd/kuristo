@@ -287,7 +287,8 @@ class Job:
             self.on_step_start(self, step)
             try:
                 if hasattr(step, "command"):
-                    for line in step.command.splitlines():
+                    cmd = utils.make_shell_string(step.command)
+                    for line in cmd.splitlines():
                         self._logger.script_line(line)
                 exit_code = step.run()
             except Exception as e:

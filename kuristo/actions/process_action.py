@@ -2,6 +2,7 @@ import os
 import subprocess
 from abc import abstractmethod
 
+import kuristo.utils as utils
 from kuristo.actions.action import Action
 from kuristo.context import Context
 
@@ -17,7 +18,7 @@ class ProcessAction(Action):
         self._env = kwargs.get("env", {})
 
     @property
-    def command(self) -> str:
+    def command(self) -> str | list:
         """
         Return command
         """
@@ -29,9 +30,10 @@ class ProcessAction(Action):
         if self.context is not None:
             env.update(self.context.env)
         env.update((var, str(val)) for var, val in self._env.items())
+        cmd, use_shell = utils.determine_shell_use(self.command)
         self._process = subprocess.Popen(
-            self.command,
-            shell=True,
+            cmd,
+            shell=use_shell,
             cwd=self.working_directory,
             env=env,
             stdout=subprocess.PIPE,
@@ -60,7 +62,7 @@ class ProcessAction(Action):
             self._process.kill()
 
     @abstractmethod
-    def create_command(self) -> str:
+    def create_command(self) -> str | list:
         """
         Subclasses must override this method to return the shell command that will be
         executed by this step.

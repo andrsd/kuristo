@@ -1,7 +1,7 @@
 import os
-import shlex
 import subprocess
 
+import kuristo.utils as utils
 from kuristo.actions.process_action import ProcessAction
 from kuristo.context import Context
 from kuristo.exceptions import UserException
@@ -60,7 +60,7 @@ class H5DiffCheck(ProcessAction):
                     f"h5diff: dataset[{i}] ({dataset['path']}) must provide either `rel-tol` or `abs-tol`"
                 )
 
-    def _create_command_for_dataset(self, dataset: dict) -> str:
+    def _create_command_for_dataset(self, dataset: dict) -> list:
         """Create h5diff command for a single dataset"""
         cmd = ["h5diff"]
         cmd += ["-r"]
@@ -77,7 +77,7 @@ class H5DiffCheck(ProcessAction):
         cmd += [self._test_path]
         cmd += [dataset["path"]]
 
-        return shlex.join(cmd)
+        return cmd
 
     def create_command(self):
         """Create command for backward compatibility (single file comparison)"""
@@ -94,7 +94,7 @@ class H5DiffCheck(ProcessAction):
             cmd += [f"--relative={self._rel_tol}"]
         cmd += [self._gold_path]
         cmd += [self._test_path]
-        return shlex.join(cmd)
+        return cmd
 
     def run(self) -> int:
         """Run h5diff comparison(s)"""
@@ -131,13 +131,13 @@ class H5DiffCheck(ProcessAction):
         outputs = []
 
         for dataset in self._datasets:
-            cmd = self._create_command_for_dataset(dataset)
+            cmd, use_shell = utils.determine_shell_use(self._create_command_for_dataset(dataset))
             dataset_path = dataset["path"]
 
             try:
                 process = subprocess.Popen(
                     cmd,
-                    shell=True,
+                    shell=use_shell,
                     cwd=self.working_directory,
                     env=env,
                     stdout=subprocess.PIPE,
