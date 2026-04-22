@@ -1,5 +1,3 @@
-import os
-
 from kuristo.actions.process_action import ProcessAction
 from kuristo.context import Context
 from kuristo.registry import action
@@ -30,8 +28,6 @@ class ExodiffCheck(ProcessAction):
         test=None,
         floor=None,
         extra_args=None,
-        source_root=None,
-        build_root=None,
         fail_on_diff=True,
         **kwargs,
     ):
@@ -40,17 +36,9 @@ class ExodiffCheck(ProcessAction):
             context=context,
             **kwargs,
         )
-        self._source_root = source_root or os.getcwd()
-        self._build_root = build_root or os.getcwd()
 
-        self._ref_path = resolve_path(
-            path_str=reference,
-            build_root=self._build_root,
-            source_root=self._source_root,
-        )
-        self._test_path = resolve_path(
-            path_str=test, build_root=self._build_root, source_root=self._source_root
-        )
+        self._ref_path = resolve_path(reference, self.working_directory)
+        self._test_path = resolve_path(test, self.working_directory)
         self._abs_tol = kwargs.get("abs-tol", None)
         self._rel_tol = kwargs.get("rel-tol", None)
         self._floor = floor

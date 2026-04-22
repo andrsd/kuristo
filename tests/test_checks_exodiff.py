@@ -1,4 +1,3 @@
-import os
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -17,19 +16,12 @@ def dummy_context():
 
 @pytest.fixture
 def temp_dirs(tmp_path):
-    """Create temporary source and build directories with test files"""
-    source_root = tmp_path / "source"
-    build_root = tmp_path / "build"
-    source_root.mkdir()
-    build_root.mkdir()
-
+    """Create temporary directory with test files"""
     # Create dummy test files
-    (source_root / "reference.e").touch()
-    (source_root / "test.e").touch()
-    (build_root / "reference.e").touch()
-    (build_root / "test.e").touch()
+    (tmp_path / "reference.e").touch()
+    (tmp_path / "test.e").touch()
 
-    return source_root, build_root
+    return tmp_path
 
 
 # ===== BASIC COMMAND CREATION TESTS =====
@@ -37,15 +29,13 @@ def temp_dirs(tmp_path):
 
 def test_create_command_basic(dummy_context, temp_dirs):
     """Test basic command creation with just reference and test files"""
-    source_root, build_root = temp_dirs
     check = ExodiffCheck(
         name="test",
         context=dummy_context,
         id=None,
         reference="reference.e",
         test="test.e",
-        source_root=str(source_root),
-        build_root=str(build_root),
+        working_dir=str(temp_dirs),
     )
     cmd = check.create_command()
     assert cmd[0] == "exodiff"
@@ -56,15 +46,13 @@ def test_create_command_basic(dummy_context, temp_dirs):
 
 def test_create_command_with_abs_tol(dummy_context, temp_dirs):
     """Test command creation with absolute tolerance"""
-    source_root, build_root = temp_dirs
     check = ExodiffCheck(
         name="test",
         context=dummy_context,
         id=None,
         reference="reference.e",
         test="test.e",
-        source_root=str(source_root),
-        build_root=str(build_root),
+        working_dir=str(temp_dirs),
         **{"abs-tol": 0.001},
     )
     cmd = check.create_command()
@@ -78,15 +66,13 @@ def test_create_command_with_abs_tol(dummy_context, temp_dirs):
 
 def test_create_command_with_rel_tol(dummy_context, temp_dirs):
     """Test command creation with relative tolerance"""
-    source_root, build_root = temp_dirs
     check = ExodiffCheck(
         name="test",
         context=dummy_context,
         id=None,
         reference="reference.e",
         test="test.e",
-        source_root=str(source_root),
-        build_root=str(build_root),
+        working_dir=str(temp_dirs),
         **{"rel-tol": 0.01},
     )
     cmd = check.create_command()
@@ -100,15 +86,13 @@ def test_create_command_with_rel_tol(dummy_context, temp_dirs):
 
 def test_create_command_with_floor(dummy_context, temp_dirs):
     """Test command creation with floor parameter"""
-    source_root, build_root = temp_dirs
     check = ExodiffCheck(
         name="test",
         context=dummy_context,
         id=None,
         reference="reference.e",
         test="test.e",
-        source_root=str(source_root),
-        build_root=str(build_root),
+        working_dir=str(temp_dirs),
         floor=1e-10,
     )
     cmd = check.create_command()
@@ -121,15 +105,12 @@ def test_create_command_with_floor(dummy_context, temp_dirs):
 
 def test_create_command_with_all_tolerances(dummy_context, temp_dirs):
     """Test command creation with absolute tolerance, relative tolerance, and floor"""
-    source_root, build_root = temp_dirs
     check = ExodiffCheck(
         name="test",
         context=dummy_context,
         id=None,
         reference="reference.e",
         test="test.e",
-        source_root=str(source_root),
-        build_root=str(build_root),
         floor=1e-12,
         **{"abs-tol": 0.001, "rel-tol": 0.01},
     )
@@ -144,15 +125,13 @@ def test_create_command_with_all_tolerances(dummy_context, temp_dirs):
 
 def test_create_command_with_extra_args(dummy_context, temp_dirs):
     """Test command creation with extra arguments"""
-    source_root, build_root = temp_dirs
     check = ExodiffCheck(
         name="test",
         context=dummy_context,
         id=None,
         reference="reference.e",
         test="test.e",
-        source_root=str(source_root),
-        build_root=str(build_root),
+        working_dir=str(temp_dirs),
         extra_args=["--coord-tol", "0.01", "--verbose"],
     )
     cmd = check.create_command()
@@ -166,15 +145,12 @@ def test_create_command_with_extra_args(dummy_context, temp_dirs):
 
 def test_create_command_with_all_parameters(dummy_context, temp_dirs):
     """Test command creation with all parameters"""
-    source_root, build_root = temp_dirs
     check = ExodiffCheck(
         name="test",
         context=dummy_context,
         id=None,
         reference="reference.e",
         test="test.e",
-        source_root=str(source_root),
-        build_root=str(build_root),
         floor=1e-10,
         extra_args=["--verbose"],
         **{"abs-tol": 0.001, "rel-tol": 0.01},
@@ -207,18 +183,6 @@ def test_create_command_with_absolute_paths(dummy_context):
     assert "/absolute/path/test.e" in cmd
 
 
-def test_default_roots_to_cwd(dummy_context):
-    """Test that source_root and build_root default to current working directory"""
-    check = ExodiffCheck(
-        name="test",
-        context=dummy_context,
-        id=None,
-        reference="/absolute/path/reference.e",
-        test="/absolute/path/test.e",
-    )
-    # Since no source_root/build_root provided, they should default to os.getcwd()
-    assert check._source_root == os.getcwd()
-    assert check._build_root == os.getcwd()
 
 
 # ===== RUN BEHAVIOR TESTS =====
@@ -226,15 +190,12 @@ def test_default_roots_to_cwd(dummy_context):
 
 def test_run_returns_zero_on_success(dummy_context, temp_dirs):
     """Test that run returns 0 when exodiff succeeds"""
-    source_root, build_root = temp_dirs
     check = ExodiffCheck(
         name="test",
         context=dummy_context,
         id=None,
         reference="reference.e",
         test="test.e",
-        source_root=str(source_root),
-        build_root=str(build_root),
     )
     with patch("kuristo.actions.process_action.ProcessAction.run", return_value=0):
         result = check.run()
@@ -243,15 +204,12 @@ def test_run_returns_zero_on_success(dummy_context, temp_dirs):
 
 def test_run_returns_exit_code_on_diff_with_fail_on_diff_true(dummy_context, temp_dirs):
     """Test that run returns non-zero exit code when exodiff finds differences and fail_on_diff=True"""
-    source_root, build_root = temp_dirs
     check = ExodiffCheck(
         name="test",
         context=dummy_context,
         id=None,
         reference="reference.e",
         test="test.e",
-        source_root=str(source_root),
-        build_root=str(build_root),
         fail_on_diff=True,
     )
     with patch("kuristo.actions.process_action.ProcessAction.run", return_value=2):
@@ -261,15 +219,12 @@ def test_run_returns_exit_code_on_diff_with_fail_on_diff_true(dummy_context, tem
 
 def test_run_returns_zero_on_diff_with_fail_on_diff_false(dummy_context, temp_dirs):
     """Test that run returns 0 when exodiff finds differences but fail_on_diff=False"""
-    source_root, build_root = temp_dirs
     check = ExodiffCheck(
         name="test",
         context=dummy_context,
         id=None,
         reference="reference.e",
         test="test.e",
-        source_root=str(source_root),
-        build_root=str(build_root),
         fail_on_diff=False,
     )
     with patch("kuristo.actions.process_action.ProcessAction.run", return_value=2):
@@ -279,15 +234,12 @@ def test_run_returns_zero_on_diff_with_fail_on_diff_false(dummy_context, temp_di
 
 def test_run_returns_zero_on_no_diff(dummy_context, temp_dirs):
     """Test that run returns 0 when there are no differences"""
-    source_root, build_root = temp_dirs
     check = ExodiffCheck(
         name="test",
         context=dummy_context,
         id=None,
         reference="reference.e",
         test="test.e",
-        source_root=str(source_root),
-        build_root=str(build_root),
         fail_on_diff=True,
     )
     with patch("kuristo.actions.process_action.ProcessAction.run", return_value=0):
@@ -297,7 +249,6 @@ def test_run_returns_zero_on_no_diff(dummy_context, temp_dirs):
 
 def test_run_with_various_exit_codes_fail_on_diff_true(dummy_context, temp_dirs):
     """Test various exit codes with fail_on_diff=True"""
-    source_root, build_root = temp_dirs
     exit_codes = [1, 2, 5, 127]
     for exit_code in exit_codes:
         check = ExodiffCheck(
@@ -306,8 +257,6 @@ def test_run_with_various_exit_codes_fail_on_diff_true(dummy_context, temp_dirs)
             id=None,
             reference="reference.e",
             test="test.e",
-            source_root=str(source_root),
-            build_root=str(build_root),
             fail_on_diff=True,
         )
         with patch("kuristo.actions.process_action.ProcessAction.run", return_value=exit_code):
@@ -317,7 +266,6 @@ def test_run_with_various_exit_codes_fail_on_diff_true(dummy_context, temp_dirs)
 
 def test_run_with_various_exit_codes_fail_on_diff_false(dummy_context, temp_dirs):
     """Test various exit codes with fail_on_diff=False always returns 0"""
-    source_root, build_root = temp_dirs
     exit_codes = [1, 2, 5, 127]
     for exit_code in exit_codes:
         check = ExodiffCheck(
@@ -326,8 +274,6 @@ def test_run_with_various_exit_codes_fail_on_diff_false(dummy_context, temp_dirs
             id=None,
             reference="reference.e",
             test="test.e",
-            source_root=str(source_root),
-            build_root=str(build_root),
             fail_on_diff=False,
         )
         with patch("kuristo.actions.process_action.ProcessAction.run", return_value=exit_code):
@@ -340,7 +286,6 @@ def test_run_with_various_exit_codes_fail_on_diff_false(dummy_context, temp_dirs
 
 def test_init_stores_all_parameters(dummy_context, temp_dirs):
     """Test that __init__ properly stores all parameters"""
-    source_root, build_root = temp_dirs
     check = ExodiffCheck(
         name="test_check",
         context=dummy_context,
@@ -349,8 +294,6 @@ def test_init_stores_all_parameters(dummy_context, temp_dirs):
         test="test.e",
         floor=1e-10,
         extra_args=["--verbose"],
-        source_root=str(source_root),
-        build_root=str(build_root),
         fail_on_diff=False,
         **{"abs-tol": 0.001, "rel-tol": 0.01},
     )
@@ -359,52 +302,41 @@ def test_init_stores_all_parameters(dummy_context, temp_dirs):
     assert check._rel_tol == 0.01
     assert check._floor == 1e-10
     assert check._extra_args == ["--verbose"]
-    assert check._source_root == str(source_root)
-    assert check._build_root == str(build_root)
     assert check._fail_on_diff is False
 
 
 def test_init_default_fail_on_diff(dummy_context, temp_dirs):
     """Test that fail_on_diff defaults to True"""
-    source_root, build_root = temp_dirs
     check = ExodiffCheck(
         name="test",
         context=dummy_context,
         id=None,
         reference="reference.e",
         test="test.e",
-        source_root=str(source_root),
-        build_root=str(build_root),
     )
     assert check._fail_on_diff is True
 
 
 def test_init_default_extra_args(dummy_context, temp_dirs):
     """Test that extra_args defaults to empty list"""
-    source_root, build_root = temp_dirs
     check = ExodiffCheck(
         name="test",
         context=dummy_context,
         id=None,
         reference="reference.e",
         test="test.e",
-        source_root=str(source_root),
-        build_root=str(build_root),
     )
     assert check._extra_args == []
 
 
 def test_init_default_tolerances(dummy_context, temp_dirs):
     """Test that tolerances default to None"""
-    source_root, build_root = temp_dirs
     check = ExodiffCheck(
         name="test",
         context=dummy_context,
         id=None,
         reference="reference.e",
         test="test.e",
-        source_root=str(source_root),
-        build_root=str(build_root),
     )
     assert check._abs_tol is None
     assert check._rel_tol is None
@@ -416,15 +348,12 @@ def test_init_default_tolerances(dummy_context, temp_dirs):
 
 def test_empty_extra_args(dummy_context, temp_dirs):
     """Test that empty extra_args list doesn't break command creation"""
-    source_root, build_root = temp_dirs
     check = ExodiffCheck(
         name="test",
         context=dummy_context,
         id=None,
         reference="reference.e",
         test="test.e",
-        source_root=str(source_root),
-        build_root=str(build_root),
         extra_args=[],
     )
     cmd = check.create_command()
@@ -434,15 +363,12 @@ def test_empty_extra_args(dummy_context, temp_dirs):
 
 def test_tolerance_zero_is_valid(dummy_context, temp_dirs):
     """Test that tolerance of 0 is valid"""
-    source_root, build_root = temp_dirs
     check = ExodiffCheck(
         name="test",
         context=dummy_context,
         id=None,
         reference="reference.e",
         test="test.e",
-        source_root=str(source_root),
-        build_root=str(build_root),
         **{"abs-tol": 0.0},
     )
     cmd = check.create_command()
@@ -451,15 +377,12 @@ def test_tolerance_zero_is_valid(dummy_context, temp_dirs):
 
 def test_very_small_tolerance(dummy_context, temp_dirs):
     """Test with very small tolerance values"""
-    source_root, build_root = temp_dirs
     check = ExodiffCheck(
         name="test",
         context=dummy_context,
         id=None,
         reference="reference.e",
         test="test.e",
-        source_root=str(source_root),
-        build_root=str(build_root),
         floor=1e-15,
         **{"rel-tol": 1e-12},
     )
@@ -484,15 +407,13 @@ def test_command_with_spaces_in_paths(dummy_context):
 
 def test_command_order_is_consistent(dummy_context, temp_dirs):
     """Test that command always puts reference before test"""
-    source_root, build_root = temp_dirs
     check = ExodiffCheck(
         name="test",
         context=dummy_context,
         id=None,
         reference="reference.e",
         test="test.e",
-        source_root=str(source_root),
-        build_root=str(build_root),
+        working_dir=str(temp_dirs),
         **{"abs-tol": 0.001},
     )
     cmd = check.create_command()
@@ -504,7 +425,6 @@ def test_command_order_is_consistent(dummy_context, temp_dirs):
 
 def test_multiple_extra_args(dummy_context, temp_dirs):
     """Test with multiple extra arguments"""
-    source_root, build_root = temp_dirs
     extra_args = ["-coord-tol", "0.01", "-nodal-tol", "0.02", "-elem-tol", "0.03"]
     check = ExodiffCheck(
         name="test",
@@ -512,8 +432,6 @@ def test_multiple_extra_args(dummy_context, temp_dirs):
         id=None,
         reference="reference.e",
         test="test.e",
-        source_root=str(source_root),
-        build_root=str(build_root),
         extra_args=extra_args,
     )
     cmd = check.create_command()

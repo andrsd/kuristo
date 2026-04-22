@@ -76,7 +76,7 @@ class Action(ABC):
         return self._context
 
     @property
-    def working_directory(self):
+    def working_directory(self) -> str | None:
         """
         Return working directory
         """

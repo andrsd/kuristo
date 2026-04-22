@@ -43,23 +43,22 @@ def get_default_core_limit():
     return os.cpu_count() or 1
 
 
-def resolve_path(path_str, source_root, build_root):
+def resolve_path(path_str: str | None, cwd: str | None):
     """
     Resolve path
+
+    Parameters:
+        path_str (str) Relative or absolute path to resolve
+        cwd (str) Current working directory
     """
+    if path_str is None:
+        raise ValueError("Could not resolve `None` path")
 
     if os.path.isabs(path_str):
         return path_str
 
-    # Heuristic fallback
-    candidate = os.path.join(build_root, path_str)
-    if os.path.exists(candidate):
-        return candidate
-    candidate = os.path.join(source_root, path_str)
-    if os.path.exists(candidate):
-        return candidate
-
-    raise FileNotFoundError(f"Could not resolve path: {path_str}")
+    base = cwd or os.getcwd()
+    return os.path.abspath(os.path.join(base, path_str))
 
 
 def create_run_output_dir(base_log_dir: Path, sub_dir=None) -> Path:
