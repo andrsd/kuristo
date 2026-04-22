@@ -183,8 +183,6 @@ def test_create_command_with_absolute_paths(dummy_context):
     assert "/absolute/path/test.e" in cmd
 
 
-
-
 # ===== RUN BEHAVIOR TESTS =====
 
 
