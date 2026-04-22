@@ -2,7 +2,6 @@ import kuristo.config as config
 from kuristo.actions.process_action import ProcessAction
 from kuristo.context import Context
 from kuristo.registry import action
-from kuristo.utils import interpolate_str
 
 
 @action("core/mpi-run")
@@ -25,11 +24,7 @@ class MPIAction(ProcessAction):
         return self._n_ranks
 
     def create_sub_command(self) -> str:
-        if self.context is None:
-            cmds = self._commands
-        else:
-            cmds = interpolate_str(self._commands, self.context.vars)
-        return cmds
+        return self._commands
 
     def create_command(self):
         cfg = config.get()

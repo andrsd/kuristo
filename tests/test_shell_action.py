@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 from kuristo.actions.shell_action import ShellAction
 from kuristo.context import Context
@@ -10,25 +10,21 @@ def make_context(vars_dict=None):
     return ctx
 
 
-def test_create_command_calls_interpolate_str():
+def test_create_command_returns_preinterpolated_value():
     ctx = make_context({"name": "world"})
-    with patch(
-        "kuristo.actions.shell_action.interpolate_str", return_value="echo world"
-    ) as mock_interp:
-        action = ShellAction("test", ctx, commands="echo {name}")
-        result = action.create_command()
-        mock_interp.assert_called_once_with("echo {name}", ctx.vars)
-        assert result == "echo world"
-
-
-def test_create_command_real_interpolation():
-    # We'll simulate interpolate_str's actual effect for realism
-    # from kuristo.actions.shell_action import interpolate_str
-    ctx = make_context({"name": "Alice"})
-    action = ShellAction("test", ctx, commands="echo ${{name}}")
+    # Command is already interpolated by ActionFactory before being passed to ShellAction
+    action = ShellAction("test", ctx, commands="echo world")
     result = action.create_command()
-    # This assumes interpolate_str uses str.format or similar
-    assert "Alice" in result
+    assert result == "echo world"
+
+
+def test_create_command_with_list_commands():
+    # ShellAction can receive either string or list commands
+    ctx = make_context({})
+    cmd_list = ["echo", "hello", "world"]
+    action = ShellAction("test", ctx, commands=cmd_list)
+    result = action.create_command()
+    assert result == cmd_list
 
 
 def test_create_command_no_context_raises():

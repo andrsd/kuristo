@@ -1,6 +1,7 @@
 from kuristo.actions.shell_action import ShellAction
 from kuristo.exceptions import UserException
 from kuristo.registry import get_action
+from kuristo.utils import interpolate_value
 
 
 class ActionFactory:
@@ -21,6 +22,9 @@ class ActionFactory:
             working_directory = step.working_directory
 
         if step.uses is None:
+            commands = step.run
+            if context is not None:
+                commands = interpolate_value(commands, context.vars)
             return ShellAction(
                 step.name,
                 context,
@@ -28,12 +32,15 @@ class ActionFactory:
                 working_dir=working_directory,
                 timeout_minutes=step.timeout_minutes,
                 continue_on_error=step.continue_on_error,
-                commands=step.run,
+                commands=commands,
                 num_cores=step.num_cores,
                 env=step.env,
             )
         elif get_action(step.uses):
             cls = get_action(step.uses)
+            params = step.params
+            if context is not None:
+                params = interpolate_value(params, context.vars)
             return cls(
                 step.name,
                 context,
@@ -41,7 +48,7 @@ class ActionFactory:
                 working_dir=working_directory,
                 timeout_minutes=step.timeout_minutes,
                 continue_on_error=step.continue_on_error,
-                **step.params,
+                **params,
             )
         else:
             raise UserException(f"Requested unknown action: {step.uses}")
