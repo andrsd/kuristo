@@ -208,6 +208,28 @@ def interpolate_str(text: str, variables: dict) -> str:
     return template.render(**variables)
 
 
+def interpolate_value(value, variables: dict):
+    """
+    Recursively interpolate variables in any value type.
+
+    Supports strings (using Jinja2), lists, and dicts.
+    Other types are returned unchanged.
+    If a variable is undefined, it is replaced with an empty string
+    """
+    if isinstance(value, str):
+        try:
+            return interpolate_str(value, variables)
+        except Exception:
+            # If interpolation fails (undefined variables, etc.), return original
+            return value
+    elif isinstance(value, list):
+        return [interpolate_value(item, variables) for item in value]
+    elif isinstance(value, dict):
+        return {key: interpolate_value(val, variables) for key, val in value.items()}
+    else:
+        return value
+
+
 def minutes_to_hhmmss(minutes: int) -> str:
     """
     Convert minutes into "H:MM:SS"

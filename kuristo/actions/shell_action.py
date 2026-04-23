@@ -1,6 +1,5 @@
 from kuristo.actions.process_action import ProcessAction
 from kuristo.context import Context
-from kuristo.utils import interpolate_str
 
 
 class ShellAction(ProcessAction):
@@ -14,11 +13,7 @@ class ShellAction(ProcessAction):
         self._n_cores = kwargs.get("num_cores", 1)
 
     def create_command(self):
-        if self.context is None:
-            cmds = self._commands
-        else:
-            cmds = interpolate_str(self._commands, self.context.vars)
-        return cmds
+        return self._commands
 
     @property
     def num_cores(self):
