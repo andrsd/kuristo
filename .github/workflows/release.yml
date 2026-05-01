@@ -42,7 +42,7 @@ jobs:
         run: echo "version=${GITHUB_REF_NAME:1}" >> "$GITHUB_OUTPUT"
 
       - name: Create release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           name: ${{ steps.get_version.outputs.version }}
           draft: false
