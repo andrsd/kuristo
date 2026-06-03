@@ -62,8 +62,14 @@ def create_results(jobs):
 
 
 def write_report_yaml(yaml_path: Path, results, total_runtime):
+    from kuristo import __version__
+
     with open(yaml_path, "w") as f:
-        yaml.safe_dump({"results": results, "total-runtime": total_runtime}, f, sort_keys=False)
+        yaml.safe_dump(
+            {"version": __version__, "results": results, "total-runtime": total_runtime},
+            f,
+            sort_keys=False,
+        )
 
 
 def run_jobs(args):
