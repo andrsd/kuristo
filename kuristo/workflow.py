@@ -161,12 +161,15 @@ class JobSpec(BaseModel):
         """
         return self.skip_ is not None
 
-    # @property
-    # def file_name(self):
-    #     """
-    #     Return file name where this job specification was
-    #     """
-    #     return self._file_name
+    @property
+    def file_name(self):
+        """
+        Return file name where this job specification was
+        """
+        return self._file_name
+
+    def set_file_name(self, file_name):
+        self._file_name = file_name
 
     @property
     def skip_reason(self):
@@ -256,6 +259,7 @@ class Workflow(BaseModel):
             wf.set_file_name(file_name)
             for name, job in wf.jobs.items():
                 job.set_id(name)
+                job.set_file_name(file_name)
                 job.set_working_directory(os.path.dirname(os.path.abspath(file_name)))
             return wf
         else:

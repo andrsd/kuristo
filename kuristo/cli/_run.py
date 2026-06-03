@@ -44,6 +44,7 @@ def create_results(jobs):
                     {
                         "id": job.num,
                         "job-name": job.name,
+                        "workflow-file": str(job.spec.file_name),
                         "status": "skipped",
                         "reason": job.skip_reason,
                     }
@@ -53,6 +54,7 @@ def create_results(jobs):
                     {
                         "id": job.num,
                         "job-name": job.name,
+                        "workflow-file": str(job.spec.file_name),
                         "return-code": job.return_code,
                         "status": "success" if job.return_code == 0 else "failed",
                         "duration": round(job.elapsed_time, 3),
