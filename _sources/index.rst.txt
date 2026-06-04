@@ -21,12 +21,12 @@ It is inspired by GitHub Actions, but tailored for scientific computing.
 
    jobs:
      single-case:
-       - name: single case
-         description: Single test case
-         steps:
-           - run: generate_mesh.sh
-           - run: run_simulation --input mesh.exo
-           - run: compare_results reference.csv output.csv
+       name: single case
+       description: Single test case
+       steps:
+         - run: generate_mesh.sh
+         - run: run_simulation --input mesh.exo
+         - run: compare_results reference.csv output.csv
 
 Contents
 --------

@@ -37,11 +37,11 @@ Kuristo workflows are written in YAML. Here's a minimal example:
 
    jobs:
      single-case:
-       - name: simple test
-         steps:
-           - run: ./generate_mesh.sh
-           - run: ./simulate --input mesh.exo
-           - run: ./check_results output.csv
+       name: simple test
+       steps:
+         - run: ./generate_mesh.sh
+         - run: ./simulate --input mesh.exo
+         - run: ./check_results output.csv
 
 Save this as ``kuristo.yml``.
 
