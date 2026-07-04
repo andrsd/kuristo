@@ -1,8 +1,11 @@
 import sys
 import traceback
 
+from rich.text import Text
+
 import kuristo.cli as cli
 import kuristo.config as config
+import kuristo.ui as ui
 from kuristo.exceptions import UserException
 
 
@@ -35,7 +38,7 @@ def main():
         elif args.command == "diff":
             cli.diff(args)
     except UserException as e:
-        print(e)
+        ui.console().print(Text(f"{e}", style="red"))
         if args.debug:
             traceback.print_exc()
         sys.exit(1)
