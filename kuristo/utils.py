@@ -180,25 +180,64 @@ def is_run_tagged(log_dir: Path, run_id: str) -> bool:
     return len(get_tags_for_run(log_dir, run_id)) > 0
 
 
+def get_run_output_dir(log_dir: Path, run_id: str) -> Path:
+    """
+    Get the path to a specific run's output directory.
+    """
+    runs_dir = log_dir / "runs"
+    run_dir = runs_dir / run_id
+    return run_dir
+
+
+def get_latest_run_dirs(log_dir: Path) -> list[Path]:
+    """
+    Get a list of run directories, sorted by modification time (newest first).
+    """
+    runs_dir = log_dir / "runs"
+    if not runs_dir.exists():
+        return []
+    run_dirs = [d for d in runs_dir.iterdir() if d.is_dir() and RUN_DIR_PATTERN.match(d.name)]
+    run_dirs.sort(key=lambda d: d.stat().st_mtime, reverse=True)
+    return run_dirs
+
+
 def resolve_run_id(log_dir: Path, run_id: str) -> str:
     """
-    Resolve a run ID (which may be an alias like a tag) to the actual run ID.
-    If run_id is a tag, follows the symlink to get the actual run ID.
-    Otherwise returns run_id unchanged.
+    Resolve a run ID (which may be an alias like a tag or "latest-N") to the actual run ID.
     """
+    runs_dir = log_dir / "runs"
+
+    # Handle "latest" alias
+    if run_id == "latest":
+        latest_link = runs_dir / "latest"
+        if latest_link.is_symlink():
+            try:
+                return latest_link.resolve().name
+            except Exception:
+                pass  # Broken symlink, fall through to other resolution methods
+
+    # Handle "latest-N" aliases
+    if run_id.startswith("latest-") and run_id[len("latest-") :].isdigit():
+        offset = int(run_id[len("latest-") :])
+        latest_runs = get_latest_run_dirs(log_dir)
+        if offset < len(latest_runs):
+            return latest_runs[offset].name
+        else:
+            raise UserException(
+                f"Run alias '{run_id}' not found (only {len(latest_runs)} runs available)."
+            )
+
+    # Handle tags (symlinks in tags_dir)
     tags_dir = log_dir / "tags"
     tag_path = tags_dir / run_id
-
-    # Check if it's a tag
     if tag_path.is_symlink():
         try:
             target = tag_path.resolve()
             return target.name
         except Exception:
-            # If symlink is broken, return the original input
-            return run_id
+            pass  # Broken symlink, fall through
 
-    # Not a tag, return as-is
+    # If it's none of the above, assume it's a direct run ID
     return run_id
 
 

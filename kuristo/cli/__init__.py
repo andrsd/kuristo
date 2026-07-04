@@ -3,6 +3,7 @@ from pathlib import Path
 
 from kuristo._version import __version__
 from kuristo.cli._batch import batch
+from kuristo.cli._diff import diff
 from kuristo.cli._doctor import print_diag
 from kuristo.cli._list import list_jobs
 from kuristo.cli._log import log
@@ -23,6 +24,7 @@ __all__ = [
     "show",
     "report",
     "tag",
+    "diff",
 ]
 
 
@@ -140,5 +142,10 @@ def build_parser():
     tag_group.add_argument(
         "-l", "--list", dest="list_tags", action="store_true", help="List all tags"
     )
+
+    # Diff command
+    diff_parser = subparsers.add_parser("diff", help="Compare two runs")
+    diff_parser.add_argument("run1", type=str, help="First run ID or tag")
+    diff_parser.add_argument("run2", type=str, help="Second run ID or tag")
 
     return parser
