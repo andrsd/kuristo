@@ -120,7 +120,7 @@ def test_status_missing_report_raises(mock_cfg_get, tmp_path):
     mock_cfg_get.return_value = mock_cfg
 
     args = MagicMock()
-    args.run = None
+    args.run_id = None
 
     with pytest.raises(UserException, match="No report found"):
         status(args)

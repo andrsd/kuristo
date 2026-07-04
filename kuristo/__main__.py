@@ -32,6 +32,8 @@ def main():
             cli.report(args)
         elif args.command == "tag":
             cli.tag(args)
+        elif args.command == "diff":
+            cli.diff(args)
     except UserException as e:
         print(e)
         if args.debug:
