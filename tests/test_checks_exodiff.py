@@ -105,23 +105,18 @@ def test_create_command_with_floor(dummy_context, temp_dirs):
 
 def test_create_command_with_all_tolerances(dummy_context, temp_dirs):
     """Test command creation with absolute tolerance, relative tolerance, and floor"""
-    check = ExodiffCheck(
-        name="test",
-        context=dummy_context,
-        id=None,
-        reference="reference.e",
-        test="test.e",
-        floor=1e-12,
-        **{"abs-tol": 0.001, "rel-tol": 0.01},
-    )
-    cmd = check.create_command()
-    assert cmd.count("-tolerance") == 2
-    assert cmd.count("-absolute") == 1
-    assert cmd.count("-relative") == 1
-    assert "0.001" in cmd
-    assert "0.01" in cmd
-    assert "-Floor" in cmd
-    assert "1e-12" in cmd
+    with pytest.raises(
+        Exception, match="Cannot supply both relative and absolute tolerance at the same time"
+    ):
+        ExodiffCheck(
+            name="test",
+            context=dummy_context,
+            id=None,
+            reference="reference.e",
+            test="test.e",
+            floor=1e-12,
+            **{"abs-tol": 0.001, "rel-tol": 0.01},
+        )
 
 
 def test_create_command_with_extra_args(dummy_context, temp_dirs):
@@ -154,14 +149,13 @@ def test_create_command_with_all_parameters(dummy_context, temp_dirs):
         test="test.e",
         floor=1e-10,
         extra_args=["--verbose"],
-        **{"abs-tol": 0.001, "rel-tol": 0.01},
+        **{"rel-tol": 0.01},
     )
     cmd = check.create_command()
     assert "exodiff" in cmd
     assert "-tolerance" in cmd
-    assert "0.001" in cmd
     assert "0.01" in cmd
-    assert "-absolute" in cmd
+    assert "-absolute" not in cmd
     assert "-Floor" in cmd
     assert "1e-10" in cmd
     assert "--verbose" in cmd
@@ -294,11 +288,11 @@ def test_init_stores_all_parameters(dummy_context, temp_dirs):
         floor=1e-10,
         extra_args=["--verbose"],
         fail_on_diff=False,
-        **{"abs-tol": 0.001, "rel-tol": 0.01},
+        **{"abs-tol": 0.001},
     )
     assert check.name == "test_check"
     assert check._abs_tol == 0.001
-    assert check._rel_tol == 0.01
+    assert check._rel_tol is None
     assert check._floor == 1e-10
     assert check._extra_args == ["--verbose"]
     assert check._fail_on_diff is False
