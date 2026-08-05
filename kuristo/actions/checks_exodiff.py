@@ -53,7 +53,7 @@ class ExodiffCheck(ProcessAction):
             cmd += ["-absolute"]
         if self._rel_tol is not None:
             cmd += ["-tolerance", str(self._rel_tol)]
-            cmd += ["-absolute"]
+            cmd += ["-relative"]
 
         if self._floor is not None:
             cmd += ["-Floor", str(self._floor)]

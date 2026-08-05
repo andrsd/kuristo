@@ -79,7 +79,7 @@ def test_create_command_with_rel_tol(dummy_context, temp_dirs):
     assert "exodiff" in cmd
     assert "-tolerance" in cmd
     assert "0.01" in cmd
-    assert "-absolute" in cmd
+    assert "-relative" in cmd
     assert any("reference.e" in arg for arg in cmd)
     assert any("test.e" in arg for arg in cmd)
 
@@ -116,7 +116,8 @@ def test_create_command_with_all_tolerances(dummy_context, temp_dirs):
     )
     cmd = check.create_command()
     assert cmd.count("-tolerance") == 2
-    assert cmd.count("-absolute") == 2
+    assert cmd.count("-absolute") == 1
+    assert cmd.count("-relative") == 1
     assert "0.001" in cmd
     assert "0.01" in cmd
     assert "-Floor" in cmd
