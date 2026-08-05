@@ -45,6 +45,11 @@ class ExodiffCheck(ProcessAction):
         self._extra_args = extra_args or []
         self._fail_on_diff = fail_on_diff
 
+        if self._abs_tol is not None and self._rel_tol is not None:
+            raise Exception(
+                "checks/exodiff: Cannot supply both relative and absolute tolerance at the same time"
+            )
+
     def create_command(self):
         cmd = ["exodiff"]
 
