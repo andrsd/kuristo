@@ -104,7 +104,6 @@
 <span class="w">      </span><span class="nt">gold</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ref.exo</span>
 <span class="w">      </span><span class="nt">test</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">result.exo</span>
 <span class="w">      </span><span class="nt">abs-tol</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1e-8</span>
-<span class="w">      </span><span class="nt">rel-tol</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1e-6</span>
 </pre></div>
 </div>
 </section>
@@ -119,12 +118,21 @@
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">rel-tol</span></code> (float, optional)</dt><dd><p>Relative difference threshold.</p>
 </dd>
+<dt><code class="docutils literal notranslate"><span class="pre">floor</span></code> (float, optional)</dt><dd><p>Floor tolerance (default 0)</p>
+</dd>
 </dl>
 <div class="admonition-notes admonition">
 <p class="admonition-title">Notes</p>
 <ul class="simple">
 <li><p>This action assumes the input files use compatible mesh topologies and metadata.</p></li>
 <li><p>Uses <code class="docutils literal notranslate"><span class="pre">exodiff</span></code> from SEACAS. Make sure it is on your PATH when running kuristo.</p></li>
+</ul>
+</div>
+<div class="admonition-caution admonition">
+<p class="admonition-title">Caution</p>
+<ul class="simple">
+<li><p>It is <strong>not</strong> possible to supply both relative and absolute tolerance at the same time.
+This is an <code class="docutils literal notranslate"><span class="pre">exodiff</span></code> limitation.</p></li>
 </ul>
 </div>
 <div class="admonition seealso">

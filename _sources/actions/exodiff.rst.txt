@@ -17,7 +17,6 @@ Example Usage
          gold: ref.exo
          test: result.exo
          abs-tol: 1e-8
-         rel-tol: 1e-6
 
 
 Arguments
@@ -35,12 +34,20 @@ Arguments
 ``rel-tol`` (float, optional)
    Relative difference threshold.
 
+``floor`` (float, optional)
+   Floor tolerance (default 0)
 
 
 .. admonition:: Notes
 
    - This action assumes the input files use compatible mesh topologies and metadata.
    - Uses ``exodiff`` from SEACAS. Make sure it is on your PATH when running kuristo.
+
+
+.. admonition:: Caution
+
+   - It is **not** possible to supply both relative and absolute tolerance at the same time.
+     This is an ``exodiff`` limitation.
 
 
 .. seealso::
