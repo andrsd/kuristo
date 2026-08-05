@@ -6,6 +6,8 @@ kuristo.egg-info
 kuristo/_version.py
 .coverage
 .pytest_cache/
+.ruff_cache/
+.cache/
 docs/_build/
 dist/
 htmlcov/
