@@ -160,7 +160,7 @@ class Scheduler:
 
         self._total_task_id = self._progress.add_task(
             Text.from_markup("[cyan]Total progress[/]"),
-            total=self._graph.number_of_nodes(),
+            total=self._get_total_number_of_jobs(),
         )
 
         start_time = time.perf_counter()
@@ -393,6 +393,13 @@ class Scheduler:
         job_task_num = self._tasks[job.num]
         self._progress.update(job_task_num, advance=1)
         self._progress.refresh()
+
+    def _get_total_number_of_jobs(self):
+        n_jobs = 0
+        for job in self._graph.nodes:
+            if isinstance(job, Job):
+                n_jobs += 1
+        return n_jobs
 
 
 def create_jobs(spec: JobSpec, out_dir: Path, event: threading.Event):
