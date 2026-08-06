@@ -26,9 +26,15 @@ def action_instance():
 
 def test_successful_run(action_instance):
     mock_popen = MagicMock()
-    mock_popen.communicate.return_value = (b"output", None)
     mock_popen.returncode = 0
-    with patch("subprocess.Popen", return_value=mock_popen):
+
+    def mock_popen_side_effect(*args, **kwargs):
+        stdout_file = kwargs.get("stdout")
+        if stdout_file:
+            stdout_file.write(b"output")
+        return mock_popen
+
+    with patch("subprocess.Popen", side_effect=mock_popen_side_effect):
         exit_code = action_instance.run()
         assert exit_code == 0
     assert action_instance.output == "output"

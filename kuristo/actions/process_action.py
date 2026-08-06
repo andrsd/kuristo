@@ -1,5 +1,6 @@
 import os
 import subprocess
+import tempfile
 from abc import abstractmethod
 
 import kuristo.utils as utils
@@ -31,31 +32,36 @@ class ProcessAction(Action):
             env.update(self.context.env)
         env.update((var, str(val)) for var, val in self._env.items())
         cmd, use_shell = utils.determine_shell_use(self.command)
-        self._process = subprocess.Popen(
-            cmd,
-            shell=use_shell,
-            cwd=self.working_directory,
-            env=env,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-        )
-        try:
-            stdout, _ = self._process.communicate(timeout=timeout * 60)
-            if self.id is not None:
-                self.context.vars["steps"][self.id] = {"output": stdout.decode()}
-            self.output = stdout
-            return self._process.returncode
+        with tempfile.TemporaryFile() as tmp_file:
+            self._process = subprocess.Popen(
+                cmd,
+                shell=use_shell,
+                cwd=self.working_directory,
+                env=env,
+                stdout=tmp_file,
+                stderr=subprocess.STDOUT,
+            )
+            try:
+                self._process.communicate(timeout=timeout * 60)
 
-        except subprocess.TimeoutExpired:
-            self.terminate()
-            outs, _ = self._process.communicate()
-            outs += b"\n"
-            outs += "Step timed out".encode()
-            self.output = outs
-            return 124
-        except subprocess.SubprocessError:
-            self.output = b""
-            return -1
+                tmp_file.seek(0)
+                stdout = tmp_file.read()
+
+                if self.id is not None:
+                    self.context.vars["steps"][self.id] = {"output": stdout.decode()}
+                self.output = stdout
+                return self._process.returncode
+
+            except subprocess.TimeoutExpired:
+                self.terminate()
+                outs, _ = self._process.communicate()
+                outs += b"\n"
+                outs += "Step timed out".encode()
+                self.output = outs
+                return 124
+            except subprocess.SubprocessError:
+                self.output = b""
+                return -1
 
     def terminate(self):
         if self._process is not None:
