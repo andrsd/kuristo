@@ -2,7 +2,8 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from kuristo.utils import build_filters, human_time, interpolate_str, minutes_to_hhmmss
+from kuristo.exceptions import UserException
+from kuristo.utils import build_filters, human_time, interpolate_str, minutes_to_hhmmss, read_report
 
 
 def test_interpolate_str_vars():
@@ -47,3 +48,33 @@ def test_build_filters():
     args.skipped = True
     args.failed = True
     assert build_filters(args) == ["failed", "skipped", "success"]
+
+
+def test_read_report_success(tmp_path):
+    report_file = tmp_path / "report.yaml"
+    report_file.write_text("""
+total-runtime: 42.5
+results:
+  - id: 1
+    status: success
+""")
+    data = read_report(report_file)
+    assert data["total-runtime"] == 42.5
+    assert data["results"][0]["id"] == 1
+
+
+def test_read_report_not_found(tmp_path):
+    missing_file = tmp_path / "does_not_exist.yaml"
+    with pytest.raises(UserException) as excinfo:
+        read_report(missing_file)
+    assert "Report file not found" in str(excinfo.value)
+
+
+def test_read_report_invalid_yaml(tmp_path):
+    bad_file = tmp_path / "bad.yaml"
+    bad_file.write_text("""
+invalid_yaml: [
+""")
+    with pytest.raises(UserException) as excinfo:
+        read_report(bad_file)
+    assert "Failed to parse report file" in str(excinfo.value)

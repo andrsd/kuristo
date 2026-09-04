@@ -303,8 +303,16 @@ def human_time(seconds: float) -> str:
 
 
 def read_report(path):
-    with open(path, "r") as f:
-        return yaml.safe_load(f)
+    try:
+        with open(path, "r") as f:
+            try:
+                return yaml.safe_load(f)
+            except yaml.YAMLError as exp:
+                raise UserException(f"Failed to parse report file {path}: {exp}")
+    except FileNotFoundError:
+        raise UserException(f"Report file not found: {path}")
+    except OSError as exp:
+        raise UserException(f"Error reading report file {path}: {exp}")
 
 
 def build_filters(args):
