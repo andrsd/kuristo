@@ -279,23 +279,37 @@ def parse_workflow_files(workflow_files: list[Path]) -> list[Workflow]:
 
 
 def workflow_from_file(file_path: Path) -> Workflow | None:
-    location = os.path.dirname(file_path)
-    with open(file_path, "r") as file:
-        data = yaml.safe_load(file)
-        if data is not None:
-            try:
-                workflow = Workflow.from_dict(file_path, data)
-                return workflow
-            except ValidationError as exp:
-                msgs = []
-                n = len(exp.errors())
-                msgs.append(f"{n} syntax error found in {location}:")
-                for error in exp.errors():
-                    loc_str = ".".join(str(p) for p in error["loc"])
-                    msgs.append(f"- {loc_str}: {error['msg']}")
-                raise RuntimeError("\n".join(msgs))
+    try:
+        with open(file_path, "r") as file:
+            data = yaml.safe_load(file)
+    except FileNotFoundError:
+        raise UserException(f"Workflow file not found: {file_path}")
+    except OSError as exp:
+        raise UserException(f"Error reading workflow file {file_path}: {exp}")
+    except yaml.YAMLError as exp:
+        mark = getattr(exp, "problem_mark", None)
+        if mark:
+            line = mark.line + 1
+            column = mark.column + 1
+            err_msg = f"YAML syntax error in {file_path} at line {line}, column {column}:\n{exp}"
         else:
-            return None
+            err_msg = f"YAML parsing error in {file_path}:\n{exp}"
+        raise UserException(err_msg)
+
+    if data is not None:
+        try:
+            workflow = Workflow.from_dict(file_path, data)
+            return workflow
+        except ValidationError as exp:
+            msgs = []
+            n = len(exp.errors())
+            msgs.append(f"{n} syntax error found in {file_path}:")
+            for error in exp.errors():
+                loc_str = ".".join(str(p) for p in error["loc"])
+                msgs.append(f"- {loc_str}: {error['msg']}")
+            raise UserException("\n".join(msgs))
+    else:
+        return None
 
 
 def get_job_ids_for_labels(workflows: list[Workflow], labels: list[str]) -> set[str]:
