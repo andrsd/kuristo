@@ -3,7 +3,14 @@ from unittest.mock import MagicMock
 import pytest
 
 from kuristo.exceptions import UserException
-from kuristo.utils import build_filters, human_time, interpolate_str, minutes_to_hhmmss, read_report
+from kuristo.utils import (
+    build_filters,
+    human_time,
+    interpolate_str,
+    interpolate_value,
+    minutes_to_hhmmss,
+    read_report,
+)
 
 
 def test_interpolate_str_vars():
@@ -78,3 +85,26 @@ invalid_yaml: [
     with pytest.raises(UserException) as excinfo:
         read_report(bad_file)
     assert "Failed to parse report file" in str(excinfo.value)
+
+
+def test_interpolate_value_success():
+    vars = {"foo": "bar"}
+    # String
+    assert interpolate_value("${{ foo }}", vars) == "bar"
+    # List
+    assert interpolate_value(["${{ foo }}", "plain"], vars) == ["bar", "plain"]
+    # Dict
+    assert interpolate_value({"k1": "${{ foo }}", "k2": "plain"}, vars) == {
+        "k1": "bar",
+        "k2": "plain",
+    }
+
+
+def test_interpolate_value_syntax_error_raises():
+    vars = {"foo": "bar"}
+    # Invalid expression with unclosed brackets or mismatched operators
+    bad_expr = "${{ foo + }}"
+    with pytest.raises(UserException) as excinfo:
+        interpolate_value(bad_expr, vars)
+    assert "Jinja template syntax error in expression" in str(excinfo.value)
+    assert "unexpected" in str(excinfo.value).lower()
