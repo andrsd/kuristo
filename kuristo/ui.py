@@ -13,12 +13,15 @@ _console_instance = None
 def console() -> Console:
     global _console_instance
     if _console_instance is None:
-        cfg = config.get()
-        _console_instance = Console(
-            force_terminal=not cfg.no_ansi,
-            no_color=cfg.no_ansi,
-            markup=not cfg.no_ansi,
-        )
+        try:
+            cfg = config.get()
+            _console_instance = Console(
+                force_terminal=not cfg.no_ansi,
+                no_color=cfg.no_ansi,
+                markup=not cfg.no_ansi,
+            )
+        except Exception:
+            _console_instance = Console()
     return _console_instance
 
 
