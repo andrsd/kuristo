@@ -49,3 +49,31 @@ base:
     cfg = Config(path=valid_config_path)
     assert cfg.workflow_filename == "my_custom_workflow.yaml"
     assert cfg.console_width == 120
+
+
+def test_config_validation_error_raises(tmp_path):
+    invalid_type_path = tmp_path / "invalid_type.yaml"
+    invalid_type_path.write_text("""
+base:
+  console-width: "not-an-integer"
+""")
+    with pytest.raises(UserException) as excinfo:
+        Config(path=invalid_type_path)
+    assert "validation error(s) found in configuration file" in str(excinfo.value)
+    assert "console-width" in str(excinfo.value)
+
+
+def test_config_num_cores_validation_fallback(tmp_path, capsys):
+    cores_fallback_path = tmp_path / "cores_fallback.yaml"
+    cores_fallback_path.write_text("""
+resources:
+  num-cores: 9999999
+""")
+    cfg = Config(path=cores_fallback_path)
+    # Since 9999999 > os.cpu_count(), it should fall back to default
+    import kuristo.utils as utils
+
+    assert cfg.num_cores == utils.get_default_core_limit()
+
+    captured = capsys.readouterr()
+    assert "falling back to system default" in captured.out
