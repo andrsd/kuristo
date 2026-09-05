@@ -26,10 +26,7 @@ class ProcessAction(Action):
 
     def run(self) -> int:
         timeout = self.timeout_minutes
-        env = os.environ.copy()
-        if self.context is not None:
-            env.update(self.context.env)
-        env.update((var, str(val)) for var, val in self._env.items())
+        env = self._create_env()
         cmd, use_shell = utils.determine_shell_use(self.command)
         self._process = subprocess.Popen(
             cmd,
@@ -70,3 +67,13 @@ class ProcessAction(Action):
         @return None if the step does not run a command.
         """
         pass
+
+    def _create_env(self):
+        """
+        Create environment for the process we will spawn
+        """
+        env = os.environ.copy()
+        if self.context is not None:
+            env.update(self.context.env)
+        env.update((var, str(val)) for var, val in self._env.items())
+        return env
