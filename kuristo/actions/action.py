@@ -40,6 +40,9 @@ class Action(ABC):
 
     @property
     def num_cores(self) -> int:
+        """
+        Return number of cores needed to run this action
+        """
         return 1
 
     @property
@@ -54,6 +57,9 @@ class Action(ABC):
 
     @output.setter
     def output(self, out):
+        """
+        Set action's output
+        """
         if isinstance(out, str):
             self._output = out
         elif isinstance(out, bytes):
@@ -84,8 +90,16 @@ class Action(ABC):
 
     @property
     def continue_on_error(self):
+        """
+        Return flag indicating if action was marked with `continue-on-error`
+        """
         return self._continue_on_error
 
     @abstractmethod
     def run(self) -> int:
+        """
+        Place to put the actions's code
+
+        Derived classes implement this method
+        """
         pass
