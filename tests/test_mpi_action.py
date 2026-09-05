@@ -35,5 +35,5 @@ def test_create_command_uses_config_and_sub_command(mock_get):
 
     result = action.create_command()
 
-    assert result == "mpirun -np 4 my_mpi_program"
+    assert result == ["mpirun", "-np", "4", "my_mpi_program"]
     mock_get.assert_called_once()

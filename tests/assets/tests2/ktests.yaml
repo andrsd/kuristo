@@ -17,12 +17,14 @@ jobs:
           num-procs: 2
 
   test-C:
-    description: "Another test that will use 4 MPI ranks"
+    description: "Another test that will use 2 MPI ranks"
     steps:
       - name: MPI-2 (b)
-        uses: app-name/mpi
+        uses: core/mpi-run
         with:
           num-procs: 2
+          run: |
+            echo A
 
   test-oversized:
     description: "Oversized test that should never be scheduled"

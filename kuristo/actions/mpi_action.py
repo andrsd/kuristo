@@ -1,3 +1,5 @@
+import shlex
+
 import kuristo.config as config
 from kuristo.actions.process_action import ProcessAction
 from kuristo.context import Context
@@ -28,6 +30,10 @@ class MPIAction(ProcessAction):
 
     def create_command(self):
         cfg = config.get()
-        launcher = cfg.mpi_launcher
-        cmd = self.create_sub_command()
-        return f"{launcher} -np {self._n_ranks} {cmd}"
+        cmd = [cfg.mpi_launcher, "-np", f"{self._n_ranks}"]
+        sub_cmd = self.create_sub_command()
+        if isinstance(sub_cmd, str):
+            cmd += shlex.split(sub_cmd)
+        else:
+            cmd += sub_cmd
+        return cmd
