@@ -77,3 +77,18 @@ resources:
 
     captured = capsys.readouterr()
     assert "falling back to system default" in captured.out
+
+
+def test_ui_console_fallback_when_config_uninitialized_and_broken():
+    from unittest.mock import patch
+
+    import kuristo.ui as ui
+
+    # Reset ui._console_instance so it gets re-initialized
+    ui._console_instance = None
+
+    # Mock config.get to raise a UserException (simulating broken config loading on lazy init)
+    with patch("kuristo.config.get", side_effect=UserException("broken config")):
+        # This should not raise an exception, but fall back to a default Console instance
+        console = ui.console()
+        assert console is not None

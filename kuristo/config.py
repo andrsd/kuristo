@@ -196,7 +196,7 @@ class Config(BaseModel):
 
 
 # Global config instance
-_instance = Config()
+_instance = None
 
 
 def construct(args):
@@ -216,4 +216,7 @@ def get() -> Config:
 
     @return Configuration object
     """
+    global _instance
+    if _instance is None:
+        _instance = Config()
     return _instance
