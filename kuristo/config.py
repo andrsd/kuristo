@@ -14,8 +14,10 @@ class Config:
         config_dir = utils.find_kuristo_root() or Path.cwd()
         if path:
             self.path = Path(path)
+            self._custom_path_provided = True
         else:
             self.path = Path(config_dir / "config.yaml")
+            self._custom_path_provided = False
         self._data = self._load()
 
         self.workflow_filename = self._get("base.workflow-filename", "kuristo.yaml")
@@ -39,9 +41,23 @@ class Config:
     def _load(self):
         try:
             with open(self.path, "r") as f:
-                return yaml.safe_load(f) or {}
+                try:
+                    return yaml.safe_load(f) or {}
+                except yaml.YAMLError as exp:
+                    mark = getattr(exp, "problem_mark", None)
+                    if mark:
+                        line = mark.line + 1
+                        column = mark.column + 1
+                        err_msg = f"Configuration YAML syntax error in {self.path} at line {line}, column {column}:\n{exp}"
+                    else:
+                        err_msg = f"Configuration YAML parsing error in {self.path}:\n{exp}"
+                    raise UserException(err_msg)
         except FileNotFoundError:
+            if self._custom_path_provided:
+                raise UserException(f"Configuration file not found: {self.path}")
             return {}
+        except OSError as exp:
+            raise UserException(f"Error reading configuration file {self.path}: {exp}")
 
     def _get(self, key, default=None):
         parts = key.split(".")

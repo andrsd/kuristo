@@ -8,7 +8,7 @@ from datetime import datetime
 from pathlib import Path
 
 import yaml
-from jinja2 import Template
+from jinja2 import Template, TemplateSyntaxError
 
 from kuristo.exceptions import UserException
 from kuristo.workflow import JobSpec
@@ -258,8 +258,12 @@ def interpolate_value(value, variables: dict):
     if isinstance(value, str):
         try:
             return interpolate_str(value, variables)
+        except TemplateSyntaxError as exp:
+            raise UserException(
+                f"Jinja template syntax error in expression '{value}': {exp.message}"
+            )
         except Exception:
-            # If interpolation fails (undefined variables, etc.), return original
+            # If other interpolation runtime errors fail, return original
             return value
     elif isinstance(value, list):
         return [interpolate_value(item, variables) for item in value]
@@ -303,8 +307,16 @@ def human_time(seconds: float) -> str:
 
 
 def read_report(path):
-    with open(path, "r") as f:
-        return yaml.safe_load(f)
+    try:
+        with open(path, "r") as f:
+            try:
+                return yaml.safe_load(f)
+            except yaml.YAMLError as exp:
+                raise UserException(f"Failed to parse report file {path}: {exp}")
+    except FileNotFoundError:
+        raise UserException(f"Report file not found: {path}")
+    except OSError as exp:
+        raise UserException(f"Error reading report file {path}: {exp}")
 
 
 def build_filters(args):
