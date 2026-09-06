@@ -130,3 +130,18 @@ def job_header_line(job_id, width: int):
     line = hdr + "=" * width
     consol.print(Text.from_markup(f"[grey42]{line}[/]"))
     consol.print(Text.from_markup(""))
+
+
+def truncate_or_pad(s: str, max_length: int) -> str:
+    """
+    Format a string to a specific maximum length.
+    If the string is shorter than max_length, it is right-padded with spaces.
+    If it is longer, it is truncated and appended with '...' such that the total length equals max_length.
+    """
+    if len(s) <= max_length:
+        return s.ljust(max_length)
+    else:
+        if max_length >= 3:
+            return s[: max_length - 3] + "..."
+        else:
+            return s[:max_length]
