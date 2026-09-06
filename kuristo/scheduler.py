@@ -311,7 +311,7 @@ class Scheduler:
                         self._active_jobs.add(job)
                         job_name = ui.job_name_markup(job.name)
                         task_id = self._progress.add_task(
-                            f"[grey58]{job_name}[/]",
+                            f"[grey58]{ui.truncate_or_pad(job_name, self._max_label_len - 66)}[/]",
                             total=job.num_steps,
                         )
                         self._tasks[job.num] = task_id
