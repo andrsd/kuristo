@@ -159,7 +159,7 @@ class Scheduler:
         self._create_out_dir()
 
         self._total_task_id = self._progress.add_task(
-            Text.from_markup("[cyan]Total progress[/]"),
+            "[bold]Total progress[/]",
             total=self._get_total_number_of_jobs(),
         )
 
@@ -311,7 +311,7 @@ class Scheduler:
                         self._active_jobs.add(job)
                         job_name = ui.job_name_markup(job.name)
                         task_id = self._progress.add_task(
-                            Text.from_markup(f"[cyan]{job_name}[/]"),
+                            f"[grey58]{job_name}[/]",
                             total=job.num_steps,
                         )
                         self._tasks[job.num] = task_id
