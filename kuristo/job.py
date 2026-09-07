@@ -4,11 +4,14 @@ import threading
 import time
 from pathlib import Path
 
+import networkx as netx
+
 import kuristo.utils as utils
 from kuristo.action_factory import ActionFactory
 from kuristo.context import Context
 from kuristo.env import Env
-from kuristo.workflow import JobSpec
+from kuristo.exceptions import UserException
+from kuristo.workflow import JobSpec, Workflow
 
 
 class Job:
@@ -77,16 +80,12 @@ class Job:
             for key, value in env.items():
                 self.env(key, value)
 
-    def __init__(
-        self, id, event: threading.Event, job_spec: JobSpec, log_dir: Path, matrix=None
-    ) -> None:
+    def __init__(self, id, job_spec: JobSpec, log_dir: Path, matrix=None) -> None:
         """
-        @param event Signalling event when job status changes
         @param job_spec Job specification
         """
         Job.ID = Job.ID + 1
         self._num = Job.ID
-        self._event = event
         self._spec = job_spec
         self._env_file = log_dir / f"job-{self._num}.env"
         self._path_file = log_dir / f"job-{self._num}.path"
@@ -120,7 +119,7 @@ class Job:
 
     def start(self):
         """
-        Run the job
+        Run the job in a spawned thread
         """
         self._status = Job.RUNNING
         self._thread = threading.Thread(target=self._target)
@@ -130,7 +129,7 @@ class Job:
 
     def wait(self):
         """
-        Wait until the jobs is fnished
+        Wait until the jobs is finished
         """
         if self._thread is not None:
             self._thread.join()
@@ -332,13 +331,11 @@ class Job:
         self._logger.job_end()
         self._status = Job.FINISHED
         self._elapsed_time = 0.0
-        self._event.set()
 
     def _finish_process(self):
         self._status = Job.FINISHED
         self.on_finish(self)
         self._logger.job_end()
-        self._event.set()
 
     def _on_timeout(self):
         """
@@ -348,7 +345,6 @@ class Job:
             if self._active_step is not None:
                 self._cancelled.set()
                 self._active_step.terminate()
-        self._event.set()
 
     def _build_steps(self, spec):
         steps = []
@@ -428,12 +424,10 @@ class JobJoiner:
     The `multiple-job` in the middle is represented by this class.
     """
 
-    def __init__(self, id, event: threading.Event, spec: JobSpec, needs: list) -> None:
+    def __init__(self, id, spec: JobSpec, needs: list) -> None:
         """
-        @param event Signalling event when job status changes
         @param job_spec Job specification
         """
-        self._event = event
         self._id = id
         self._name = id
         self._spec = spec
@@ -520,4 +514,46 @@ class JobJoiner:
 
     def start(self):
         self._status = Job.FINISHED
-        self._event.set()
+
+
+def create_jobs(spec: JobSpec, out_dir: Path):
+    """
+    Create jobs
+
+    @param job Job specification
+    @return List of `Job`s
+    """
+    jobs = []
+    if spec.strategy:
+        needs = []
+        for id, variant in spec.build_matrix_values():
+            j = Job(id, spec, out_dir, matrix=variant)
+            jobs.append(j)
+            needs.append(id)
+        jobs.append(JobJoiner(spec.id, spec, needs))
+    else:
+        jobs.append(Job(spec.id, spec, out_dir))
+    return jobs
+
+
+def create_job_graph(workflows: list[Workflow], out_dir: Path) -> netx.DiGraph:
+    """
+    Create directed graph that captures dependencies between jobs
+    """
+    graph = netx.DiGraph()
+    for wf in workflows:
+        job_map = {}
+        for sp in wf.jobs.values():
+            spec_jobs = create_jobs(sp, out_dir)
+            for job in spec_jobs:
+                graph.add_node(job)
+                job_map[job.id] = job
+
+        for job in job_map.values():
+            for dep_name in job.needs:
+                if dep_name not in job_map:
+                    raise UserException(
+                        f"{wf.file_name}: Job '{job.spec.id}' depends on unknown job '{dep_name}'"
+                    )
+                graph.add_edge(job_map[dep_name], job_map[job.id])
+    return graph

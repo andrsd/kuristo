@@ -3,6 +3,7 @@ from pathlib import Path
 import yaml
 
 import kuristo.config as config
+import kuristo.ui as ui
 import kuristo.utils as utils
 from kuristo.exceptions import UserException
 from kuristo.job import Job
@@ -107,6 +108,8 @@ def run_jobs(args):
     )
     scheduler.check()
     scheduler.run_all_jobs()
+    ui.line(cfg.console_width)
+    scheduler.print_stats()
 
     # Only write report for full runs (not --rerun-failed)
     if not args.rerun_failed:

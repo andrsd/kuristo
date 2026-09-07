@@ -1,4 +1,4 @@
-import threading
+import asyncio
 import time
 from pathlib import Path
 
@@ -16,10 +16,11 @@ from rich.text import Text
 
 import kuristo.config as config
 import kuristo.ui as ui
+import kuristo.utils as utils
 from kuristo.exceptions import UserException
-from kuristo.job import Job, JobJoiner
+from kuristo.job import Job, JobJoiner, create_job_graph
 from kuristo.resources import Resources
-from kuristo.workflow import JobSpec, Workflow
+from kuristo.workflow import Workflow
 
 
 class StepCountColumn(ProgressColumn):
@@ -65,6 +66,37 @@ class NullProgress:
         pass
 
 
+class AsyncResources:
+    """
+    An asynchronous resource manager wrapping Resources that supports non-blocking
+    waits for core allocation.
+    """
+
+    def __init__(self, rcs: Resources) -> None:
+        self._rcs = rcs
+        self._condition = asyncio.Condition()
+        self._waiting_priority = 0
+
+    async def acquire(self, n: int, priority: bool = False):
+        async with self._condition:
+            if priority:
+                self._waiting_priority += 1
+            try:
+                while self._rcs.available_cores < n or (
+                    not priority and self._waiting_priority > 0
+                ):
+                    await self._condition.wait()
+                self._rcs.allocate_cores(n)
+            finally:
+                if priority:
+                    self._waiting_priority -= 1
+
+    async def release(self, n: int):
+        async with self._condition:
+            self._rcs.free_cores(n)
+            self._condition.notify_all()
+
+
 class Scheduler:
     """
     Job scheduler
@@ -95,17 +127,8 @@ class Scheduler:
         """
         cfg = config.get()
         self._out_dir = Path(out_dir)
-        self._active_jobs = set()
-        self._lock = threading.Lock()
-        self._event = threading.Event()
         self._priority_job_nums = priority_job_nums or set()
-
-        self._graph = self._create_graph(workflows)
-        if labels:
-            self._graph = self._apply_label_filter(self._graph, labels)
-        if job_nums:
-            self._graph = self._apply_num_filter(self._graph, job_nums)
-
+        self._graph = self._create_job_graph(workflows, labels, job_nums)
         self._max_label_len = cfg.console_width
         self._max_num_width = 1
         for job in self._graph.nodes:
@@ -119,7 +142,6 @@ class Scheduler:
             self._progress = Progress(
                 SpinnerColumn(),
                 StepCountColumn(self._max_num_width),
-                # TextColumn(" "),
                 TextColumn("[progress.description]{task.description}"),
                 BarColumn(style=Style(color="grey23"), pulse_style=Style(color="grey46")),
                 TextColumn(" "),
@@ -154,8 +176,6 @@ class Scheduler:
         """
         Run all jobs in the queue
         """
-        cfg = config.get()
-
         self._create_out_dir()
 
         self._total_task_id = self._progress.add_task(
@@ -163,49 +183,78 @@ class Scheduler:
             total=self._get_total_number_of_jobs(),
         )
 
+        asyncio.run(self._run_all_jobs_async())
+
+    async def _run_all_jobs_async(self):
+        """
+        Run jobs asynchronously
+        """
+        job_nodes = utils.topological_sort(self._graph)
+        resources_async = AsyncResources(self._resources)
         start_time = time.perf_counter()
+        tasks_dict = {}
         with self._progress:
-            while any(not job.is_processed for job in self._graph.nodes):
-                self._schedule_next_job()
-                self._event.wait()
-                self._event.clear()
-        for j in self._active_jobs:
-            j.wait()
+            for job in job_nodes:
+                tasks_dict[job] = asyncio.create_task(
+                    self._run_job(job, tasks_dict, resources_async)
+                )
+
+            await asyncio.gather(*tasks_dict.values())
         end_time = time.perf_counter()
         self._total_runtime = end_time - start_time
-        if cfg.no_ansi:
-            self._progress.console.print("")
 
-        ui.line(cfg.console_width)
-        ui.stats(
-            ui.RunStats(
-                n_success=self._n_success,
-                n_failed=self._n_failed,
-                n_skipped=self._n_skipped,
+    async def _run_job(self, job, tasks_dict, resources_async):
+        # wait for all dependencies to complete
+        predecessors = list(self._graph.predecessors(job))
+        if predecessors:
+            await asyncio.gather(*[tasks_dict[dep] for dep in predecessors])
+
+        if job.is_skipped:
+            job.skip_process()
+            ui.status_line(job, "SKIP", self._max_num_width, self._max_label_len)
+            self._n_skipped = self._n_skipped + 1
+            return
+
+        if isinstance(job, JobJoiner):
+            job.start()
+            return
+
+        required = job.required_cores
+        # wait for cores
+        await resources_async.acquire(required)
+        try:
+            job_name = ui.job_name_markup(job.name)
+            task_id = self._progress.add_task(
+                f"[grey58]{ui.truncate_or_pad(job_name, self._max_label_len - 66)}[/]",
+                total=job.num_steps,
             )
-        )
-        ui.time(self._total_runtime)
+            self._tasks[job.num] = task_id
 
-    def _create_graph(self, workflows: list[Workflow]) -> netx.DiGraph:
-        graph = netx.DiGraph()
-        for wf in workflows:
-            job_map = {}
-            for sp in wf.jobs.values():
-                spec_jobs = create_jobs(sp, self._out_dir, self._event)
-                for job in spec_jobs:
-                    job.on_finish = self._job_completed
-                    job.on_step_start = self._on_step_start
-                    job.on_step_finish = self._on_step_finish
-                    graph.add_node(job)
-                    job_map[job.id] = job
+            ui.status_line(job, "STARTING", self._max_num_width, self._max_label_len)
 
-            for job in job_map.values():
-                for dep_name in job.needs:
-                    if dep_name not in job_map:
-                        raise UserException(
-                            f"{wf.file_name}: Job '{job.spec.id}' depends on unknown job '{dep_name}'"
-                        )
-                    graph.add_edge(job_map[dep_name], job_map[job.id])
+            job.start()
+            await asyncio.to_thread(job.wait)
+        finally:
+            await resources_async.release(required)
+
+    def _create_job_graph(
+        self,
+        workflows: list[Workflow],
+        labels: list[str] | None = None,
+        job_nums: set[int] | None = None,
+    ) -> netx.DiGraph:
+        """
+        Create directed graph of jobs that will be executed. Graph captures dependencies between jobs.
+        """
+        graph = create_job_graph(workflows, self._out_dir)
+        if labels:
+            graph = self._apply_label_filter(graph, labels)
+        if job_nums:
+            graph = self._apply_num_filter(graph, job_nums)
+        for job in graph.nodes:
+            job.on_finish = self._job_completed
+            job.on_step_start = self._on_step_start
+            job.on_step_finish = self._on_step_finish
         return graph
 
     def _apply_label_filter(self, graph: netx.DiGraph, labels: list[str]) -> netx.DiGraph:
@@ -277,68 +326,30 @@ class Scheduler:
         graph.remove_nodes_from(nodes_to_remove)
         return graph
 
-    def _get_ready_jobs(self):
-        """
-        Find jobs whose dependencies are completed and are still waiting.
-        If priority_job_nums is set, prioritize those jobs first.
-        """
-        ready_jobs = []
-        for job in self._graph.nodes:
-            if job.status == Job.WAITING:
-                predecessors = list(self._graph.predecessors(job))
-                if all(dep.status == Job.FINISHED for dep in predecessors):
-                    ready_jobs.append(job)
-        if self._priority_job_nums:
-            ready_jobs.sort(key=lambda job: job.num not in self._priority_job_nums)
-        return ready_jobs
-
-    def _schedule_next_job(self):
-        with self._lock:
-            ready_jobs = self._get_ready_jobs()
-            for job in ready_jobs:
-                if job.is_skipped:
-                    job.skip_process()
-                    ui.status_line(job, "SKIP", self._max_num_width, self._max_label_len)
-                    self._n_skipped = self._n_skipped + 1
-                    continue
-
-                if isinstance(job, JobJoiner):
-                    job.start()
-                else:
-                    required = job.required_cores
-                    if self._resources.available_cores >= required:
-                        self._resources.allocate_cores(required)
-                        self._active_jobs.add(job)
-                        job_name = ui.job_name_markup(job.name)
-                        task_id = self._progress.add_task(
-                            f"[grey58]{ui.truncate_or_pad(job_name, self._max_label_len - 66)}[/]",
-                            total=job.num_steps,
-                        )
-                        self._tasks[job.num] = task_id
-                        job.start()
-                        ui.status_line(job, "STARTING", self._max_num_width, self._max_label_len)
-        self._progress.refresh()
-
     def _job_completed(self, job):
         assert isinstance(job, Job)
 
-        self._progress.refresh()
-        time.sleep(0.25)
-        with self._lock:
-            if job.return_code == 0:
-                ui.status_line(job, "PASS", self._max_num_width, self._max_label_len)
-                self._n_success = self._n_success + 1
-            elif job.return_code == 124:
-                ui.status_line(job, "TIMEOUT", self._max_num_width, self._max_label_len)
-                self._n_failed = self._n_failed + 1
-            else:
-                ui.status_line(job, "FAIL", self._max_num_width, self._max_label_len)
-                self._n_failed = self._n_failed + 1
-            task_id = self._tasks[job.num]
-            self._progress.remove_task(task_id)
-            del self._tasks[job.num]
-            self._resources.free_cores(job.required_cores)
-            self._progress.update(self._total_task_id, advance=1)
+        try:
+            loop = asyncio.get_running_loop()
+            loop.call_later(0.25, self._job_completed_sync, job)
+        except RuntimeError:
+            time.sleep(0.25)
+            self._job_completed_sync(job)
+
+    def _job_completed_sync(self, job):
+        if job.return_code == 0:
+            ui.status_line(job, "PASS", self._max_num_width, self._max_label_len)
+            self._n_success = self._n_success + 1
+        elif job.return_code == 124:
+            ui.status_line(job, "TIMEOUT", self._max_num_width, self._max_label_len)
+            self._n_failed = self._n_failed + 1
+        else:
+            ui.status_line(job, "FAIL", self._max_num_width, self._max_label_len)
+            self._n_failed = self._n_failed + 1
+        task_id = self._tasks[job.num]
+        self._progress.remove_task(task_id)
+        del self._tasks[job.num]
+        self._progress.update(self._total_task_id, advance=1)
 
     def _check_for_cycles(self):
         """
@@ -378,6 +389,9 @@ class Scheduler:
         self._out_dir.mkdir(parents=True, exist_ok=True)
 
     def exit_code(self, *, strict=False):
+        """
+        Return error code to report back into calling environment
+        """
         if self._n_failed > 0:
             return 1
         if strict and self._n_skipped > 0:
@@ -385,9 +399,20 @@ class Scheduler:
         return 0
 
     def _on_step_start(self, job, step):
-        self._progress.refresh()
+        try:
+            loop = asyncio.get_running_loop()
+            loop.call_soon_threadsafe(self._progress.refresh)
+        except RuntimeError:
+            self._progress.refresh()
 
     def _on_step_finish(self, job, step):
+        try:
+            loop = asyncio.get_running_loop()
+            loop.call_soon_threadsafe(self._on_step_finish_sync, job, step)
+        except RuntimeError:
+            self._on_step_finish_sync(job, step)
+
+    def _on_step_finish_sync(self, job, step):
         assert isinstance(job, Job)
 
         job_task_num = self._tasks[job.num]
@@ -401,23 +426,15 @@ class Scheduler:
                 n_jobs += 1
         return n_jobs
 
-
-def create_jobs(spec: JobSpec, out_dir: Path, event: threading.Event):
-    """
-    Create jobs
-
-    @param job Job specification
-    @param event Event for signaling that job status changed
-    @return List of `Job`s
-    """
-    jobs = []
-    if spec.strategy:
-        needs = []
-        for id, variant in spec.build_matrix_values():
-            j = Job(id, event, spec, out_dir, matrix=variant)
-            jobs.append(j)
-            needs.append(id)
-        jobs.append(JobJoiner(spec.id, event, spec, needs))
-    else:
-        jobs.append(Job(spec.id, event, spec, out_dir))
-    return jobs
+    def print_stats(self):
+        """
+        Print stats and total run time
+        """
+        ui.stats(
+            ui.RunStats(
+                n_success=self._n_success,
+                n_failed=self._n_failed,
+                n_skipped=self._n_skipped,
+            )
+        )
+        ui.time(self._total_runtime)
