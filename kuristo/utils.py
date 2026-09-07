@@ -7,6 +7,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+import networkx as netx
 import yaml
 from jinja2 import Template, TemplateSyntaxError
 
@@ -373,3 +374,16 @@ def make_shell_string(cmd: str | list):
         return shlex.join(cmd)
     else:
         return cmd
+
+
+def topological_sort(graph: netx.DiGraph):
+    """
+    Sort graph nodes topologically
+
+    @param graph Graph to sort
+    @return List of topologically sorted nodes
+    """
+    try:
+        return list(netx.topological_sort(graph))
+    except netx.NetworkXUnfeasible:
+        return list(graph.nodes)
