@@ -51,13 +51,19 @@ def create_results(jobs):
                     }
                 )
             else:
+                if job.return_code == 0:
+                    status = "success"
+                elif job.return_code == 124:
+                    status = "timeout"
+                else:
+                    status = "failed"
                 results.append(
                     {
                         "id": job.num,
                         "job-name": job.name,
                         "workflow-file": str(job.spec.file_name),
                         "return-code": job.return_code,
-                        "status": "success" if job.return_code == 0 else "failed",
+                        "status": status,
                         "duration": round(job.elapsed_time, 3),
                     }
                 )

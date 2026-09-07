@@ -54,8 +54,6 @@ class ProcessAction(Action):
                 outs, _ = self._process.communicate()
                 if outs is None:
                     outs = b""
-                outs += b"\n"
-                outs += "Step timed out".encode()
                 self.output = outs
                 return 124
             except subprocess.SubprocessError:

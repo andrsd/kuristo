@@ -50,7 +50,6 @@ def test_timeout_handling(action_instance):
     with patch("subprocess.Popen", return_value=mock_popen):
         exit_code = action_instance.run()
         assert exit_code == 124
-    assert action_instance.output.endswith("Step timed out")
 
 
 def test_subprocess_error_handling(action_instance):
