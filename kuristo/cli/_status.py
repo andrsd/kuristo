@@ -7,17 +7,18 @@ STATUS_LABELS = {
     "success": "PASS",
     "failed": "FAIL",
     "skipped": "SKIP",
+    "timeout": "TIMEOUT",
 }
 
 
 def summarize(results):
-    counts = {"success": 0, "failed": 0, "skipped": 0}
+    counts = {"success": 0, "failed": 0, "skipped": 0, "timeout": 0}
 
     for r in results:
         status = r["status"]
         counts[status] += 1
 
-    return ui.RunStats(counts["success"], counts["failed"], counts["skipped"])
+    return ui.RunStats(counts["success"], counts["failed"] + counts["timeout"], counts["skipped"])
 
 
 def build_filters(args):
