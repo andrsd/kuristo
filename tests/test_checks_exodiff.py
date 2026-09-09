@@ -33,7 +33,7 @@ def test_create_command_basic(dummy_context, temp_dirs):
         name="test",
         context=dummy_context,
         id=None,
-        reference="reference.e",
+        gold="reference.e",
         test="test.e",
         working_dir=str(temp_dirs),
     )
@@ -50,7 +50,7 @@ def test_create_command_with_abs_tol(dummy_context, temp_dirs):
         name="test",
         context=dummy_context,
         id=None,
-        reference="reference.e",
+        gold="reference.e",
         test="test.e",
         working_dir=str(temp_dirs),
         **{"abs-tol": 0.001},
@@ -70,7 +70,7 @@ def test_create_command_with_rel_tol(dummy_context, temp_dirs):
         name="test",
         context=dummy_context,
         id=None,
-        reference="reference.e",
+        gold="reference.e",
         test="test.e",
         working_dir=str(temp_dirs),
         **{"rel-tol": 0.01},
@@ -90,7 +90,7 @@ def test_create_command_with_floor(dummy_context, temp_dirs):
         name="test",
         context=dummy_context,
         id=None,
-        reference="reference.e",
+        gold="reference.e",
         test="test.e",
         working_dir=str(temp_dirs),
         floor=1e-10,
@@ -112,7 +112,7 @@ def test_create_command_with_all_tolerances(dummy_context, temp_dirs):
             name="test",
             context=dummy_context,
             id=None,
-            reference="reference.e",
+            gold="reference.e",
             test="test.e",
             floor=1e-12,
             **{"abs-tol": 0.001, "rel-tol": 0.01},
@@ -125,10 +125,10 @@ def test_create_command_with_extra_args(dummy_context, temp_dirs):
         name="test",
         context=dummy_context,
         id=None,
-        reference="reference.e",
+        gold="reference.e",
         test="test.e",
         working_dir=str(temp_dirs),
-        extra_args=["--coord-tol", "0.01", "--verbose"],
+        **{"extra-args": ["--coord-tol", "0.01", "--verbose"]},
     )
     cmd = check.create_command()
     assert "exodiff" in cmd
@@ -145,11 +145,10 @@ def test_create_command_with_all_parameters(dummy_context, temp_dirs):
         name="test",
         context=dummy_context,
         id=None,
-        reference="reference.e",
+        gold="reference.e",
         test="test.e",
         floor=1e-10,
-        extra_args=["--verbose"],
-        **{"rel-tol": 0.01},
+        **{"extra-args": ["--verbose"], "rel-tol": 0.01},
     )
     cmd = check.create_command()
     assert "exodiff" in cmd
@@ -170,7 +169,7 @@ def test_create_command_with_absolute_paths(dummy_context):
         name="test",
         context=dummy_context,
         id=None,
-        reference="/absolute/path/reference.e",
+        gold="/absolute/path/reference.e",
         test="/absolute/path/test.e",
     )
     cmd = check.create_command()
@@ -187,7 +186,7 @@ def test_run_returns_zero_on_success(dummy_context, temp_dirs):
         name="test",
         context=dummy_context,
         id=None,
-        reference="reference.e",
+        gold="reference.e",
         test="test.e",
     )
     with patch("kuristo.actions.process_action.ProcessAction.run", return_value=0):
@@ -196,14 +195,14 @@ def test_run_returns_zero_on_success(dummy_context, temp_dirs):
 
 
 def test_run_returns_exit_code_on_diff_with_fail_on_diff_true(dummy_context, temp_dirs):
-    """Test that run returns non-zero exit code when exodiff finds differences and fail_on_diff=True"""
+    """Test that run returns non-zero exit code when exodiff finds differences and fail-on-diff=True"""
     check = ExodiffCheck(
         name="test",
         context=dummy_context,
         id=None,
-        reference="reference.e",
+        gold="reference.e",
         test="test.e",
-        fail_on_diff=True,
+        **{"fail-on-diff": True},
     )
     with patch("kuristo.actions.process_action.ProcessAction.run", return_value=2):
         result = check.run()
@@ -211,14 +210,14 @@ def test_run_returns_exit_code_on_diff_with_fail_on_diff_true(dummy_context, tem
 
 
 def test_run_returns_zero_on_diff_with_fail_on_diff_false(dummy_context, temp_dirs):
-    """Test that run returns 0 when exodiff finds differences but fail_on_diff=False"""
+    """Test that run returns 0 when exodiff finds differences but fail-on-diff=False"""
     check = ExodiffCheck(
         name="test",
         context=dummy_context,
         id=None,
-        reference="reference.e",
+        gold="reference.e",
         test="test.e",
-        fail_on_diff=False,
+        **{"fail-on-diff": False},
     )
     with patch("kuristo.actions.process_action.ProcessAction.run", return_value=2):
         result = check.run()
@@ -231,9 +230,9 @@ def test_run_returns_zero_on_no_diff(dummy_context, temp_dirs):
         name="test",
         context=dummy_context,
         id=None,
-        reference="reference.e",
+        gold="reference.e",
         test="test.e",
-        fail_on_diff=True,
+        **{"fail-on-diff": True},
     )
     with patch("kuristo.actions.process_action.ProcessAction.run", return_value=0):
         result = check.run()
@@ -241,16 +240,16 @@ def test_run_returns_zero_on_no_diff(dummy_context, temp_dirs):
 
 
 def test_run_with_various_exit_codes_fail_on_diff_true(dummy_context, temp_dirs):
-    """Test various exit codes with fail_on_diff=True"""
+    """Test various exit codes with fail-on-diff=True"""
     exit_codes = [1, 2, 5, 127]
     for exit_code in exit_codes:
         check = ExodiffCheck(
             name="test",
             context=dummy_context,
             id=None,
-            reference="reference.e",
+            gold="reference.e",
             test="test.e",
-            fail_on_diff=True,
+            **{"fail-on-diff": True},
         )
         with patch("kuristo.actions.process_action.ProcessAction.run", return_value=exit_code):
             result = check.run()
@@ -258,16 +257,16 @@ def test_run_with_various_exit_codes_fail_on_diff_true(dummy_context, temp_dirs)
 
 
 def test_run_with_various_exit_codes_fail_on_diff_false(dummy_context, temp_dirs):
-    """Test various exit codes with fail_on_diff=False always returns 0"""
+    """Test various exit codes with fail-on-diff=False always returns 0"""
     exit_codes = [1, 2, 5, 127]
     for exit_code in exit_codes:
         check = ExodiffCheck(
             name="test",
             context=dummy_context,
             id=None,
-            reference="reference.e",
+            gold="reference.e",
             test="test.e",
-            fail_on_diff=False,
+            **{"fail-on-diff": False},
         )
         with patch("kuristo.actions.process_action.ProcessAction.run", return_value=exit_code):
             result = check.run()
@@ -283,12 +282,10 @@ def test_init_stores_all_parameters(dummy_context, temp_dirs):
         name="test_check",
         context=dummy_context,
         id="step_1",
-        reference="reference.e",
+        gold="reference.e",
         test="test.e",
         floor=1e-10,
-        extra_args=["--verbose"],
-        fail_on_diff=False,
-        **{"abs-tol": 0.001},
+        **{"extra-args": ["--verbose"], "fail-on-diff": False, "abs-tol": 0.001},
     )
     assert check.name == "test_check"
     assert check._abs_tol == 0.001
@@ -299,12 +296,12 @@ def test_init_stores_all_parameters(dummy_context, temp_dirs):
 
 
 def test_init_default_fail_on_diff(dummy_context, temp_dirs):
-    """Test that fail_on_diff defaults to True"""
+    """Test that fail-on-diff defaults to True"""
     check = ExodiffCheck(
         name="test",
         context=dummy_context,
         id=None,
-        reference="reference.e",
+        gold="reference.e",
         test="test.e",
     )
     assert check._fail_on_diff is True
@@ -316,7 +313,7 @@ def test_init_default_extra_args(dummy_context, temp_dirs):
         name="test",
         context=dummy_context,
         id=None,
-        reference="reference.e",
+        gold="reference.e",
         test="test.e",
     )
     assert check._extra_args == []
@@ -328,7 +325,7 @@ def test_init_default_tolerances(dummy_context, temp_dirs):
         name="test",
         context=dummy_context,
         id=None,
-        reference="reference.e",
+        gold="reference.e",
         test="test.e",
     )
     assert check._abs_tol is None
@@ -345,9 +342,9 @@ def test_empty_extra_args(dummy_context, temp_dirs):
         name="test",
         context=dummy_context,
         id=None,
-        reference="reference.e",
+        gold="reference.e",
         test="test.e",
-        extra_args=[],
+        **{"extra-args": []},
     )
     cmd = check.create_command()
     assert cmd is not None
@@ -360,7 +357,7 @@ def test_tolerance_zero_is_valid(dummy_context, temp_dirs):
         name="test",
         context=dummy_context,
         id=None,
-        reference="reference.e",
+        gold="reference.e",
         test="test.e",
         **{"abs-tol": 0.0},
     )
@@ -374,7 +371,7 @@ def test_very_small_tolerance(dummy_context, temp_dirs):
         name="test",
         context=dummy_context,
         id=None,
-        reference="reference.e",
+        gold="reference.e",
         test="test.e",
         floor=1e-15,
         **{"rel-tol": 1e-12},
@@ -390,7 +387,7 @@ def test_command_with_spaces_in_paths(dummy_context):
         name="test",
         context=dummy_context,
         id=None,
-        reference="/path with spaces/reference.e",
+        gold="/path with spaces/reference.e",
         test="/path with spaces/test.e",
     )
     cmd = check.create_command()
@@ -404,7 +401,7 @@ def test_command_order_is_consistent(dummy_context, temp_dirs):
         name="test",
         context=dummy_context,
         id=None,
-        reference="reference.e",
+        gold="reference.e",
         test="test.e",
         working_dir=str(temp_dirs),
         **{"abs-tol": 0.001},
@@ -423,9 +420,9 @@ def test_multiple_extra_args(dummy_context, temp_dirs):
         name="test",
         context=dummy_context,
         id=None,
-        reference="reference.e",
+        gold="reference.e",
         test="test.e",
-        extra_args=extra_args,
+        **{"extra-args": extra_args},
     )
     cmd = check.create_command()
     for arg in extra_args:
