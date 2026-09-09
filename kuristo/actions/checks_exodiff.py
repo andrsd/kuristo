@@ -10,40 +10,25 @@ class ExodiffCheck(ProcessAction):
     Run exodiff on two Exodus files.
 
     Parameters:
-        reference (str): Path to gold/reference file
+        gold (str): Path to gold/reference file
         test (str): Path to test output file
         rel-tol (float): Relative tolerance
         abs-tol (float): Absolute tolerance
         floor (float): Floor tolerance
-        extra_args (list[str]): Raw args passed to exodiff
-        fail_on_diff (bool): If false, ignore diff return code
+        extra-args (list[str]): Raw args passed to exodiff
+        fail-on-diff (bool): If false, ignore diff return code
     """
 
-    def __init__(
-        self,
-        name,
-        context: Context,
-        id,
-        reference=None,
-        test=None,
-        floor=None,
-        extra_args=None,
-        fail_on_diff=True,
-        **kwargs,
-    ):
-        super().__init__(
-            name=name,
-            context=context,
-            **kwargs,
-        )
+    def __init__(self, name, context: Context, **kwargs):
+        super().__init__(name=name, context=context, **kwargs)
 
-        self._ref_path = resolve_path(reference, self.working_directory)
-        self._test_path = resolve_path(test, self.working_directory)
+        self._gold_path = resolve_path(kwargs["gold"], self.working_directory)
+        self._test_path = resolve_path(kwargs["test"], self.working_directory)
         self._abs_tol = kwargs.get("abs-tol", None)
         self._rel_tol = kwargs.get("rel-tol", None)
-        self._floor = floor
-        self._extra_args = extra_args or []
-        self._fail_on_diff = fail_on_diff
+        self._floor = kwargs.get("floor", None)
+        self._extra_args = kwargs.get("extra-args", [])
+        self._fail_on_diff = kwargs.get("fail-on-diff", True)
 
         if self._abs_tol is not None and self._rel_tol is not None:
             raise Exception(
@@ -64,7 +49,7 @@ class ExodiffCheck(ProcessAction):
             cmd += ["-Floor", str(self._floor)]
 
         cmd += self._extra_args
-        cmd += [self._ref_path, self._test_path]
+        cmd += [self._gold_path, self._test_path]
 
         return cmd
 
