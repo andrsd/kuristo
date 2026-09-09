@@ -333,6 +333,22 @@ def test_init_default_tolerances(dummy_context, temp_dirs):
     assert check._floor is None
 
 
+def test_comapre_file(dummy_context, temp_dirs):
+    """Test that compare-file is set"""
+    check = ExodiffCheck(
+        name="test",
+        context=dummy_context,
+        id=None,
+        gold="reference.e",
+        test="test.e",
+        **{"compare-file": "file.exodiff"},
+    )
+    assert check._abs_tol is None
+    assert check._rel_tol is None
+    assert check._floor is None
+    assert check._compare_file == "file.exodiff"
+
+
 # ===== EDGE CASE TESTS =====
 
 

@@ -17,6 +17,7 @@ class ExodiffCheck(ProcessAction):
         floor (float): Floor tolerance
         extra-args (list[str]): Raw args passed to exodiff
         fail-on-diff (bool): If false, ignore diff return code
+        compare-file (str): Comparison file to use (see `exodiff -help file`)
     """
 
     def __init__(self, name, context: Context, **kwargs):
@@ -29,6 +30,7 @@ class ExodiffCheck(ProcessAction):
         self._floor = kwargs.get("floor", None)
         self._extra_args = kwargs.get("extra-args", [])
         self._fail_on_diff = kwargs.get("fail-on-diff", True)
+        self._compare_file = kwargs.get("compare-file", None)
 
         if self._abs_tol is not None and self._rel_tol is not None:
             raise Exception(
@@ -47,6 +49,9 @@ class ExodiffCheck(ProcessAction):
 
         if self._floor is not None:
             cmd += ["-Floor", str(self._floor)]
+
+        if self._compare_file is not None:
+            cmd += ["-file", str(self._compare_file)]
 
         cmd += self._extra_args
         cmd += [self._gold_path, self._test_path]
